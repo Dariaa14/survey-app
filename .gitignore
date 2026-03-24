@@ -1,52 +1,105 @@
-# Miscellaneous
-*.class
-*.lock
+# =========================
+# GENERAL
+# =========================
 *.log
-*.pyc
+logs
+*.pid
+*.seed
+*.pid.lock
+*.out
+*.err
+*.stackdump
 *.swp
-.buildlog/
-.history
+*.swo
+*~
 
+# =========================
+# ENV FILES
+# =========================
+.env
+.env.*
+!.env.example
 
+# =========================
+# NODE.JS BACKEND
+# =========================
 
-# Flutter repo-specific
+# Dependencies
+node_modules/
+jspm_packages/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.output
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output
+
+# Cache
+.npm
+.eslintcache
+.stylelintcache
+.cache
+.parcel-cache
+.vite/
+*.tsbuildinfo
+
+# Frameworks
+.next
+.nuxt
+.svelte-kit/
+.docusaurus
+.serverless/
+.firebase/
+
+# Misc
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# =========================
+# FLUTTER FRONTEND
+# =========================
+
+# Dart / Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+.pub-cache/
+.pub-preload-cache/
+build/
+**/doc/api/
+**/generated_plugin_registrant.dart
+
+# Flutter system files
 /bin/cache/
 /bin/internal/bootstrap.bat
 /bin/internal/bootstrap.sh
 /bin/mingit/
-/dev/benchmarks/mega_gallery/
-/dev/bots/.recipe_deps
-/dev/bots/android_tools/
-/dev/devicelab/ABresults*.json
-/dev/docs/doc/
-/dev/docs/flutter.docs.zip
-/dev/docs/lib/
-/dev/docs/pubspec.yaml
-/dev/integration_tests/**/xcuserdata
-/dev/integration_tests/**/Pods
-/packages/flutter/coverage/
-version
-analysis_benchmark.json
 
-# packages file containing multi-root paths
-.packages.generated
-
-# Flutter/Dart/Pub related
-**/doc/api/
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-**/generated_plugin_registrant.dart
-.packages
-.pub-preload-cache/
-.pub/
-build/
+# Flutter generated
 flutter_*.png
 linked_*.ds
 unlinked.ds
 unlinked_spec.ds
 
-# Android related
+# Android
 **/android/**/gradle-wrapper.jar
 .gradle/
 **/android/captures/
@@ -57,7 +110,7 @@ unlinked_spec.ds
 **/android/key.properties
 *.jks
 
-# iOS/XCode related
+# iOS
 **/ios/**/*.mode1v3
 **/ios/**/*.mode2v3
 **/ios/**/*.moved-aside
@@ -75,23 +128,15 @@ unlinked_spec.ds
 **/ios/**/xcuserdata
 **/ios/.generated/
 **/ios/Flutter/.last_build_id
-**/ios/Flutter/App.framework
-**/ios/Flutter/Flutter.framework
-**/ios/Flutter/Flutter.podspec
-**/ios/Flutter/Generated.xcconfig
 **/ios/Flutter/ephemeral
 **/ios/Flutter/app.flx
 **/ios/Flutter/app.zip
 **/ios/Flutter/flutter_assets/
-**/ios/Flutter/flutter_export_environment.sh
-**/ios/ServiceDefinitions.json
-**/ios/Runner/GeneratedPluginRegistrant.*
 
 # macOS
-**/Flutter/ephemeral/
-**/Pods/
 **/macos/Flutter/GeneratedPluginRegistrant.swift
 **/macos/Flutter/ephemeral
+**/Pods/
 **/xcuserdata/
 
 # Windows
@@ -107,13 +152,14 @@ unlinked_spec.ds
 # Coverage
 coverage/
 
-# Symbols
-app.*.symbols
+# =========================
+# EDITORS & OS
+# =========================
 
-# Exceptions to above rules.
-!**/ios/**/default.mode1v3
-!**/ios/**/default.mode2v3
-!**/ios/**/default.pbxuser
-!**/ios/**/default.perspectivev3
-!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
-!/dev/ci/**/Gemfile.lock
+.vscode/
+.idea/
+.vscode-test/
+.history
+
+.DS_Store
+Thumbs.db
