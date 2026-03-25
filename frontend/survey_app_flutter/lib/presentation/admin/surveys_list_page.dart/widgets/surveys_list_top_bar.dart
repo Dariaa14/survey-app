@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:survey_app_flutter/shared/custom_primary_button.dart';
+import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
@@ -61,18 +61,20 @@ class SurveysListTopBar extends StatelessWidget {
         final Widget createSurveyButton = isCompact
             ? SizedBox(
                 width: double.infinity,
-                child: CustomPrimaryButton(
+                child: CustomButton(
                   onPressed: () {
                     context.go(AppRoutes.adminSurveyCreatePath());
                   },
                   text: AppStrings.createSurveyButton,
+                  variant: CustomButtonVariant.primary,
                 ),
               )
-            : CustomPrimaryButton(
+            : CustomButton(
                 onPressed: () {
                   context.go(AppRoutes.adminSurveyCreatePath());
                 },
                 text: AppStrings.createSurveyButton,
+                variant: CustomButtonVariant.primary,
               );
 
         return Container(

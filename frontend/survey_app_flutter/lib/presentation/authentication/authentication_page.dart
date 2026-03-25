@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:survey_app_flutter/shared/custom_inverted_button.dart';
-import 'package:survey_app_flutter/shared/custom_primary_button.dart';
+import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/shared/custom_textfield.dart';
 import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
@@ -78,18 +77,19 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                     Row(
                       children: [
                         // Sign Up Button
-                        CustomInvertedButton(
+                        CustomButton(
                           onPressed: () {},
                           text: AppStrings.noAccountButton,
                         ),
 
                         const SizedBox(width: 16),
                         // Login Button
-                        CustomPrimaryButton(
+                        CustomButton(
                           text: AppStrings.loginButton,
                           onPressed: () {
                             context.go(AppRoutes.adminSurveys);
                           },
+                          variant: CustomButtonVariant.primary,
                         ),
                       ],
                     ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/question_builder_page.dart';
-import 'package:survey_app_flutter/shared/custom_inverted_button.dart';
+import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// A widget that displays the questions section of the survey builder page.
@@ -41,7 +41,7 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
               runSpacing: 12,
               alignment: WrapAlignment.end,
               children: [
-                CustomInvertedButton(
+                CustomButton(
                   onPressed: () {
                     showDialog<void>(
                       context: context,
@@ -52,7 +52,7 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
                   },
                   text: '+ ${AppStrings.multiChoiceTab}',
                 ),
-                CustomInvertedButton(
+                CustomButton(
                   onPressed: () {
                     showDialog<void>(
                       context: context,

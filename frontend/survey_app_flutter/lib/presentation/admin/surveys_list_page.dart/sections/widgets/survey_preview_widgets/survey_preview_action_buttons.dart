@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview_widgets/survey_preview_data.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview_widgets/survey_preview_status.dart';
-import 'package:survey_app_flutter/shared/custom_inverted_button.dart';
-import 'package:survey_app_flutter/shared/custom_inverted_red_button.dart';
-import 'package:survey_app_flutter/shared/custom_inverted_secondary_button.dart';
+import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Action buttons for the survey preview widget.
@@ -18,29 +16,31 @@ class SurveyPreviewActionButtons extends StatelessWidget {
     switch (survey.status) {
       case SurveyPreviewStatus.published:
         return [
-          CustomInvertedButton(
+          CustomButton(
             onPressed: () {},
             text: AppStrings.surveyResultsButton,
           ),
-          CustomInvertedRedButton(
+          CustomButton(
             onPressed: () {},
             text: AppStrings.surveyCloseButton,
+            variant: CustomButtonVariant.red,
           ),
         ];
       case SurveyPreviewStatus.draft:
         return [
-          CustomInvertedButton(
+          CustomButton(
             onPressed: () {},
             text: AppStrings.surveyEditButton,
           ),
-          CustomInvertedSecondaryButton(
+          CustomButton(
             onPressed: () {},
             text: AppStrings.surveyPublishButton,
+            variant: CustomButtonVariant.secondary,
           ),
         ];
       case SurveyPreviewStatus.closed:
         return [
-          CustomInvertedButton(
+          CustomButton(
             onPressed: () {},
             text: AppStrings.surveyResultsButton,
           ),

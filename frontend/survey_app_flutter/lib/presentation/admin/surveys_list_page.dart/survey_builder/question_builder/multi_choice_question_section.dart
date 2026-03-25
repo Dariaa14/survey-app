@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/widgets/question_builder_action_buttons.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/widgets/question_limit_input_widget.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/widgets/required_limit_section.dart';
-import 'package:survey_app_flutter/shared/custom_inverted_button.dart';
+import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/shared/custom_textfield.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
@@ -60,7 +60,7 @@ class _MultiChoiceQuestionSectionState
               ),
             ),
             const SizedBox(height: 12),
-            CustomInvertedButton(
+            CustomButton(
               onPressed: () {},
               text: '+ ${AppStrings.addOptionButton}',
             ),

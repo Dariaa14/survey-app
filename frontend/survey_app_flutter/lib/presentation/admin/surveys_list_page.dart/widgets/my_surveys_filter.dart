@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/shared/custom_inverted_gray_button.dart';
-import 'package:survey_app_flutter/shared/custom_inverted_red_button.dart';
-import 'package:survey_app_flutter/shared/custom_inverted_secondary_button.dart';
+import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// A filter widget for the "My Surveys" tab in the admin surveys list page.
@@ -13,21 +11,25 @@ class MySurveysFilter extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final filterButtons = [
-      CustomInvertedGrayButton(
+      CustomButton(
         onPressed: () {},
         text: AppStrings.allFilterButton,
+        variant: CustomButtonVariant.gray,
       ),
-      CustomInvertedGrayButton(
+      CustomButton(
         onPressed: () {},
         text: AppStrings.draftFilterButton,
+        variant: CustomButtonVariant.gray,
       ),
-      CustomInvertedSecondaryButton(
+      CustomButton(
         onPressed: () {},
         text: AppStrings.publishedFilterButton,
+        variant: CustomButtonVariant.secondary,
       ),
-      CustomInvertedRedButton(
+      CustomButton(
         onPressed: () {},
         text: AppStrings.closedFilterButton,
+        variant: CustomButtonVariant.red,
       ),
     ];
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/shared/custom_inverted_button.dart';
-import 'package:survey_app_flutter/shared/custom_primary_button.dart';
+import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Shared action buttons for question builder sections.
@@ -29,13 +28,14 @@ class QuestionBuilderActionButtons extends StatelessWidget {
         spacing: 12,
         runSpacing: 12,
         children: [
-          CustomInvertedButton(
+          CustomButton(
             onPressed: cancelAction,
             text: AppStrings.cancelButton,
           ),
-          CustomPrimaryButton(
+          CustomButton(
             onPressed: onSave,
             text: AppStrings.saveButton,
+            variant: CustomButtonVariant.primary,
           ),
         ],
       ),
