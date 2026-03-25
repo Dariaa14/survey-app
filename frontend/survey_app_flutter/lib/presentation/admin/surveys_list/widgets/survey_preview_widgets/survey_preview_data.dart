@@ -1,4 +1,4 @@
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview_widgets/survey_preview_status.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_status.dart';
 
 /// Data model used by survey preview widgets.
 class SurveyPreviewData {

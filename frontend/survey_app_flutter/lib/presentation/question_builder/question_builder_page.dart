@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/free_text_question_section.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/multi_choice_question_section.dart';
+import 'package:survey_app_flutter/presentation/question_builder/free_text_question_section.dart';
+import 'package:survey_app_flutter/presentation/question_builder/multi_choice_question_section.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';

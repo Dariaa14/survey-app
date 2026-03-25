@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/widgets/question_limit_input_widget.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/widgets/required_checkbox.dart';
+import 'package:survey_app_flutter/presentation/question_builder/widgets/question_limit_input_widget.dart';
+import 'package:survey_app_flutter/presentation/question_builder/widgets/required_checkbox.dart';
 
 /// Shared section combining required checkbox and limit input.
 class RequiredLimitSection extends StatelessWidget {

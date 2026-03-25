@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview_widgets/survey_preview_data.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/sections/survey_builder_details_section.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/sections/survey_builder_questions_section.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_data.dart';
+import 'package:survey_app_flutter/presentation/survey_builder/sections/survey_builder_details_section.dart';
+import 'package:survey_app_flutter/presentation/survey_builder/sections/survey_builder_questions_section.dart';
 
 /// A page for building and editing surveys in the admin section.
 class SurveyBuilderPage extends StatefulWidget {

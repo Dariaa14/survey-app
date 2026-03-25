@@ -1,8 +1,8 @@
 import 'package:go_router/go_router.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview_widgets/survey_preview_data.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/survey_builder_page.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/surveys_list_page.dart';
+import 'package:survey_app_flutter/presentation/admin/admin_main_page.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_data.dart';
 import 'package:survey_app_flutter/presentation/authentication/authentication_page.dart';
+import 'package:survey_app_flutter/presentation/survey_builder/survey_builder_page.dart';
 
 /// Route path constants used across the app.
 abstract final class AppRoutes {
@@ -39,7 +39,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.adminSurveys,
-      builder: (context, state) => const SurveysListPage(),
+      builder: (context, state) => const AdminMainPage(),
     ),
     GoRoute(
       path: AppRoutes.adminSurveyCreate,

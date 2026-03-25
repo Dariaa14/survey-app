@@ -6,9 +6,9 @@ import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// A top bar widget for the surveys list page in the admin section.
-class SurveysListTopBar extends StatelessWidget {
-  /// Constructs a [SurveysListTopBar].
-  const SurveysListTopBar({
+class AdminTopBar extends StatelessWidget {
+  /// Constructs a [AdminTopBar].
+  const AdminTopBar({
     required this.onTabSelected,
     required this.selectedTabIndex,
     super.key,

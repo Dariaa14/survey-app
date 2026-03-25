@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview_widgets/survey_preview_data.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview_widgets/survey_preview_status.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/widgets/my_surveys_filter.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_data.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_status.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/surveys_filter.dart';
 
 /// A section that displays the list of surveys created by the admin.
-class MySurveysListSection extends StatelessWidget {
-  /// Constructs a [MySurveysListSection].
-  const MySurveysListSection({super.key});
+class SurveyListPage extends StatelessWidget {
+  /// Constructs a [SurveyListPage].
+  const SurveyListPage({super.key});
 
   List<SurveyPreviewData> _mockSurveys() {
     return const [
@@ -53,7 +53,7 @@ class MySurveysListSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const MySurveysFilter(),
+        const SurveysFilter(),
         const SizedBox(height: 24),
         ...surveys.map(
           (survey) => Padding(

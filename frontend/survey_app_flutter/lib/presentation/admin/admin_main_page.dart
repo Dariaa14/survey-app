@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/my_surveys_list_section.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/widgets/surveys_list_top_bar.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list/survey_list_page.dart';
+import 'package:survey_app_flutter/presentation/admin/widgets/admin_top_bar.dart';
 
-/// A page that displays the list of surveys for the admin.
-class SurveysListPage extends StatefulWidget {
-  /// Constructs a [SurveysListPage].
-  const SurveysListPage({super.key});
+/// A page that displays the admin main interface, including the surveys list
+/// and other admin sections.
+class AdminMainPage extends StatefulWidget {
+  /// Constructs a [AdminMainPage].
+  const AdminMainPage({super.key});
 
   @override
-  State<SurveysListPage> createState() => _SurveysListPageState();
+  State<AdminMainPage> createState() => _AdminMainPageState();
 }
 
-class _SurveysListPageState extends State<SurveysListPage> {
+class _AdminMainPageState extends State<AdminMainPage> {
   int _selectedTabIndex = 0;
 
   @override
@@ -24,7 +25,7 @@ class _SurveysListPageState extends State<SurveysListPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SurveysListTopBar(
+                AdminTopBar(
                   onTabSelected: (index) {
                     setState(() {
                       _selectedTabIndex = index;
@@ -34,7 +35,7 @@ class _SurveysListPageState extends State<SurveysListPage> {
                 ),
                 if (_selectedTabIndex == 0) ...[
                   const SizedBox(height: 24),
-                  const MySurveysListSection(),
+                  const SurveyListPage(),
                 ],
               ],
             ),
