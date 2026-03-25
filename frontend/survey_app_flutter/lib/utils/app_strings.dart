@@ -96,6 +96,10 @@ class AppStrings {
   /// The label for the question text field.
   static const String questionTextLabel = "Textul întrebării";
 
+  /// Placeholder for the question text input.
+  static const String questionTextPlaceholder =
+      "Ex: Ce funcționalitate ai folosit cel mai mult?";
+
   /// The label for the "Required" checkbox.
   static const String requiredLabel = "Required";
 
@@ -111,6 +115,15 @@ class AppStrings {
   /// The label for the maximum numbers of options field in the multi-choice
   /// question builder.
   static const String maxOptionsLabel = "Selecții maxime";
+
+  /// Placeholder for maximum selections input.
+  static const String maxOptionsPlaceholder = "Ex: 2";
+
+  /// The label for max character length in free-text question builder.
+  static const String maxCharactersLabel = "Lungime maximă caractere";
+
+  /// Placeholder for max character length input.
+  static const String maxCharactersPlaceholder = "Ex: 1000";
 
   /// The label for the number of options field in the multi-choice question
   /// builder.

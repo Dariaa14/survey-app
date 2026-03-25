@@ -27,6 +27,7 @@ class RequiredCheckbox extends StatelessWidget {
         Checkbox(
           value: isRequired,
           onChanged: (value) => onChanged(required: value),
+          activeColor: colorScheme.secondary,
         ),
         Text(
           AppStrings.requiredLabel,

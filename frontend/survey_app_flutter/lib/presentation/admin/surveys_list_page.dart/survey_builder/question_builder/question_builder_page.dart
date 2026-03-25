@@ -98,10 +98,15 @@ class _QuestionBuilderPageState extends State<QuestionBuilderPage> {
               ),
               const SizedBox(height: 24),
               Expanded(
-                child: SingleChildScrollView(
-                  child: _isMultiChoiceSelected
-                      ? const MultiChoiceQuestionSection()
-                      : const FreeTextQuestionSection(),
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(
+                    context,
+                  ).copyWith(scrollbars: false),
+                  child: SingleChildScrollView(
+                    child: _isMultiChoiceSelected
+                        ? const MultiChoiceQuestionSection()
+                        : const FreeTextQuestionSection(),
+                  ),
                 ),
               ),
             ],

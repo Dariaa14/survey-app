@@ -40,7 +40,9 @@ class _MultiChoiceQuestionSectionState
               ),
             ),
             const SizedBox(height: 8),
-            const CustomTextfield(),
+            const CustomTextfield(
+              hintText: AppStrings.questionTextPlaceholder,
+            ),
             const SizedBox(height: 16),
             if (isCompact)
               Column(
