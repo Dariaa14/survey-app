@@ -145,6 +145,9 @@ class AppStrings {
   /// The text for the "Add Option" button in the multi-choice question builder.
   static const String addOptionButton = "Adaugă opțiune";
 
+  /// The text for adding a new question from questions preview list.
+  static const String addQuestionButton = "Adaugă întrebare";
+
   /// The text for the "Cancel" button in the question builder.
   static const String cancelButton = "Anulează";
 

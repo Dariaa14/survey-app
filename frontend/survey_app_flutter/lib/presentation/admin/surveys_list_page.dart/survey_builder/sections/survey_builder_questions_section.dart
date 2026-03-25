@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/question_builder_page.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/sections/questions_widgets/add_question_dashed_button.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/sections/questions_widgets/question_preview.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/sections/questions_widgets/question_preview_data.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
@@ -75,6 +76,17 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 12),
             child: QuestionPreview(question: q),
           ),
+        ),
+        const SizedBox(height: 4),
+        AddQuestionDashedButton(
+          onTap: () {
+            showDialog<void>(
+              context: context,
+              builder: (context) => const QuestionBuilderPage(
+                initialIsMultiChoiceSelected: true,
+              ),
+            );
+          },
         ),
       ],
     );
