@@ -6,7 +6,21 @@ import 'package:survey_app_flutter/utils/app_strings.dart';
 /// A widget that displays the details section of the survey builder page.
 class SurveyBuilderDetailsSection extends StatelessWidget {
   /// Constructs a [SurveyBuilderDetailsSection].
-  const SurveyBuilderDetailsSection({super.key});
+  const SurveyBuilderDetailsSection({
+    required this.surveyTitleController,
+    required this.surveyDescriptionController,
+    required this.surveySlugController,
+    super.key,
+  });
+
+  /// Controller for the survey title text field.
+  final TextEditingController surveyTitleController;
+
+  /// Controller for the survey description text field.
+  final TextEditingController surveyDescriptionController;
+
+  /// Controller for the survey slug text field.
+  final TextEditingController surveySlugController;
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +44,9 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        const CustomTextfield(
+        CustomTextfield(
           hintText: AppStrings.surveyTitlePlaceholder,
+          controller: surveyTitleController,
         ),
         const SizedBox(height: 16),
         Text(
@@ -41,8 +56,9 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        const CustomTextfield(
+        CustomTextfield(
           hintText: AppStrings.surveyDescriptionPlaceholder,
+          controller: surveyDescriptionController,
           minLines: 3,
           maxLines: 3,
         ),
@@ -56,6 +72,7 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
         const SizedBox(height: 8),
         CustomTextfield(
           hintText: AppStrings.surveySlugPlaceholder,
+          controller: surveySlugController,
           textColor: colorScheme.secondary,
         ),
         const SizedBox(height: 8),

@@ -4,7 +4,9 @@ import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sec
 class SurveyPreviewData {
   /// Constructs a [SurveyPreviewData].
   const SurveyPreviewData({
+    required this.id,
     required this.title,
+    required this.description,
     required this.slug,
     required this.questionCount,
     required this.createdAt,
@@ -13,8 +15,14 @@ class SurveyPreviewData {
     this.submitRate,
   });
 
+  /// Unique survey identifier.
+  final int id;
+
   /// Survey title.
   final String title;
+
+  /// Survey description.
+  final String description;
 
   /// URL slug.
   final String slug;

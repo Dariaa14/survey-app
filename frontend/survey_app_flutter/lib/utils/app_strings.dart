@@ -70,6 +70,16 @@ class AppStrings {
   /// Action label for publishing a draft survey.
   static const String surveyPublishButton = "Publică";
 
+    /// Confirmation message shown before closing a survey.
+    static const String surveyCloseConfirmMessage =
+            "Ești sigur? Respondenții nu vor mai putea accesa sondajul.";
+
+    /// Confirmation option for closing a survey.
+    static const String yesOption = "Da";
+
+    /// Cancellation option for closing a survey.
+    static const String noOption = "Nu";
+
   // Create/edit survey page:
   /// The title for the survey details section.
   static const String surveyDetailsTitle = "Detalii sondaj";

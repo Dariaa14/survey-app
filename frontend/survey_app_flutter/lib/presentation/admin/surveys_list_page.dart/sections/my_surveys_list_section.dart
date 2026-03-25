@@ -12,7 +12,10 @@ class MySurveysListSection extends StatelessWidget {
   List<SurveyPreviewData> _mockSurveys() {
     return const [
       SurveyPreviewData(
+        id: 1,
         title: 'Feedback produs nou',
+        description:
+            'Colectam pareri despre noul nostru produs lansat luna aceasta.',
         slug: 'feedback-produs-nou',
         questionCount: 7,
         createdAt: '12 martie 2026',
@@ -21,14 +24,20 @@ class MySurveysListSection extends StatelessWidget {
         submitRate: 63,
       ),
       SurveyPreviewData(
+        id: 2,
         title: 'Satisfactie clienti B2B',
+        description:
+            'Evaluam nivelul de satisfactie al clientilor business pentru a imbunatati serviciile oferite.',
         slug: 'satisfactie-clienti-b2b',
         questionCount: 5,
         createdAt: '05 martie 2026',
         status: SurveyPreviewStatus.draft,
       ),
       SurveyPreviewData(
+        id: 3,
         title: 'Retrospectiva campanie iarna',
+        description:
+            'Analizam performanta campaniei de iarna pentru a identifica punctele de îmbunătățire.',
         slug: 'retrospectiva-campanie-iarna',
         questionCount: 9,
         createdAt: '14 februarie 2026',

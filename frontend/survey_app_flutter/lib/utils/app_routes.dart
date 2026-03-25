@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview_widgets/survey_preview_data.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/survey_builder_page.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/surveys_list_page.dart';
 import 'package:survey_app_flutter/presentation/authentication/authentication_page.dart';
@@ -46,9 +47,13 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.adminSurveyEdit,
-      builder: (context, state) => SurveyBuilderPage(
-        surveyId: state.pathParameters['surveyId']!,
-      ),
+      builder: (context, state) {
+        final survey = state.extra is SurveyPreviewData
+            ? state.extra as SurveyPreviewData?
+            : null;
+
+        return SurveyBuilderPage(survey: survey);
+      },
     ),
   ],
 );

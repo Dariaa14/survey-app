@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview_widgets/survey_preview_data.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview_widgets/survey_preview_status.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
+import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Action buttons for the survey preview widget.
@@ -12,7 +14,30 @@ class SurveyPreviewActionButtons extends StatelessWidget {
   /// Survey data used to determine visible action buttons.
   final SurveyPreviewData survey;
 
-  List<Widget> _buttonsForStatus() {
+  Future<void> _showCloseSurveyDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: const Text(AppStrings.surveyCloseConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text(AppStrings.noOption),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text(AppStrings.yesOption),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buttonsForStatus(BuildContext context) {
     switch (survey.status) {
       case SurveyPreviewStatus.published:
         return [
@@ -21,7 +46,9 @@ class SurveyPreviewActionButtons extends StatelessWidget {
             text: AppStrings.surveyResultsButton,
           ),
           CustomButton(
-            onPressed: () {},
+            onPressed: () {
+              _showCloseSurveyDialog(context);
+            },
             text: AppStrings.surveyCloseButton,
             variant: CustomButtonVariant.red,
           ),
@@ -29,7 +56,12 @@ class SurveyPreviewActionButtons extends StatelessWidget {
       case SurveyPreviewStatus.draft:
         return [
           CustomButton(
-            onPressed: () {},
+            onPressed: () {
+              context.go(
+                AppRoutes.adminSurveyEditPath(survey.id.toString()),
+                extra: survey,
+              );
+            },
             text: AppStrings.surveyEditButton,
           ),
           CustomButton(
@@ -50,7 +82,7 @@ class SurveyPreviewActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buttons = _buttonsForStatus();
+    final buttons = _buttonsForStatus(context);
 
     return Row(
       mainAxisSize: MainAxisSize.min,

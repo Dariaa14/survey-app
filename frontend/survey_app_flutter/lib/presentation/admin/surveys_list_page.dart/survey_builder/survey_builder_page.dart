@@ -1,14 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/sections/widgets/survey_preview_widgets/survey_preview_data.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/sections/survey_builder_details_section.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/sections/survey_builder_questions_section.dart';
 
 /// A page for building and editing surveys in the admin section.
-class SurveyBuilderPage extends StatelessWidget {
+class SurveyBuilderPage extends StatefulWidget {
   /// Constructs a [SurveyBuilderPage].
-  const SurveyBuilderPage({this.surveyId, super.key});
+  const SurveyBuilderPage({this.survey, super.key});
 
-  /// The id of the survey being edited. Null when creating a new survey.
-  final String? surveyId;
+  /// Optional full survey payload passed from navigation.
+  final SurveyPreviewData? survey;
+
+  @override
+  State<SurveyBuilderPage> createState() => _SurveyBuilderPageState();
+}
+
+class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
+  late TextEditingController _surveyTitleController;
+  late TextEditingController _surveyDescriptionController;
+  late TextEditingController _surveySlugController;
+
+  @override
+  void initState() {
+    super.initState();
+    _surveyTitleController = TextEditingController(
+      text: widget.survey?.title ?? '',
+    );
+    _surveyDescriptionController = TextEditingController(
+      text: widget.survey?.description ?? '',
+    );
+    _surveySlugController = TextEditingController(
+      text: widget.survey?.slug ?? '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _surveyTitleController.dispose();
+    _surveyDescriptionController.dispose();
+    _surveySlugController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,18 +66,28 @@ class SurveyBuilderPage extends StatelessWidget {
                             color: Theme.of(context).colorScheme.outline,
                           ),
                           const SizedBox(height: 16),
-                          const SurveyBuilderDetailsSection(),
+                          SurveyBuilderDetailsSection(
+                            surveyTitleController: _surveyTitleController,
+                            surveyDescriptionController:
+                                _surveyDescriptionController,
+                            surveySlugController: _surveySlugController,
+                          ),
                         ],
                       )
-                    : const Row(
+                    : Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
                             width: 360,
-                            child: SurveyBuilderDetailsSection(),
+                            child: SurveyBuilderDetailsSection(
+                              surveyTitleController: _surveyTitleController,
+                              surveyDescriptionController:
+                                  _surveyDescriptionController,
+                              surveySlugController: _surveySlugController,
+                            ),
                           ),
-                          SizedBox(width: 24),
-                          SurveyBuilderQuestionsSection(),
+                          const SizedBox(width: 24),
+                          const SurveyBuilderQuestionsSection(),
                         ],
                       ),
               ),
