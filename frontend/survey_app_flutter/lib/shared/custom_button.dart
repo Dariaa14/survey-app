@@ -1,87 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/utils/theme.dart';
-
-/// The visual variant used by [CustomButton].
-enum CustomButtonVariant {
-  /// Filled primary style.
-  primary,
-
-  /// Default outlined neutral style.
-  normal,
-
-  /// Secondary tinted outlined style.
-  secondary,
-
-  /// Destructive outlined red style.
-  red,
-
-  /// Gray outlined style.
-  gray,
-}
+import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 
 /// A generic custom button widget for the Survey App.
 class CustomButton extends StatelessWidget {
   /// Constructs a [CustomButton].
   const CustomButton({
     required this.onPressed,
-    required this.text,
-    this.variant = CustomButtonVariant.normal,
+    this.text,
+    this.child,
+    this.variant = CustomColorVariant.normal,
     super.key,
-  });
+  }) : assert(text != null || child != null);
 
   /// Callback when the button is pressed.
   final VoidCallback onPressed;
 
   /// The text displayed on the button.
-  final String text;
+  final String? text;
+
+  /// Optional custom widget displayed in the button.
+  final Widget? child;
 
   /// The visual style variant for the button.
-  final CustomButtonVariant variant;
-
-  Color? _backgroundColor(ColorScheme colorScheme) {
-    switch (variant) {
-      case CustomButtonVariant.primary:
-        return colorScheme.primary;
-      case CustomButtonVariant.normal:
-        return null;
-      case CustomButtonVariant.secondary:
-        return colorScheme.secondaryContainer;
-      case CustomButtonVariant.red:
-        return redContainer;
-      case CustomButtonVariant.gray:
-        return colorScheme.surfaceContainer;
-    }
-  }
-
-  Color _borderColor(ColorScheme colorScheme) {
-    switch (variant) {
-      case CustomButtonVariant.primary:
-        return colorScheme.primary;
-      case CustomButtonVariant.normal:
-        return colorScheme.outline;
-      case CustomButtonVariant.secondary:
-        return colorScheme.secondary;
-      case CustomButtonVariant.red:
-        return colorScheme.error;
-      case CustomButtonVariant.gray:
-        return colorScheme.outline;
-    }
-  }
-
-  Color _textColor(ColorScheme colorScheme) {
-    switch (variant) {
-      case CustomButtonVariant.primary:
-        return colorScheme.onPrimary;
-      case CustomButtonVariant.normal:
-        return colorScheme.onSurfaceVariant;
-      case CustomButtonVariant.secondary:
-        return colorScheme.secondary;
-      case CustomButtonVariant.red:
-        return colorScheme.error;
-      case CustomButtonVariant.gray:
-        return colorScheme.onSurfaceVariant;
-    }
-  }
+  final CustomColorVariant variant;
 
   @override
   Widget build(BuildContext context) {
@@ -90,21 +31,24 @@ class CustomButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        backgroundColor: _backgroundColor(colorScheme),
-        side: BorderSide(color: _borderColor(colorScheme)),
+        backgroundColor: backgroundColor(colorScheme, variant),
+        foregroundColor: textColor(colorScheme, variant),
+        side: BorderSide(color: borderColor(colorScheme, variant)),
         padding: const EdgeInsets.all(20),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: _textColor(colorScheme),
-        ),
-      ),
+      child:
+          child ??
+          Text(
+            text!,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: textColor(colorScheme, variant),
+            ),
+          ),
     );
   }
 }

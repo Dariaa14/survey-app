@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
+import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/shared/custom_textfield.dart';
 import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
@@ -89,7 +90,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                           onPressed: () {
                             context.go(AppRoutes.adminSurveys);
                           },
-                          variant: CustomButtonVariant.primary,
+                          variant: CustomColorVariant.primary,
                         ),
                       ],
                     ),

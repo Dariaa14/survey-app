@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
+import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// A filter widget for the "My Surveys" tab in the admin surveys list page.
@@ -14,22 +15,22 @@ class MySurveysFilter extends StatelessWidget {
       CustomButton(
         onPressed: () {},
         text: AppStrings.allFilterButton,
-        variant: CustomButtonVariant.gray,
+        variant: CustomColorVariant.gray,
       ),
       CustomButton(
         onPressed: () {},
         text: AppStrings.draftFilterButton,
-        variant: CustomButtonVariant.gray,
+        variant: CustomColorVariant.gray,
       ),
       CustomButton(
         onPressed: () {},
         text: AppStrings.publishedFilterButton,
-        variant: CustomButtonVariant.secondary,
+        variant: CustomColorVariant.invertedSecondary,
       ),
       CustomButton(
         onPressed: () {},
         text: AppStrings.closedFilterButton,
-        variant: CustomButtonVariant.red,
+        variant: CustomColorVariant.invertedRed,
       ),
     ];
 

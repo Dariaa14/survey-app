@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
+import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Shared action buttons for question builder sections.
@@ -35,7 +36,7 @@ class QuestionBuilderActionButtons extends StatelessWidget {
           CustomButton(
             onPressed: onSave,
             text: AppStrings.saveButton,
-            variant: CustomButtonVariant.primary,
+            variant: CustomColorVariant.primary,
           ),
         ],
       ),

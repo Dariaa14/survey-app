@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/question_builder_page.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/sections/questions_widgets/question_preview.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/sections/questions_widgets/question_preview_data.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
@@ -67,6 +69,13 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: 20),
+        ..._mockQuestions().map(
+          (q) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: QuestionPreview(question: q),
+          ),
+        ),
       ],
     );
 
@@ -75,5 +84,26 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
     }
 
     return Expanded(child: content);
+  }
+
+  List<QuestionPreviewData> _mockQuestions() {
+    return [
+      QuestionPreviewData(
+        title: 'Care este culoarea ta preferată?',
+        id: 1,
+        type: QuestionType.multipleChoice,
+        required: true,
+      ),
+      QuestionPreviewData(
+        title: 'Ce părere ai despre produsul nostru?',
+        id: 2,
+        type: QuestionType.freeText,
+      ),
+      QuestionPreviewData(
+        title: 'Cât de des folosești produsul nostru?',
+        id: 3,
+        type: QuestionType.multipleChoice,
+      ),
+    ];
   }
 }

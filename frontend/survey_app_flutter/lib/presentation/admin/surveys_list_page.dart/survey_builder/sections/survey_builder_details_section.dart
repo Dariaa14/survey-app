@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
+import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/shared/custom_textfield.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
@@ -106,7 +107,7 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
           child: CustomButton(
             onPressed: () {},
             text: '🚀   ${AppStrings.publishSurveyButton}',
-            variant: CustomButtonVariant.primary,
+            variant: CustomColorVariant.primary,
           ),
         ),
       ],

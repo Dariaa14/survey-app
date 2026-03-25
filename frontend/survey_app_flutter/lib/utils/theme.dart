@@ -12,8 +12,8 @@ ColorScheme darkColorScheme = const ColorScheme.dark(
   secondary: Color.fromARGB(255, 94, 240, 180),
   secondaryContainer: Color.fromARGB(255, 30, 48, 45),
 
-  tertiary: Color.fromARGB(255, 27, 34, 44),
-  onTertiary: Color.fromARGB(255, 119, 184, 213),
+  tertiary: Color.fromARGB(255, 119, 184, 213),
+  tertiaryContainer: Color.fromARGB(255, 44, 50, 60),
 
   surfaceContainer: Color.fromARGB(255, 30, 30, 36),
   surface: Color.fromARGB(255, 17, 17, 21),

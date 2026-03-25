@@ -70,15 +70,15 @@ class AppStrings {
   /// Action label for publishing a draft survey.
   static const String surveyPublishButton = "Publică";
 
-    /// Confirmation message shown before closing a survey.
-    static const String surveyCloseConfirmMessage =
-            "Ești sigur? Respondenții nu vor mai putea accesa sondajul.";
+  /// Confirmation message shown before closing a survey.
+  static const String surveyCloseConfirmMessage =
+      "Ești sigur? Respondenții nu vor mai putea accesa sondajul.";
 
-    /// Confirmation option for closing a survey.
-    static const String yesOption = "Da";
+  /// Confirmation option for closing a survey.
+  static const String yesOption = "Da";
 
-    /// Cancellation option for closing a survey.
-    static const String noOption = "Nu";
+  /// Cancellation option for closing a survey.
+  static const String noOption = "Nu";
 
   // Create/edit survey page:
   /// The title for the survey details section.
@@ -139,6 +139,9 @@ class AppStrings {
   /// The label for the "Required" checkbox.
   static const String requiredLabel = "Required";
 
+  /// The label for optional question state.
+  static const String optionalLabel = "Optional";
+
   /// The text for the "Add Option" button in the multi-choice question builder.
   static const String addOptionButton = "Adaugă opțiune";
 
@@ -147,6 +150,17 @@ class AppStrings {
 
   /// The text for the "Save" button in the question builder.
   static const String saveButton = "Salvează";
+
+  /// The label for edit button in question preview.
+  static const String questionPreviewEditButton = "Edit";
+
+  /// Formats the max selections text in question preview.
+  static String questionPreviewMaxSelections(int value) =>
+      "max $value selecții";
+
+  /// Formats the max characters text in question preview.
+  static String questionPreviewMaxCharacters(int value) =>
+      "max $value caractere";
 
   /// The label for the maximum numbers of options field in the multi-choice
   /// question builder.

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
+import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
@@ -66,7 +67,7 @@ class SurveysListTopBar extends StatelessWidget {
                     context.go(AppRoutes.adminSurveyCreatePath());
                   },
                   text: AppStrings.createSurveyButton,
-                  variant: CustomButtonVariant.primary,
+                  variant: CustomColorVariant.primary,
                 ),
               )
             : CustomButton(
@@ -74,7 +75,7 @@ class SurveysListTopBar extends StatelessWidget {
                   context.go(AppRoutes.adminSurveyCreatePath());
                 },
                 text: AppStrings.createSurveyButton,
-                variant: CustomButtonVariant.primary,
+                variant: CustomColorVariant.primary,
               );
 
         return Container(
