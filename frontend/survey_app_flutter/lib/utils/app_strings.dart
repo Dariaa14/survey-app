@@ -44,6 +44,32 @@ class AppStrings {
   /// The text for the "Closed" filter button.
   static const String closedFilterButton = "Closed";
 
+  /// Formats the survey preview metadata line.
+  static String surveyPreviewMeta(
+    String slug,
+    int questionCount,
+    String createdAt,
+  ) => "slug: $slug · $questionCount întrebări · creat $createdAt";
+
+  /// Formats the published survey info line.
+  static String surveyPublishedInfo(int invitations, String submitRate) =>
+      "$invitations invitații · rată răspuns $submitRate%";
+
+  /// Info text displayed for draft surveys.
+  static const String surveyDraftInfo = "Invitațiile nu pot fi trimise încă";
+
+  /// Action label for viewing survey results.
+  static const String surveyResultsButton = "Rezultate";
+
+  /// Action label for closing a published survey.
+  static const String surveyCloseButton = "Închide";
+
+  /// Action label for editing a draft survey.
+  static const String surveyEditButton = "Editează";
+
+  /// Action label for publishing a draft survey.
+  static const String surveyPublishButton = "Publică";
+
   // Create/edit survey page:
   /// The title for the survey details section.
   static const String surveyDetailsTitle = "Detalii sondaj";
