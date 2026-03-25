@@ -22,6 +22,8 @@ ColorScheme darkColorScheme = const ColorScheme.dark(
   onSurfaceVariant: Color.fromARGB(255, 154, 150, 140),
   onSurface: Color.fromARGB(255, 250, 250, 250),
 
+  outline: Color.fromARGB(255, 42, 42, 53),
+
   error: Color.fromARGB(255, 234, 111, 80),
   onError: Color.fromARGB(255, 255, 255, 255),
 );

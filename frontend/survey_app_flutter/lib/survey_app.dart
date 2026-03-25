@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/presentation/authentication/authentication_page.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+
+import 'package:survey_app_flutter/utils/app_routes.dart';
+import 'package:survey_app_flutter/utils/app_strings.dart';
 import 'package:survey_app_flutter/utils/theme.dart';
 
 void main() {
+  usePathUrlStrategy();
   runApp(const SurveyApp());
 }
 
@@ -13,10 +17,10 @@ class SurveyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Survey App',
+    return MaterialApp.router(
+      title: AppStrings.appTitle,
       theme: darkThemeData,
-      home: const AuthenticationPage(),
+      routerConfig: appRouter,
     );
   }
 }
