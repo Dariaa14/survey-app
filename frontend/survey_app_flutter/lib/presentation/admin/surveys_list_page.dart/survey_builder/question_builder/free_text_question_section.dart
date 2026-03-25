@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/widgets/max_characters_widget.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/widgets/required_checkbox.dart';
-import 'package:survey_app_flutter/shared/custom_inverted_button.dart';
-import 'package:survey_app_flutter/shared/custom_primary_button.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/widgets/question_builder_action_buttons.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/widgets/question_limit_input_widget.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/widgets/required_limit_section.dart';
 import 'package:survey_app_flutter/shared/custom_textfield.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
@@ -26,8 +25,6 @@ class _FreeTextQuestionSectionState extends State<FreeTextQuestionSection> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isCompact = constraints.maxWidth < 560;
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -42,61 +39,19 @@ class _FreeTextQuestionSectionState extends State<FreeTextQuestionSection> {
               hintText: AppStrings.questionTextPlaceholder,
             ),
             const SizedBox(height: 16),
-            if (isCompact)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  RequiredCheckbox(
-                    isRequired: _isRequired,
-                    onChanged: ({bool? required}) {
-                      setState(() {
-                        _isRequired = required ?? false;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  MaxCharactersWidget(
-                    onChanged: (value) {},
-                  ),
-                ],
-              )
-            else
-              Row(
-                children: [
-                  RequiredCheckbox(
-                    isRequired: _isRequired,
-                    onChanged: ({bool? required}) {
-                      setState(() {
-                        _isRequired = required ?? false;
-                      });
-                    },
-                  ),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    child: MaxCharactersWidget(
-                      onChanged: (value) {},
-                    ),
-                  ),
-                ],
-              ),
+            RequiredLimitSection(
+              isRequired: _isRequired,
+              onRequiredChanged: ({bool? required}) {
+                setState(() {
+                  _isRequired = required ?? false;
+                });
+              },
+              limitType: QuestionLimitType.maxCharacters,
+              onLimitChanged: (value) {},
+            ),
             const SizedBox(height: 20),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  CustomInvertedButton(
-                    onPressed: () {},
-                    text: AppStrings.cancelButton,
-                  ),
-                  CustomPrimaryButton(
-                    onPressed: () {},
-                    text: AppStrings.saveButton,
-                  ),
-                ],
-              ),
+            QuestionBuilderActionButtons(
+              onSave: () {},
             ),
           ],
         );
