@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/question_builder/question_builder_page.dart';
 import 'package:survey_app_flutter/shared/custom_inverted_button.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
@@ -41,12 +42,26 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
               alignment: WrapAlignment.end,
               children: [
                 CustomInvertedButton(
-                  onPressed: () {},
-                  text: AppStrings.addMultiChoiceQuestionButton,
+                  onPressed: () {
+                    showDialog<void>(
+                      context: context,
+                      builder: (context) => const QuestionBuilderPage(
+                        initialIsMultiChoiceSelected: true,
+                      ),
+                    );
+                  },
+                  text: '+ ${AppStrings.multiChoiceTab}',
                 ),
                 CustomInvertedButton(
-                  onPressed: () {},
-                  text: AppStrings.addFreeTextQuestionButton,
+                  onPressed: () {
+                    showDialog<void>(
+                      context: context,
+                      builder: (context) => const QuestionBuilderPage(
+                        initialIsMultiChoiceSelected: false,
+                      ),
+                    );
+                  },
+                  text: '+ ${AppStrings.freeTextTab}',
                 ),
               ],
             ),

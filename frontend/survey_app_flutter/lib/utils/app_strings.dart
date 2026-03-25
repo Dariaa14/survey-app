@@ -83,9 +83,37 @@ class AppStrings {
   /// The title prefix for the survey questions section.
   static const String questionsTitle = "Întrebări";
 
-  /// The button text for adding a multi-choice question.
-  static const String addMultiChoiceQuestionButton = "+ Multi-choice";
+  // Question builder page:
+  /// The title shown at the top of the question builder page.
+  static const String editQuestionTitle = "Editează întrebare";
 
-  /// The button text for adding a free-text question.
-  static const String addFreeTextQuestionButton = "+ Text liber";
+  /// Tab label for multi-choice question type.
+  static const String multiChoiceTab = "Multi-choice";
+
+  /// Tab label for free-text question type.
+  static const String freeTextTab = "Text liber";
+
+  /// The label for the question text field.
+  static const String questionTextLabel = "Textul întrebării";
+
+  /// The label for the "Required" checkbox.
+  static const String requiredLabel = "Required";
+
+  /// The text for the "Add Option" button in the multi-choice question builder.
+  static const String addOptionButton = "Adaugă opțiune";
+
+  /// The text for the "Cancel" button in the question builder.
+  static const String cancelButton = "Anulează";
+
+  /// The text for the "Save" button in the question builder.
+  static const String saveButton = "Salvează";
+
+  /// The label for the maximum numbers of options field in the multi-choice
+  /// question builder.
+  static const String maxOptionsLabel = "Selecții maxime";
+
+  /// The label for the number of options field in the multi-choice question
+  /// builder.
+  static String numberOfOptionsLabel(int minOptions) =>
+      "Opțiuni (minim $minOptions)";
 }
