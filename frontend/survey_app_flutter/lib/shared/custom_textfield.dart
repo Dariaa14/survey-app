@@ -8,6 +8,10 @@ class CustomTextfield extends StatefulWidget {
     this.hintText = 'Enter text',
     this.controller,
     this.onChanged,
+    this.textColor,
+    this.minLines,
+    this.maxLines = 1,
+    this.showScrollbar = false,
   });
 
   /// The placeholder text displayed in the text field
@@ -19,22 +23,37 @@ class CustomTextfield extends StatefulWidget {
   /// Callback when text changes
   final Function(String)? onChanged;
 
+  /// Optional text color for the input content.
+  final Color? textColor;
+
+  /// Minimum number of visible lines for the text field.
+  final int? minLines;
+
+  /// Maximum number of visible lines for the text field.
+  final int? maxLines;
+
+  /// Whether to show a scrollbar for the text field content.
+  final bool showScrollbar;
+
   @override
   State<CustomTextfield> createState() => _CustomTextfieldState();
 }
 
 class _CustomTextfieldState extends State<CustomTextfield> {
   late FocusNode _focusNode;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _focusNode = FocusNode();
+    _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -46,6 +65,15 @@ class _CustomTextfieldState extends State<CustomTextfield> {
       focusNode: _focusNode,
       controller: widget.controller,
       onChanged: widget.onChanged,
+      minLines: widget.minLines,
+      maxLines: widget.maxLines,
+      scrollController: _scrollController,
+      keyboardType: widget.maxLines == null || (widget.maxLines ?? 1) > 1
+          ? TextInputType.multiline
+          : TextInputType.text,
+      textInputAction: widget.maxLines == null || (widget.maxLines ?? 1) > 1
+          ? TextInputAction.newline
+          : TextInputAction.done,
       cursorColor: colorScheme.onSurface,
       decoration: InputDecoration(
         hintText: widget.hintText,
@@ -71,7 +99,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
           borderSide: BorderSide(color: colorScheme.secondary),
         ),
       ),
-      style: TextStyle(color: colorScheme.onSurface),
+      style: TextStyle(color: widget.textColor ?? colorScheme.onSurface),
     );
   }
 }

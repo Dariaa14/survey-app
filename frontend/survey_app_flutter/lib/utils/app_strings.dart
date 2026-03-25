@@ -43,4 +43,49 @@ class AppStrings {
 
   /// The text for the "Closed" filter button.
   static const String closedFilterButton = "Closed";
+
+  // Create/edit survey page:
+  /// The title for the survey details section.
+  static const String surveyDetailsTitle = "Detalii sondaj";
+
+  /// The label for the survey title field.
+  static const String surveyTitleLabel = "Titlu *";
+
+  /// The label for the survey description field.
+  static const String surveyDescriptionLabel = "Descriere";
+
+  /// The label for the survey slug field.
+  static const String surveySlugLabel = "Slug *";
+
+  /// The helper text for the survey slug field.
+  static const String autoGenerateSlugHelperText =
+      "Auto-generat din titlu, editabil";
+
+  /// Placeholder for the survey title field.
+  static const String surveyTitlePlaceholder = "Ex: Feedback produs nou";
+
+  /// Placeholder for the survey description field.
+  static const String surveyDescriptionPlaceholder =
+      "Ex: Te rog să ne dai feedback despre noul produs lansat în ianuarie.";
+
+  /// Placeholder for the survey slug field.
+  static const String surveySlugPlaceholder = "Ex: feedback-produs-nou";
+
+  /// The title for the actions section.
+  static const String actionsTitle = "Acțiuni";
+
+  /// The text for the "Save" button in the survey builder.
+  static const String saveSurveyButton = "Salvează draft";
+
+  /// The text for the "Publish" button in the survey builder.
+  static const String publishSurveyButton = "Publică sondaj";
+
+  /// The title prefix for the survey questions section.
+  static const String questionsTitle = "Întrebări";
+
+  /// The button text for adding a multi-choice question.
+  static const String addMultiChoiceQuestionButton = "+ Multi-choice";
+
+  /// The button text for adding a free-text question.
+  static const String addFreeTextQuestionButton = "+ Text liber";
 }

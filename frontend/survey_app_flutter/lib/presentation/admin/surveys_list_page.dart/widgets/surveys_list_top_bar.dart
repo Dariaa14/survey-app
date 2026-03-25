@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:survey_app_flutter/shared/custom_primary_button.dart';
+import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// A top bar widget for the surveys list page in the admin section.
@@ -60,12 +62,16 @@ class SurveysListTopBar extends StatelessWidget {
             ? SizedBox(
                 width: double.infinity,
                 child: CustomPrimaryButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    context.go(AppRoutes.adminSurveyCreatePath());
+                  },
                   text: AppStrings.createSurveyButton,
                 ),
               )
             : CustomPrimaryButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.go(AppRoutes.adminSurveyCreatePath());
+                },
                 text: AppStrings.createSurveyButton,
               );
 

@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/survey_builder/survey_builder_page.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list_page.dart/surveys_list_page.dart';
 import 'package:survey_app_flutter/presentation/authentication/authentication_page.dart';
 
@@ -9,6 +10,22 @@ abstract final class AppRoutes {
 
   /// The admin surveys list page path.
   static const String adminSurveys = '/admin/surveys';
+
+  /// The survey builder create page path.
+  static const String adminSurveyCreate = '/admin/surveys/new';
+
+  /// The survey builder edit page path pattern.
+  static const String adminSurveyEdit = '/admin/surveys/:surveyId/edit';
+
+  /// Builds a concrete survey edit route from an id.
+  static String adminSurveyEditPath(String surveyId) {
+    return '/admin/surveys/$surveyId/edit';
+  }
+
+  /// The survey builder create page route.
+  static String adminSurveyCreatePath() {
+    return adminSurveyCreate;
+  }
 }
 
 /// The app-level router configuration.
@@ -22,6 +39,16 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.adminSurveys,
       builder: (context, state) => const SurveysListPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.adminSurveyCreate,
+      builder: (context, state) => const SurveyBuilderPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.adminSurveyEdit,
+      builder: (context, state) => SurveyBuilderPage(
+        surveyId: state.pathParameters['surveyId']!,
+      ),
     ),
   ],
 );
