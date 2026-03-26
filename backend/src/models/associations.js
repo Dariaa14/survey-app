@@ -1,4 +1,5 @@
 const { Survey } = require('./survey');
+const User = require('./user');
 const { Question } = require('./question');
 const { Option } = require('./option');
 const { EmailList } = require('./emailList');
@@ -8,10 +9,11 @@ const { Response } = require('./response');
 const { AnswerChoice } = require('./answerChoice');
 const { AnswerText } = require('./answerText');
 
+User.hasMany(Survey, { foreignKey: 'owner_id', as: 'surveys' });
+Survey.belongsTo(User, { foreignKey: 'owner_id', as: 'owner' });
 
 Survey.hasMany(Question, { foreignKey: 'survey_id', as: 'questions' });
 Question.belongsTo(Survey, { foreignKey: 'survey_id', as: 'survey' });
-
 
 Question.hasMany(Option, { foreignKey: 'question_id', as: 'options' });
 Option.belongsTo(Question, { foreignKey: 'question_id', as: 'question' });

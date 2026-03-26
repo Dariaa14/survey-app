@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 const sequelize = new Sequelize(
     process.env.DB_NAME,     
@@ -12,6 +12,8 @@ const sequelize = new Sequelize(
     }
 );
 
+module.exports = { sequelize };
+
 (async () => {
     try {
         await sequelize.authenticate();
@@ -21,4 +23,3 @@ const sequelize = new Sequelize(
     }
 })();
 
-module.exports = { sequelize };

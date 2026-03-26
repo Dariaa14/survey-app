@@ -26,7 +26,7 @@ const Survey = sequelize.define('Survey', {
         allowNull: true,
     },
     status: {
-        type: DataTypes.ENUM('draft', 'published', 'closed'),
+        type: 'survey_status',
         allowNull: false,
         defaultValue: 'draft',
     },

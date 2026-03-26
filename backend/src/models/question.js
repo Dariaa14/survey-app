@@ -12,7 +12,7 @@ const Question = sequelize.define('Question', {
         allowNull: false,
     },
     type: {
-        type: DataTypes.ENUM('choice', 'text'),
+        type: 'question_type',
         allowNull: false,
     },
     title: {

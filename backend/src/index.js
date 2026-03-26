@@ -16,6 +16,7 @@ app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
+/// Models and DB
 const { sequelize } = require('./db');
 const models = require('./models'); 
 
@@ -29,3 +30,10 @@ const models = require('./models');
         console.error(err);
     }
 })();
+
+/// Routes 
+const userRoutes = require('./routes/userRoutes');
+app.use('/api/users', userRoutes);
+
+const surveyRoutes = require('./routes/surveyRoutes');
+app.use('/api/surveys', surveyRoutes);

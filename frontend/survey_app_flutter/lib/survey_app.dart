@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:survey_app_flutter/core/dependency_injection.dart';
 
 import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
@@ -7,6 +8,8 @@ import 'package:survey_app_flutter/utils/theme.dart';
 
 void main() {
   usePathUrlStrategy();
+  loadRepositories();
+
   runApp(const SurveyApp());
 }
 
