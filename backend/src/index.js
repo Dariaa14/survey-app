@@ -15,3 +15,17 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+const { sequelize } = require('./db');
+const models = require('./models'); 
+
+(async () => {
+    try {
+        await sequelize.authenticate();
+        console.log('Database connected');
+        await sequelize.sync({ alter: true });
+        console.log('All models synced');
+    } catch (err) {
+        console.error(err);
+    }
+})();
