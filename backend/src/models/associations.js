@@ -5,8 +5,8 @@ const { EmailList } = require('./emailList');
 const { EmailContact } = require('./emailContact');
 const { Invitation } = require('./invitation');
 const { Response } = require('./response');
-const { AnswerChoice } = require('./answerschoice');
-const { AnswerText } = require('./answerstext');
+const { AnswerChoice } = require('./answerChoice');
+const { AnswerText } = require('./answerText');
 
 
 Survey.hasMany(Question, { foreignKey: 'survey_id', as: 'questions' });
