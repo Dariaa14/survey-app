@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -16,75 +17,151 @@ class UserRepositoryImpl implements UserRepository {
   /// Base URL for the authentication API.
   final String baseUrl = 'http://localhost:3000';
 
+  Exception _requestFailed(
+    String operation,
+    int statusCode,
+    String body,
+  ) {
+    return Exception(
+      '$operation failed (HTTP $statusCode). Response: $body',
+    );
+  }
+
   @override
   Future<List<UserEntity>> getAllUsers() async {
-    final response = await http.get(Uri.parse(baseUsersUrl));
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
-      return data
-          .map(
-            (json) => UserEntityImpl.fromJson(json as Map<String, dynamic>),
-          )
-          .toList();
-    } else {
-      throw Exception('Failed to fetch users');
+    try {
+      final response = await http
+          .get(Uri.parse(baseUsersUrl))
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
+        return data
+            .map(
+              (json) => UserEntityImpl.fromJson(json as Map<String, dynamic>),
+            )
+            .toList();
+      }
+
+      throw _requestFailed(
+        'Fetching users',
+        response.statusCode,
+        response.body,
+      );
+    } on SocketException catch (e) {
+      throw Exception('Network error while fetching users: ${e.message}');
+    } on HttpException catch (e) {
+      throw Exception('HTTP error while fetching users: ${e.message}');
+    } on FormatException {
+      throw Exception('Invalid users payload format from server.');
     }
   }
 
   @override
   Future<UserEntity> getUserById(String userId) async {
-    final response = await http.get(Uri.parse('$baseUsersUrl/$userId'));
-    if (response.statusCode == 200) {
-      return UserEntityImpl.fromJson(
-        jsonDecode(response.body) as Map<String, dynamic>,
-      );
-    } else {
-      throw Exception('Failed to fetch user');
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUsersUrl/$userId'))
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        return UserEntityImpl.fromJson(
+          jsonDecode(response.body) as Map<String, dynamic>,
+        );
+      }
+
+      throw _requestFailed('Fetching user', response.statusCode, response.body);
+    } on SocketException catch (e) {
+      throw Exception('Network error while fetching user: ${e.message}');
+    } on HttpException catch (e) {
+      throw Exception('HTTP error while fetching user: ${e.message}');
+    } on FormatException {
+      throw Exception('Invalid user payload format from server.');
     }
   }
 
   @override
   Future<UserEntity> createUser(UserEntity user) async {
-    final response = await http.post(
-      Uri.parse(baseUsersUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode((user as UserEntityImpl).toJson()),
-    );
+    try {
+      final response = await http
+          .post(
+            Uri.parse(baseUsersUrl),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode((user as UserEntityImpl).toJson()),
+          )
+          .timeout(const Duration(seconds: 15));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return UserEntityImpl.fromJson(
-        jsonDecode(response.body) as Map<String, dynamic>,
-      );
-    } else {
-      throw Exception('Failed to create user');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return UserEntityImpl.fromJson(
+          jsonDecode(response.body) as Map<String, dynamic>,
+        );
+      }
+
+      throw _requestFailed('Creating user', response.statusCode, response.body);
+    } on SocketException catch (e) {
+      throw Exception('Network error while creating user: ${e.message}');
+    } on HttpException catch (e) {
+      throw Exception('HTTP error while creating user: ${e.message}');
+    } on FormatException {
+      throw Exception('Invalid create-user payload format from server.');
+    } catch (e) {
+      throw Exception('Unexpected error while creating user: $e');
     }
   }
 
   @override
   Future<bool> login(String email, String password) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/api/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email, 'password': password}),
-    );
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/api/users/login'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email, 'password': password}),
+          )
+          .timeout(const Duration(seconds: 15));
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      final token = data['token'] as String;
-      await _storage.write(key: 'auth_token', value: token);
-      return true;
-    } else {
-      return false;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final token = data['token'] as String?;
+        if (token == null || token.isEmpty) {
+          throw Exception('Login succeeded but token is missing in response.');
+        }
+
+        await _storage.write(key: 'auth_token', value: token);
+        return true;
+      }
+
+      if (response.statusCode == 400 || response.statusCode == 401) {
+        return false;
+      }
+
+      throw _requestFailed('Login', response.statusCode, response.body);
+    } on SocketException catch (e) {
+      throw Exception('Network error while logging in: ${e.message}');
+    } on HttpException catch (e) {
+      throw Exception('HTTP error while logging in: ${e.message}');
+    } on FormatException {
+      throw Exception('Invalid login payload format from server.');
+    } catch (e) {
+      throw Exception('Unexpected error while logging in: $e');
     }
   }
 
   @override
   Future<String?> getAuthToken() async {
-    return _storage.read(key: 'auth_token');
+    try {
+      return _storage.read(key: 'auth_token');
+    } catch (_) {
+      throw Exception('Failed to read auth token from secure storage.');
+    }
   }
 
   @override
   Future<void> logout() async {
-    await _storage.delete(key: 'auth_token');
+    try {
+      await _storage.delete(key: 'auth_token');
+    } catch (_) {
+      throw Exception('Failed to clear auth token from secure storage.');
+    }
   }
 }

@@ -4,6 +4,7 @@ import 'package:survey_app_flutter/data/repositories_impl/user_repository_impl.d
 import 'package:survey_app_flutter/domain/repositories/survey_repository.dart';
 import 'package:survey_app_flutter/domain/repositories/user_repository.dart';
 import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
+import 'package:survey_app_flutter/presentation/authentication/bloc/authentication_bloc.dart';
 
 /// Instance of getIt
 final GetIt getIt = GetIt.instance;
@@ -12,6 +13,7 @@ final GetIt getIt = GetIt.instance;
 void loadDependencies() {
   _loadRepositories();
   _loadUseCases();
+  _loadBlocs();
 }
 
 /// Method that registers repositories
@@ -25,5 +27,11 @@ void _loadUseCases() {
   //getIt.registerLazySingleton<SurveyUseCase>(SurveyUseCase.new);
   getIt.registerLazySingleton<UserUseCase>(
     () => UserUseCase(getIt.get<UserRepository>()),
+  );
+}
+
+void _loadBlocs() {
+  getIt.registerFactory<AuthenticationBloc>(
+    () => AuthenticationBloc(userUseCase: getIt.get<UserUseCase>()),
   );
 }

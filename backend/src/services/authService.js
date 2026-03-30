@@ -1,14 +1,15 @@
 
 const bcrypt = require('bcrypt');
 const db = require('../db'); 
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
 
 async function login(email, password) {
-  const result = await db.query(
-    'SELECT * FROM users WHERE email = $1',
-    [email]
-  );
+  const user = await User.findOne({
+      where: { email },           
+      attributes: ['id', 'email', 'password_hash', 'type', 'created_at']
+    });
 
-  const user = result.rows[0];
   if (!user) {
     throw new Error('Invalid credentials');
   }
@@ -25,9 +26,9 @@ async function login(email, password) {
       email: user.email,
       type: user.type,
     },
-    JWT_SECRET,
+    process.env.JWT_SECRET,
     {
-      expiresIn: JWT_EXPIRES_IN,
+      expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
 

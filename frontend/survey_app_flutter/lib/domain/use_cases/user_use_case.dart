@@ -22,4 +22,19 @@ class UserUseCase {
   Future<UserEntity> createUser(UserEntity user) async {
     return _userRepository.createUser(user);
   }
+
+  /// Authenticates a user with their email and password.
+  Future<bool> login(String email, String password) async {
+    return _userRepository.login(email, password);
+  }
+
+  /// Retrieves the stored authentication token, if available.
+  Future<String?> getAuthToken() async {
+    return _userRepository.getAuthToken();
+  }
+
+  /// Logs out the current user by clearing stored authentication data.
+  Future<void> logout() async {
+    return _userRepository.logout();
+  }
 }
