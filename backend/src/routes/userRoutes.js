@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
+const userController = require('../controllers/userController');
 
 // CREATE
 router.post('/', async (req, res) => {
@@ -61,5 +62,9 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch user' });
     }
 });
+
+
+// LOGIN
+router.post('/login', userController.login);
 
 module.exports = router;

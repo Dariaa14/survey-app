@@ -10,4 +10,13 @@ abstract class UserRepository {
 
   /// Creates a new user in the data source.
   Future<UserEntity> createUser(UserEntity user);
+
+  /// Authenticates a user with their email and password.
+  Future<bool> login(String email, String password);
+
+  /// Retrieves the stored authentication token, if available.
+  Future<String?> getAuthToken();
+
+  /// Logs out the current user by clearing stored authentication data.
+  Future<void> logout();
 }

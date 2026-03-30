@@ -8,7 +8,7 @@ import 'package:survey_app_flutter/utils/theme.dart';
 
 void main() {
   usePathUrlStrategy();
-  loadRepositories();
+  loadDependencies();
 
   runApp(const SurveyApp());
 }
