@@ -111,11 +111,28 @@ class AuthenticationBloc
         );
         return;
       }
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.unauthenticated,
+          token: '',
+          errorMessage: 'Login step failed: $e',
+        ),
+      );
+      return;
+    }
 
+    try {
       final token = await _userUseCase.getAuthToken() ?? '';
+      final isAdmin = await _userUseCase.isCurrentUserAdmin();
+
       emit(
         state
-            .copyWith(status: AuthenticationStatus.authenticated, token: token)
+            .copyWith(
+              status: AuthenticationStatus.authenticated,
+              isAdmin: isAdmin,
+              token: token,
+            )
             .copyWithNull(nullErrorMessage: true),
       );
     } catch (e) {
@@ -151,6 +168,7 @@ class AuthenticationBloc
             status: AuthenticationStatus.unauthenticated,
             token: '',
             password: '',
+            isAdmin: false,
           )
           .copyWithNull(nullErrorMessage: true),
     );

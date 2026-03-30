@@ -32,6 +32,9 @@ class AuthenticationState extends Equatable {
   /// An optional error message if authentication fails.
   final String? errorMessage;
 
+  /// Indicates whether the currently authenticated user has admin privileges.
+  final bool isAdmin;
+
   /// Constructs an [AuthenticationState] with the given [status] and optional [errorMessage].
   const AuthenticationState({
     this.status = AuthenticationStatus.initial,
@@ -39,6 +42,7 @@ class AuthenticationState extends Equatable {
     this.email = '',
     this.password = '',
     this.token = '',
+    this.isAdmin = false,
   });
 
   /// Creates a copy of the current state with updated fields.
@@ -48,6 +52,7 @@ class AuthenticationState extends Equatable {
     String? password,
     String? token,
     String? errorMessage,
+    bool? isAdmin,
   }) {
     return AuthenticationState(
       status: status ?? this.status,
@@ -55,6 +60,7 @@ class AuthenticationState extends Equatable {
       password: password ?? this.password,
       token: token ?? this.token,
       errorMessage: errorMessage ?? this.errorMessage,
+      isAdmin: isAdmin ?? this.isAdmin,
     );
   }
 
@@ -66,8 +72,16 @@ class AuthenticationState extends Equatable {
         password: password,
         token: token,
         errorMessage: nullErrorMessage ? null : errorMessage,
+        isAdmin: isAdmin,
       );
 
   @override
-  List<Object?> get props => [status, email, password, token, errorMessage];
+  List<Object?> get props => [
+    status,
+    email,
+    password,
+    token,
+    errorMessage,
+    isAdmin,
+  ];
 }

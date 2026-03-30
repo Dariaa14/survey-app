@@ -33,6 +33,16 @@ class UserUseCase {
     return _userRepository.getAuthToken();
   }
 
+  /// Fetches the currently authenticated user.
+  Future<UserEntity> getCurrentUser() async {
+    return _userRepository.getCurrentUser();
+  }
+
+  /// Returns whether the current authenticated user is admin.
+  Future<bool> isCurrentUserAdmin() async {
+    return _userRepository.isCurrentUserAdmin();
+  }
+
   /// Logs out the current user by clearing stored authentication data.
   Future<void> logout() async {
     return _userRepository.logout();

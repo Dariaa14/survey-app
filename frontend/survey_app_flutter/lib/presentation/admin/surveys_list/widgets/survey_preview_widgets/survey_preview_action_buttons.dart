@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_data.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_status.dart';
+import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/utils/app_routes.dart';
@@ -13,7 +12,7 @@ class SurveyPreviewActionButtons extends StatelessWidget {
   const SurveyPreviewActionButtons({required this.survey, super.key});
 
   /// Survey data used to determine visible action buttons.
-  final SurveyPreviewData survey;
+  final SurveyEntity survey;
 
   Future<void> _showCloseSurveyDialog(BuildContext context) {
     return showDialog<void>(
@@ -40,7 +39,7 @@ class SurveyPreviewActionButtons extends StatelessWidget {
 
   List<Widget> _buttonsForStatus(BuildContext context) {
     switch (survey.status) {
-      case SurveyPreviewStatus.published:
+      case SurveyStatus.published:
         return [
           CustomButton(
             onPressed: () {},
@@ -54,12 +53,12 @@ class SurveyPreviewActionButtons extends StatelessWidget {
             variant: CustomColorVariant.invertedRed,
           ),
         ];
-      case SurveyPreviewStatus.draft:
+      case SurveyStatus.draft:
         return [
           CustomButton(
             onPressed: () {
               context.go(
-                AppRoutes.adminSurveyEditPath(survey.id.toString()),
+                AppRoutes.adminSurveyEditPath(survey.id),
                 extra: survey,
               );
             },
@@ -71,7 +70,7 @@ class SurveyPreviewActionButtons extends StatelessWidget {
             variant: CustomColorVariant.invertedSecondary,
           ),
         ];
-      case SurveyPreviewStatus.closed:
+      case SurveyStatus.closed:
         return [
           CustomButton(
             onPressed: () {},

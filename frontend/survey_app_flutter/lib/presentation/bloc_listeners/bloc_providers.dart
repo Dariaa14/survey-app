@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:survey_app_flutter/presentation/admin/bloc/admin_bloc.dart';
 import 'package:survey_app_flutter/presentation/authentication/bloc/authentication_bloc.dart';
 import 'package:survey_app_flutter/utils/app_blocs.dart';
 
@@ -13,9 +14,12 @@ class BlocProviders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<AuthenticationBloc>.value(
-      value: AppBlocs.authenticationBloc,
-      child: child,
+    return BlocProvider<AdminBloc>.value(
+      value: AppBlocs.adminBloc,
+      child: BlocProvider<AuthenticationBloc>.value(
+        value: AppBlocs.authenticationBloc,
+        child: child,
+      ),
     );
   }
 }

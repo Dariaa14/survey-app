@@ -17,6 +17,12 @@ abstract class UserRepository {
   /// Retrieves the stored authentication token, if available.
   Future<String?> getAuthToken();
 
+  /// Fetches the currently authenticated user using the stored auth token.
+  Future<UserEntity> getCurrentUser();
+
+  /// Returns whether the currently authenticated user has admin role.
+  Future<bool> isCurrentUserAdmin();
+
   /// Logs out the current user by clearing stored authentication data.
   Future<void> logout();
 }

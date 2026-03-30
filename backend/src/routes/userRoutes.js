@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const userController = require('../controllers/userController');
 
+const { verifyToken } = require('../utils/authMiddleware');
+
 // CREATE
 router.post('/', async (req, res) => {
     try {
@@ -48,6 +50,9 @@ router.get('/', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch users' });
     }
 });
+
+// GET current authenticated user
+router.get('/me', verifyToken, userController.getCurrentUser);
 
 // GET by ID
 router.get('/:id', async (req, res) => {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_data.dart';
+import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/sections/survey_builder_details_section.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/sections/survey_builder_questions_section.dart';
 
@@ -9,7 +9,7 @@ class SurveyBuilderPage extends StatefulWidget {
   const SurveyBuilderPage({this.survey, super.key});
 
   /// Optional full survey payload passed from navigation.
-  final SurveyPreviewData? survey;
+  final SurveyEntity? survey;
 
   @override
   State<SurveyBuilderPage> createState() => _SurveyBuilderPageState();

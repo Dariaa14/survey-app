@@ -50,7 +50,10 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
           AppBlocs.authenticationBloc
             ..add(const AuthenticationEmailChanged(''))
             ..add(const AuthenticationPasswordChanged(''));
-          context.go(AppRoutes.adminSurveys);
+
+          if (AppBlocs.authenticationBloc.state.isAdmin) {
+            context.go(AppRoutes.adminSurveys);
+          } else {}
         },
         listenWhen: (previous, current) =>
             previous.status != current.status &&

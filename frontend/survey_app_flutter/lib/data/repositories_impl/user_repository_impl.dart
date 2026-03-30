@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -136,6 +137,10 @@ class UserRepositoryImpl implements UserRepository {
       }
 
       throw _requestFailed('Login', response.statusCode, response.body);
+    } on TimeoutException {
+      throw Exception(
+        'Timeout while logging in (POST $baseUrl/api/users/login).',
+      );
     } on SocketException catch (e) {
       throw Exception('Network error while logging in: ${e.message}');
     } on HttpException catch (e) {
@@ -154,6 +159,58 @@ class UserRepositoryImpl implements UserRepository {
     } catch (_) {
       throw Exception('Failed to read auth token from secure storage.');
     }
+  }
+
+  @override
+  Future<UserEntity> getCurrentUser() async {
+    try {
+      final token = await _storage.read(key: 'auth_token');
+      if (token == null || token.isEmpty) {
+        throw Exception('No auth token available. Please login again.');
+      }
+
+      final response = await http
+          .get(
+            Uri.parse('$baseUsersUrl/me'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        return UserEntityImpl.fromJson(
+          jsonDecode(response.body) as Map<String, dynamic>,
+        );
+      }
+
+      throw _requestFailed(
+        'Fetching current user',
+        response.statusCode,
+        response.body,
+      );
+    } on TimeoutException {
+      throw Exception(
+        'Timeout while fetching current user (GET $baseUsersUrl/me).',
+      );
+    } on SocketException catch (e) {
+      throw Exception(
+        'Network error while fetching current user: ${e.message}',
+      );
+    } on HttpException catch (e) {
+      throw Exception('HTTP error while fetching current user: ${e.message}');
+    } on FormatException {
+      throw Exception('Invalid current-user payload format from server.');
+    } catch (e) {
+      throw Exception('Unexpected error while fetching current user: $e');
+    }
+  }
+
+  @override
+  Future<bool> isCurrentUserAdmin() async {
+    final currentUser = await getCurrentUser();
+    return currentUser.type == UserType.admin;
   }
 
   @override

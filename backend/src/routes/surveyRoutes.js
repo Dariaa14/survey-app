@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { Survey } = require('../models/survey');
+const { requireAdmin } = require('../utils/adminMiddleware');
+const { verifyToken } = require('../utils/authMiddleware');
+
 
 // CREATE 
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, requireAdmin, async (req, res) => {
     try {
         const { owner_id, title, description, slug, status } = req.body;
 
@@ -45,7 +48,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id',verifyToken, requireAdmin, async (req, res) => {
     try {
         const survey = await Survey.findByPk(req.params.id);
         if (!survey) return res.status(404).json({ error: 'Survey not found' });
@@ -57,7 +60,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // GET by owner_id
-router.get('/user/:ownerId', async (req, res) => {
+router.get('/user/:ownerId',verifyToken, requireAdmin, async (req, res) => {
     try {
         const { ownerId } = req.params;
 
@@ -75,7 +78,7 @@ router.get('/user/:ownerId', async (req, res) => {
 
 
 // UPDATE by ID
-router.put('/:id', async (req, res) => {
+router.put('/:id',verifyToken, requireAdmin, async (req, res) => {
     try {
         const { title, description, slug, status, published_at, closed_at } = req.body;
         const survey = await Survey.findByPk(req.params.id);
@@ -90,7 +93,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE by ID
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',verifyToken, requireAdmin, async (req, res) => {
     try {
         const survey = await Survey.findByPk(req.params.id);
         if (!survey) return res.status(404).json({ error: 'Survey not found' });

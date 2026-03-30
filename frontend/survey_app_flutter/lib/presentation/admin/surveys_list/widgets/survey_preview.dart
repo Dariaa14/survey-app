@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_action_buttons.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_data.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_status_row.dart';
 import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
@@ -12,7 +12,7 @@ class SurveyPreview extends StatelessWidget {
   const SurveyPreview({required this.survey, super.key});
 
   /// Survey data displayed by this preview.
-  final SurveyPreviewData survey;
+  final SurveyEntity survey;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class SurveyPreview extends StatelessWidget {
             Text(
               AppStrings.surveyPreviewMeta(
                 survey.slug,
-                survey.questionCount,
+                1, // survey.questionCount,
                 survey.createdAt,
               ),
               style: textTheme.bodyMedium?.copyWith(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_data.dart';
-import 'package:survey_app_flutter/presentation/admin/surveys_list/widgets/survey_preview_widgets/survey_preview_status.dart';
+import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 import 'package:survey_app_flutter/utils/theme.dart';
 
@@ -13,49 +12,49 @@ class SurveyPreviewStatusRow extends StatelessWidget {
   });
 
   /// Survey data used to render the chip and optional info.
-  final SurveyPreviewData survey;
+  final SurveyEntity survey;
 
   Color _statusBackground(ColorScheme colorScheme) {
     switch (survey.status) {
-      case SurveyPreviewStatus.published:
+      case SurveyStatus.published:
         return colorScheme.secondaryContainer;
-      case SurveyPreviewStatus.draft:
+      case SurveyStatus.draft:
         return colorScheme.surfaceContainer;
-      case SurveyPreviewStatus.closed:
+      case SurveyStatus.closed:
         return redContainer;
     }
   }
 
   Color _statusDotColor(ColorScheme colorScheme) {
     switch (survey.status) {
-      case SurveyPreviewStatus.published:
+      case SurveyStatus.published:
         return colorScheme.secondary;
-      case SurveyPreviewStatus.draft:
+      case SurveyStatus.draft:
         return colorScheme.onSurfaceVariant;
-      case SurveyPreviewStatus.closed:
+      case SurveyStatus.closed:
         return colorScheme.error;
     }
   }
 
   String _statusLabel() {
     switch (survey.status) {
-      case SurveyPreviewStatus.published:
+      case SurveyStatus.published:
         return AppStrings.publishedFilterButton;
-      case SurveyPreviewStatus.draft:
+      case SurveyStatus.draft:
         return AppStrings.draftFilterButton;
-      case SurveyPreviewStatus.closed:
+      case SurveyStatus.closed:
         return AppStrings.closedFilterButton;
     }
   }
 
   String? _statusInfoText() {
-    if (survey.status == SurveyPreviewStatus.published) {
-      final invitations = survey.invitationsCount ?? 0;
-      final submitRate = survey.submitRate?.toStringAsFixed(0) ?? '0';
+    if (survey.status == SurveyStatus.published) {
+      final invitations = 1; // survey.invitationsCount ?? 0;
+      final submitRate = '0'; //survey.submitRate?.toStringAsFixed(0) ?? '0';
       return AppStrings.surveyPublishedInfo(invitations, submitRate);
     }
 
-    if (survey.status == SurveyPreviewStatus.draft) {
+    if (survey.status == SurveyStatus.draft) {
       return AppStrings.surveyDraftInfo;
     }
 

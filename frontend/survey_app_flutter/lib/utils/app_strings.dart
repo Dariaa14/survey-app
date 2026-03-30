@@ -48,8 +48,28 @@ class AppStrings {
   static String surveyPreviewMeta(
     String slug,
     int questionCount,
-    String createdAt,
-  ) => "slug: $slug · $questionCount întrebări · creat $createdAt";
+    DateTime createdAt,
+  ) =>
+      "slug: $slug · $questionCount întrebări · creat ${_formatShortRoDate(createdAt)}";
+
+  static String _formatShortRoDate(DateTime date) {
+    const List<String> shortMonths = <String>[
+      'ian',
+      'feb',
+      'mar',
+      'apr',
+      'mai',
+      'iun',
+      'iul',
+      'aug',
+      'sep',
+      'oct',
+      'nov',
+      'dec',
+    ];
+
+    return '${date.day} ${shortMonths[date.month - 1]}';
+  }
 
   /// Formats the published survey info line.
   static String surveyPublishedInfo(int invitations, String submitRate) =>
