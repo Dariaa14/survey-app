@@ -72,8 +72,14 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     );
 
     try {
+      final token = await _userRepository.getAuthToken();
+      if (token == null || token.isEmpty) {
+        throw Exception('No auth token available.');
+      }
+
       final surveys = await _surveyRepository.getSurveysByUser(
         adminUser.id,
+        token,
       );
 
       emit(
@@ -107,7 +113,15 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
 
     try {
-      final surveys = await _surveyRepository.getSurveysByUser(adminUser.id);
+      final token = await _userRepository.getAuthToken();
+      if (token == null || token.isEmpty) {
+        throw Exception('No auth token available.');
+      }
+
+      final surveys = await _surveyRepository.getSurveysByUser(
+        adminUser.id,
+        token,
+      );
 
       emit(
         state

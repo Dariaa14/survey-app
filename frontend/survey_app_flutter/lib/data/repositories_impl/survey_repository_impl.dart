@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:survey_app_flutter/data/entities_impl/survey_entity_impl.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
@@ -8,8 +7,6 @@ import 'package:survey_app_flutter/domain/repositories/survey_repository.dart';
 /// Concrete implementation of [SurveyRepository] that interacts with
 /// a RESTful API.
 class SurveyRepositoryImpl implements SurveyRepository {
-  final _storage = const FlutterSecureStorage();
-
   /// Base URL for the survey API.
   final String baseUrl = 'http://localhost:3000/api/surveys';
 
@@ -29,12 +26,10 @@ class SurveyRepositoryImpl implements SurveyRepository {
   }
 
   @override
-  Future<List<SurveyEntity>> getSurveysByUser(String userId) async {
-    final token = await _storage.read(key: 'auth_token');
-    if (token == null || token.isEmpty) {
-      throw Exception('No auth token available.');
-    }
-
+  Future<List<SurveyEntity>> getSurveysByUser(
+    String userId,
+    String token,
+  ) async {
     final response = await http.get(
       Uri.parse('$baseUrl/user/$userId'),
       headers: {
