@@ -1,3 +1,5 @@
+import 'package:survey_app_flutter/data/entities_impl/question_entity_impl.dart';
+import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 
 /// Concrete implementation of [SurveyEntity] used in data layer.
@@ -10,6 +12,7 @@ class SurveyEntityImpl implements SurveyEntity {
     required this.title,
     required this.status,
     required this.createdAt,
+    this.questions = const [],
     this.description,
     this.publishedAt,
     this.closedAt,
@@ -27,6 +30,7 @@ class SurveyEntityImpl implements SurveyEntity {
       createdAt: DateTime.parse(json['created_at'] as String),
       publishedAt: _parseNullableDate(json['published_at']),
       closedAt: _parseNullableDate(json['closed_at']),
+      questions: _parseQuestions(json['questions']),
     );
   }
 
@@ -57,6 +61,9 @@ class SurveyEntityImpl implements SurveyEntity {
   @override
   final DateTime? closedAt;
 
+  @override
+  final List<QuestionEntity> questions;
+
   /// Serializes this entity to backend-compatible JSON.
   Map<String, dynamic> toJson() {
     return {
@@ -69,7 +76,28 @@ class SurveyEntityImpl implements SurveyEntity {
       'created_at': createdAt.toIso8601String(),
       'published_at': publishedAt?.toIso8601String(),
       'closed_at': closedAt?.toIso8601String(),
+      'questions': questions.map(_questionToJson).toList(),
     };
+  }
+
+  static List<QuestionEntity> _parseQuestions(dynamic value) {
+    if (value is! List<dynamic>) {
+      return const <QuestionEntity>[];
+    }
+
+    return value
+        .map(
+          (json) => QuestionEntityImpl.fromJson(json as Map<String, dynamic>),
+        )
+        .toList();
+  }
+
+  static Map<String, dynamic> _questionToJson(QuestionEntity question) {
+    if (question is QuestionEntityImpl) {
+      return question.toJson();
+    }
+
+    throw Exception('Unsupported question type for JSON serialization');
   }
 
   static SurveyStatus _mapSurveyStatus(String? value) {

@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
+
 const { Survey } = require('../models/survey');
+const { Question } = require('../models/question');
+const { Option } = require('../models/option');
+
+const models = require('../models/associations');
+
 const { requireAdmin } = require('../utils/adminMiddleware');
 const { verifyToken } = require('../utils/authMiddleware');
 
@@ -47,35 +53,71 @@ router.get('/', async (req, res) => {
     }
 });
 
-// GET by ID
-router.get('/:id',verifyToken, requireAdmin, async (req, res) => {
-    try {
-        const survey = await Survey.findByPk(req.params.id);
-        if (!survey) return res.status(404).json({ error: 'Survey not found' });
-        res.json(survey);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Failed to fetch survey' });
-    }
-});
 
 // GET by owner_id
-router.get('/user/:ownerId',verifyToken, requireAdmin, async (req, res) => {
+router.get('/user/:ownerId', verifyToken, requireAdmin, async (req, res) => {
     try {
         const { ownerId } = req.params;
 
+        console.log('Fetching surveys for user ID:', ownerId);
+
         const surveys = await Survey.findAll({
             where: { owner_id: ownerId },
-            order: [['created_at', 'DESC']],
+            include: [
+                {
+                    model: Question,
+                    as: 'questions',       
+                    include: [
+                        {
+                            model: Option,
+                            as: 'options', 
+                            order: [['order', 'ASC']] 
+                        }
+                    ]
+                }
+            ],
+            order: [
+                [{ model: Question, as: 'questions' }, 'order', 'ASC'],
+                [{ model: Question, as: 'questions' }, { model: Option, as: 'options' }, 'order', 'ASC']
+            ]
         });
 
         res.json(surveys);
     } catch (err) {
-        console.error(err);
+        console.error('Error fetching surveys:', err.stack);
         res.status(500).json({ error: 'Failed to fetch surveys for user' });
     }
 });
 
+// GET by ID
+router.get('/:id', verifyToken, requireAdmin, async (req, res) => {
+    try {
+        const survey = await Survey.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Question,
+                    include: [
+                        {
+                            model: Option
+                        }
+                    ]
+                }
+            ],
+            order: [
+                [Question, 'order', 'ASC'],
+                [Question, Option, 'order', 'ASC']
+            ]
+        });
+
+        if (!survey) {
+            return res.status(404).json({ error: 'Survey not found' });
+        }
+
+        res.json(survey);
+    } catch (err) {
+        console.error('ERROR:', err.stack);
+    }
+});
 
 // UPDATE by ID
 router.put('/:id',verifyToken, requireAdmin, async (req, res) => {

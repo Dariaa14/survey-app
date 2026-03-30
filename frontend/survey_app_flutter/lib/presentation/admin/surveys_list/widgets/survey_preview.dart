@@ -55,7 +55,7 @@ class SurveyPreview extends StatelessWidget {
             Text(
               AppStrings.surveyPreviewMeta(
                 survey.slug,
-                1, // survey.questionCount,
+                survey.questions.length,
                 survey.createdAt,
               ),
               style: textTheme.bodyMedium?.copyWith(

@@ -1,3 +1,5 @@
+import 'package:survey_app_flutter/domain/entities/question_entity.dart';
+
 /// Survey status values based on backend `status` enum.
 enum SurveyStatus {
   /// Survey is editable but not yet published.
@@ -38,4 +40,7 @@ abstract class SurveyEntity {
 
   /// Close timestamp.
   DateTime? get closedAt;
+
+  /// The list of questions associated with this survey.
+  List<QuestionEntity> get questions;
 }
