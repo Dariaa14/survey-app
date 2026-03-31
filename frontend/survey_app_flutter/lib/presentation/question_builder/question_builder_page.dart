@@ -43,7 +43,11 @@ class QuestionBuilderPage extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: 720, maxHeight: maxDialogHeight),
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: BlocBuilder<QuestionBuilderBloc, QuestionBuilderState>(
+          child: BlocConsumer<QuestionBuilderBloc, QuestionBuilderState>(
+            listenWhen: (previous, current) => previous.type != current.type,
+            listener: (context, state) {
+              AppBlocs.questionBuilderBloc.add(QuestionBuilderReset());
+            },
             bloc: AppBlocs.questionBuilderBloc
               ..add(
                 QuestionTypeChanged(

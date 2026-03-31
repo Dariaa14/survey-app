@@ -16,7 +16,7 @@ class QuestionBuilderActionButtons extends StatelessWidget {
   final VoidCallback? onCancel;
 
   /// Callback for save action.
-  final VoidCallback onSave;
+  final VoidCallback? onSave;
 
   @override
   Widget build(BuildContext context) {

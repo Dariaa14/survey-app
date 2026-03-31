@@ -151,7 +151,7 @@ class QuestionBuilderBloc
     QuestionBuilderReset event,
     Emitter<QuestionBuilderState> emit,
   ) {
-    emit(const QuestionBuilderState());
+    emit(QuestionBuilderState(type: state.type));
   }
 
   /// Builds a [QuestionEntity] based on the current state of the question

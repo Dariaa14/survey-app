@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_bloc.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_event.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_state.dart';
@@ -61,7 +60,7 @@ class MultiChoiceQuestionSection extends StatelessWidget {
                   },
                   limitType: QuestionLimitType.maxOptions,
                   onLimitChanged: (value) {
-                    final int maxSelections = int.tryParse(value) ?? 0;
+                    final int? maxSelections = int.tryParse(value.trim());
                     AppBlocs.questionBuilderBloc.add(
                       QuestionMaxSelectionsChanged(maxSelections),
                     );
@@ -111,22 +110,66 @@ class MultiChoiceQuestionSection extends StatelessWidget {
               text: '+ ${AppStrings.addOptionButton}',
             ),
             const SizedBox(height: 20),
-            QuestionBuilderActionButtons(
-              onSave: () {
-                if (AppBlocs.questionBuilderBloc.state.options.length <
-                    _minOptions) {
-                  Fluttertoast.showToast(
-                    msg: AppStrings.warningMinimumOptions(_minOptions),
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    backgroundColor: Theme.of(context).colorScheme.error,
-                    textColor: Theme.of(context).colorScheme.onError,
+            BlocBuilder<QuestionBuilderBloc, QuestionBuilderState>(
+              bloc: AppBlocs.questionBuilderBloc,
+              buildWhen: (previous, current) =>
+                  previous.title != current.title ||
+                  previous.maxSelections != current.maxSelections ||
+                  previous.options != current.options,
+              builder: (context, state) {
+                final isTitleValid = state.title.trim().isNotEmpty;
+                final isMaxSelectionsValid =
+                    state.maxSelections != null && state.maxSelections! > 0;
+                final hasMinimumOptions = state.options.length >= _minOptions;
+                final hasOnlyNonEmptyOptions = state.options.every(
+                  (option) => option.label.trim().isNotEmpty,
+                );
+                final canSave = isTitleValid &&
+                    isMaxSelectionsValid &&
+                    hasMinimumOptions &&
+                    hasOnlyNonEmptyOptions;
+
+                String? validationMessage;
+                if (!hasMinimumOptions) {
+                  validationMessage = AppStrings.warningMinimumOptions(
+                    _minOptions,
                   );
-                  return;
+                } else if (!hasOnlyNonEmptyOptions) {
+                  validationMessage =
+                      AppStrings.questionBuilderEmptyOptionsMessage;
+                } else if (!isTitleValid || !isMaxSelectionsValid) {
+                  validationMessage =
+                      AppStrings.questionBuilderInvalidFieldsMessage;
                 }
-                Navigator.pop(
-                  context,
-                  AppBlocs.questionBuilderBloc.buildQuestionEntity(),
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (validationMessage != null)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            validationMessage,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.error,
+                            ),
+                          ),
+                        ),
+                      ),
+                    QuestionBuilderActionButtons(
+                      onSave: canSave
+                          ? () {
+                              Navigator.pop(
+                                context,
+                                AppBlocs.questionBuilderBloc
+                                    .buildQuestionEntity(),
+                              );
+                            }
+                          : null,
+                    ),
+                  ],
                 );
               },
             ),

@@ -59,7 +59,7 @@ class _FreeTextQuestionSectionState extends State<FreeTextQuestionSection> {
                   },
                   limitType: QuestionLimitType.maxCharacters,
                   onLimitChanged: (value) {
-                    final int maxCharacters = int.tryParse(value) ?? 0;
+                    final int? maxCharacters = int.tryParse(value.trim());
                     AppBlocs.questionBuilderBloc.add(
                       QuestionMaxLengthChanged(maxCharacters),
                     );
@@ -68,11 +68,45 @@ class _FreeTextQuestionSectionState extends State<FreeTextQuestionSection> {
               },
             ),
             const SizedBox(height: 20),
-            QuestionBuilderActionButtons(
-              onSave: () {
-                Navigator.pop(
-                  context,
-                  AppBlocs.questionBuilderBloc.buildQuestionEntity(),
+            BlocBuilder<QuestionBuilderBloc, QuestionBuilderState>(
+              bloc: AppBlocs.questionBuilderBloc,
+              buildWhen: (previous, current) =>
+                  previous.title != current.title ||
+                  previous.maxLength != current.maxLength,
+              builder: (context, state) {
+                final isTitleValid = state.title.trim().isNotEmpty;
+                final isMaxLengthValid =
+                    state.maxLength != null && state.maxLength! > 0;
+                final canSave = isTitleValid && isMaxLengthValid;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (!canSave)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            AppStrings.questionBuilderInvalidFieldsMessage,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.error,
+                            ),
+                          ),
+                        ),
+                      ),
+                    QuestionBuilderActionButtons(
+                      onSave: canSave
+                          ? () {
+                              Navigator.pop(
+                                context,
+                                AppBlocs.questionBuilderBloc
+                                    .buildQuestionEntity(),
+                              );
+                            }
+                          : null,
+                    ),
+                  ],
                 );
               },
             ),

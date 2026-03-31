@@ -13,7 +13,7 @@ class CustomButton extends StatelessWidget {
   }) : assert(text != null || child != null);
 
   /// Callback when the button is pressed.
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   /// The text displayed on the button.
   final String? text;

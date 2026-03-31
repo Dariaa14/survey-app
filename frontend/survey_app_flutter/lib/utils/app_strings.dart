@@ -216,4 +216,12 @@ class AppStrings {
   /// the minimum required options.
   static String warningMinimumOptions(int minOptions) =>
       "Trebuie minim $minOptions opțiuni.";
+
+    /// Validation message shown when required question fields are invalid.
+    static const String questionBuilderInvalidFieldsMessage =
+      "Completează toate câmpurile obligatorii cu valori valide.";
+
+    /// Validation message shown when option labels are empty.
+    static const String questionBuilderEmptyOptionsMessage =
+      "Toate opțiunile trebuie completate.";
 }
