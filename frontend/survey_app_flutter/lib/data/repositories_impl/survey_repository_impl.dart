@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:survey_app_flutter/data/entities_impl/question_entity_impl.dart';
 import 'package:survey_app_flutter/data/entities_impl/survey_entity_impl.dart';
+import 'package:survey_app_flutter/domain/entities/option_entity.dart';
+import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/domain/repositories/survey_repository.dart';
 
@@ -104,6 +107,53 @@ class SurveyRepositoryImpl implements SurveyRepository {
       );
     } else {
       throw Exception('Failed to update survey');
+    }
+  }
+
+  @override
+  Future<QuestionEntity> createQuestion({
+    required String surveyId,
+    required String token,
+    required QuestionType type,
+    required String title,
+    required bool required,
+    required int order,
+    int? maxLength,
+    int? maxSelections,
+    List<OptionEntity>? options,
+  }) async {
+    final questionTypeString = type == QuestionType.text
+        ? 'text'
+        : 'multipleChoice';
+
+    final requestBody = {
+      'type': questionTypeString,
+      'title': title,
+      'required': required,
+      'order': order,
+      if (maxLength != null) 'max_length': maxLength,
+      if (maxSelections != null) 'max_selections': maxSelections,
+      if (options != null && options.isNotEmpty)
+        'options': options
+            .map((opt) => {'label': opt.label, 'order': opt.order})
+            .toList(),
+    };
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/$surveyId/questions'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return QuestionEntityImpl.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+    } else {
+      throw Exception('Failed to create question');
     }
   }
 }

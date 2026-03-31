@@ -1,3 +1,5 @@
+import 'package:survey_app_flutter/domain/entities/option_entity.dart';
+import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/domain/repositories/survey_repository.dart';
 
@@ -48,5 +50,30 @@ class SurveyUseCase {
   /// Updates an existing survey.
   Future<SurveyEntity> updateSurvey(SurveyEntity survey) async {
     return _surveyRepository.updateSurvey(survey);
+  }
+
+  /// Creates a new question in the specified survey.
+  Future<QuestionEntity> createQuestion({
+    required String surveyId,
+    required String token,
+    required QuestionType type,
+    required String title,
+    required bool required,
+    required int order,
+    int? maxLength,
+    int? maxSelections,
+    List<OptionEntity>? options,
+  }) async {
+    return _surveyRepository.createQuestion(
+      surveyId: surveyId,
+      token: token,
+      type: type,
+      title: title,
+      required: required,
+      order: order,
+      maxLength: maxLength,
+      maxSelections: maxSelections,
+      options: options,
+    );
   }
 }

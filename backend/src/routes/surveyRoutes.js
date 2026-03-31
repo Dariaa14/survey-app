@@ -148,4 +148,132 @@ router.delete('/:id',verifyToken, requireAdmin, async (req, res) => {
     }
 });
 
+/// CREATE question
+router.post('/:id/questions', verifyToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const {
+            type,
+            title,
+            required,
+            order,
+            max_length,
+            max_selections,
+            options 
+        } = req.body;
+
+        const survey = await Survey.findByPk(id);
+        if (!survey) return res.status(404).json({ error: 'Survey not found' });
+
+        if (survey.status !== 'draft') {
+            return res.status(400).json({ error: 'Can only add questions to draft surveys' });
+        }
+
+        const question = await Question.create({
+            survey_id: id,
+            type,
+            title,
+            required: required ?? false,
+            order: order ?? 0,
+            max_length,
+            max_selections
+        });
+
+        if (options && Array.isArray(options)) {
+            const optionData = options.map((opt, index) => ({
+                question_id: question.id,
+                label: opt.label,
+                order: opt.order ?? index
+            }));
+
+            await Option.bulkCreate(optionData);
+        }
+
+        res.status(201).json(question);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to add question' });
+    }
+});
+
+/// UPDATE question
+router.put('/:id/questions/:qid', verifyToken, requireAdmin, async (req, res) => {
+    try {
+        const { id, qid } = req.params;
+
+        const survey = await Survey.findByPk(id);
+        if (!survey) return res.status(404).json({ error: 'Survey not found' });
+
+        if (survey.status !== 'draft') {
+            return res.status(400).json({ error: 'Can only edit draft surveys' });
+        }
+
+        const question = await Question.findByPk(qid);
+        if (!question) return res.status(404).json({ error: 'Question not found' });
+
+        await question.update(req.body);
+
+        res.json(question);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to update question' });
+    }
+});
+
+///PUBLISH survey
+router.post('/:id/publish', verifyToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const survey = await Survey.findByPk(id);
+        if (!survey) return res.status(404).json({ error: 'Survey not found' });
+
+        if (survey.status !== 'draft') {
+            return res.status(400).json({ error: 'Only draft surveys can be published' });
+        }
+
+        const questionCount = await Question.count({
+            where: { survey_id: id }
+        });
+
+        if (questionCount < 1) {
+            return res.status(400).json({ error: 'Survey must have at least 1 question' });
+        }
+
+        await survey.update({
+            status: 'published',
+            published_at: new Date()
+        });
+
+        res.json({ message: 'Survey published' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to publish survey' });
+    }
+});
+
+/// CLOSE survey
+router.post('/:id/close', verifyToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const survey = await Survey.findByPk(id);
+        if (!survey) return res.status(404).json({ error: 'Survey not found' });
+
+        if (survey.status !== 'published') {
+            return res.status(400).json({ error: 'Only published surveys can be closed' });
+        }
+
+        await survey.update({
+            status: 'closed',
+            closed_at: new Date()
+        });
+
+        res.json({ message: 'Survey closed' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to close survey' });
+    }
+});
+
 module.exports = router;
