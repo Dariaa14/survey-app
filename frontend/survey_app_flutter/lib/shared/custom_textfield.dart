@@ -8,6 +8,7 @@ class CustomTextfield extends StatefulWidget {
     this.hintText = 'Enter text',
     this.controller,
     this.onChanged,
+    this.readOnly = false,
     this.textColor,
     this.minLines,
     this.maxLines = 1,
@@ -22,6 +23,9 @@ class CustomTextfield extends StatefulWidget {
 
   /// Callback when text changes
   final Function(String)? onChanged;
+
+  /// Whether the text field can only be read.
+  final bool readOnly;
 
   /// Optional text color for the input content.
   final Color? textColor;
@@ -64,7 +68,8 @@ class _CustomTextfieldState extends State<CustomTextfield> {
     return TextField(
       focusNode: _focusNode,
       controller: widget.controller,
-      onChanged: widget.onChanged,
+      onChanged: widget.readOnly ? null : widget.onChanged,
+      readOnly: widget.readOnly,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       scrollController: _scrollController,

@@ -18,6 +18,7 @@ class SurveyBuilderQuestionsSection extends StatefulWidget {
   const SurveyBuilderQuestionsSection({
     required this.questions,
     this.expand = true,
+    this.isReadOnly = false,
     super.key,
   });
 
@@ -26,6 +27,9 @@ class SurveyBuilderQuestionsSection extends StatefulWidget {
 
   /// Whether the section should occupy remaining horizontal space in a Row.
   final bool expand;
+
+  /// Whether section is read-only.
+  final bool isReadOnly;
 
   @override
   State<SurveyBuilderQuestionsSection> createState() =>
@@ -113,73 +117,94 @@ class _SurveyBuilderQuestionsSectionState
               ),
             ),
             const Spacer(),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              alignment: WrapAlignment.end,
-              children: [
-                CustomButton(
-                  onPressed: () => _showAddQuestionDialog(context),
-                  text: '+ ${AppStrings.multiChoiceTab}',
-                ),
-                CustomButton(
-                  onPressed: () =>
-                      _showAddQuestionDialog(context, isMultiChoice: false),
-                  text: '+ ${AppStrings.freeTextTab}',
-                ),
-              ],
-            ),
+            if (!widget.isReadOnly)
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.end,
+                children: [
+                  CustomButton(
+                    onPressed: () => _showAddQuestionDialog(context),
+                    text: '+ ${AppStrings.multiChoiceTab}',
+                  ),
+                  CustomButton(
+                    onPressed: () =>
+                        _showAddQuestionDialog(context, isMultiChoice: false),
+                    text: '+ ${AppStrings.freeTextTab}',
+                  ),
+                ],
+              ),
           ],
         ),
         const SizedBox(height: 20),
-        ReorderableListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          buildDefaultDragHandles: false,
-          itemCount: _visibleQuestions.length,
-          onReorder: (oldIndex, newIndex) {
-            var targetIndex = newIndex;
-            if (newIndex > oldIndex) {
-              targetIndex -= 1;
-            }
+        if (!widget.isReadOnly)
+          ReorderableListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            buildDefaultDragHandles: false,
+            itemCount: _visibleQuestions.length,
+            onReorder: (oldIndex, newIndex) {
+              var targetIndex = newIndex;
+              if (newIndex > oldIndex) {
+                targetIndex -= 1;
+              }
 
-            if (oldIndex == targetIndex) {
-              return;
-            }
+              if (oldIndex == targetIndex) {
+                return;
+              }
 
-            setState(() {
-              final moved = _visibleQuestions.removeAt(oldIndex);
-              _visibleQuestions.insert(targetIndex, moved);
-              _awaitingBlocReorderSync = true;
-            });
+              setState(() {
+                final moved = _visibleQuestions.removeAt(oldIndex);
+                _visibleQuestions.insert(targetIndex, moved);
+                _awaitingBlocReorderSync = true;
+              });
 
-            AppBlocs.surveyBuilderBloc.add(
-              ReorderQuestions(oldIndex: oldIndex, newIndex: targetIndex),
-            );
-          },
-          itemBuilder: (context, index) {
-            final q = _visibleQuestions[index];
-            return Padding(
-              key: ObjectKey(q),
-              padding: const EdgeInsets.only(bottom: 12),
-              child: QuestionPreview(
-                question: q,
-                onEdit: () => _showAddQuestionDialog(context, question: q),
-                dragHandle: ReorderableDragStartListener(
-                  index: index,
-                  child: Icon(
-                    Icons.drag_indicator,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+              AppBlocs.surveyBuilderBloc.add(
+                ReorderQuestions(oldIndex: oldIndex, newIndex: targetIndex),
+              );
+            },
+            itemBuilder: (context, index) {
+              final q = _visibleQuestions[index];
+              return Padding(
+                key: ObjectKey(q),
+                padding: const EdgeInsets.only(bottom: 12),
+                child: QuestionPreview(
+                  question: q,
+                  onEdit: () => _showAddQuestionDialog(context, question: q),
+                  dragHandle: ReorderableDragStartListener(
+                    index: index,
+                    child: Icon(
+                      Icons.drag_indicator,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 4),
-        AddQuestionDashedButton(
-          onTap: () => _showAddQuestionDialog(context),
-        ),
+              );
+            },
+          )
+        else
+          Column(
+            children: _visibleQuestions
+                .map(
+                  (q) => Padding(
+                    key: ObjectKey(q),
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: QuestionPreview(
+                      question: q,
+                      onEdit: () {},
+                      showActions: false,
+                      showDragIndicator: false,
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        if (!widget.isReadOnly) ...[
+          const SizedBox(height: 4),
+          AddQuestionDashedButton(
+            onTap: () => _showAddQuestionDialog(context),
+          ),
+        ],
       ],
     );
 

@@ -58,6 +58,9 @@ class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isReadOnly =
+        widget.survey != null && widget.survey!.status != SurveyStatus.draft;
+
     return BlocProviders(
       child: Scaffold(
         body: SafeArea(
@@ -81,6 +84,7 @@ class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
                                 return SurveyBuilderQuestionsSection(
                                   questions: state.questions,
                                   expand: false,
+                                  isReadOnly: isReadOnly,
                                 );
                               },
                             ),
@@ -94,6 +98,7 @@ class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
                               surveyDescriptionController:
                                   _surveyDescriptionController,
                               surveySlugController: _surveySlugController,
+                              isReadOnly: isReadOnly,
                             ),
                           ],
                         )
@@ -107,6 +112,7 @@ class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
                                 surveyDescriptionController:
                                     _surveyDescriptionController,
                                 surveySlugController: _surveySlugController,
+                                isReadOnly: isReadOnly,
                               ),
                             ),
                             const SizedBox(width: 24),
@@ -117,6 +123,7 @@ class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
                               builder: (context, state) {
                                 return SurveyBuilderQuestionsSection(
                                   questions: state.questions,
+                                  isReadOnly: isReadOnly,
                                 );
                               },
                             ),

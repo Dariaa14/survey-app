@@ -18,6 +18,7 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
     required this.surveyTitleController,
     required this.surveyDescriptionController,
     required this.surveySlugController,
+    this.isReadOnly = false,
     super.key,
   });
 
@@ -29,6 +30,9 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
 
   /// Controller for the survey slug text field.
   final TextEditingController surveySlugController;
+
+  /// Whether details are read-only.
+  final bool isReadOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +78,12 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
         CustomTextfield(
           hintText: AppStrings.surveyTitlePlaceholder,
           controller: surveyTitleController,
-          onChanged: (value) {
-            AppBlocs.surveyBuilderBloc.add(UpdateSurveyTitle(value));
-          },
+          readOnly: isReadOnly,
+          onChanged: isReadOnly
+              ? null
+              : (value) {
+                  AppBlocs.surveyBuilderBloc.add(UpdateSurveyTitle(value));
+                },
         ),
         const SizedBox(height: 16),
         Text(
@@ -91,9 +98,12 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
           controller: surveyDescriptionController,
           minLines: 3,
           maxLines: 3,
-          onChanged: (value) {
-            AppBlocs.surveyBuilderBloc.add(UpdateSurveyDescription(value));
-          },
+          readOnly: isReadOnly,
+          onChanged: isReadOnly
+              ? null
+              : (value) {
+                  AppBlocs.surveyBuilderBloc.add(UpdateSurveyDescription(value));
+                },
         ),
         const SizedBox(height: 16),
         Text(
@@ -113,9 +123,12 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
             hintText: AppStrings.surveySlugPlaceholder,
             controller: surveySlugController,
             textColor: colorScheme.secondary,
-            onChanged: (value) {
-              AppBlocs.surveyBuilderBloc.add(UpdateSurveySlug(value));
-            },
+            readOnly: isReadOnly,
+            onChanged: isReadOnly
+                ? null
+                : (value) {
+                    AppBlocs.surveyBuilderBloc.add(UpdateSurveySlug(value));
+                  },
           ),
         ),
         const SizedBox(height: 8),
@@ -126,17 +139,18 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        Divider(color: colorScheme.onSurfaceVariant),
-        const SizedBox(height: 20),
-        Text(
-          AppStrings.actionsTitle.toUpperCase(),
-          style: textTheme.titleMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
+        if (!isReadOnly) ...[
+          Divider(color: colorScheme.onSurfaceVariant),
+          const SizedBox(height: 20),
+          Text(
+            AppStrings.actionsTitle.toUpperCase(),
+            style: textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        BlocBuilder<SurveyBuilderBloc, SurveyBuilderState>(
+          const SizedBox(height: 12),
+          BlocBuilder<SurveyBuilderBloc, SurveyBuilderState>(
           bloc: AppBlocs.surveyBuilderBloc,
           buildWhen: (previous, current) =>
               previous.title != current.title ||
@@ -210,6 +224,7 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
             );
           },
         ),
+        ],
       ],
       ),
     );

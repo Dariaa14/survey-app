@@ -14,6 +14,8 @@ class QuestionPreview extends StatelessWidget {
     required this.question,
     required this.onEdit,
     this.dragHandle,
+    this.showActions = true,
+    this.showDragIndicator = true,
 
     super.key,
   });
@@ -26,6 +28,12 @@ class QuestionPreview extends StatelessWidget {
 
   /// Optional drag handle widget displayed at the start of the preview.
   final Widget? dragHandle;
+
+  /// Whether edit/delete actions are shown.
+  final bool showActions;
+
+  /// Whether drag indicator should be shown when no drag handle is provided.
+  final bool showDragIndicator;
 
   String _maxLimitText() {
     if (question.type == QuestionType.multipleChoice) {
@@ -59,6 +67,14 @@ class QuestionPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final Widget? leading =
+        dragHandle ??
+        (showDragIndicator
+            ? Icon(
+                Icons.drag_indicator,
+                color: colorScheme.onSurfaceVariant,
+              )
+            : null);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -70,12 +86,10 @@ class QuestionPreview extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          dragHandle ??
-              Icon(
-                Icons.drag_indicator,
-                color: colorScheme.onSurfaceVariant,
-              ),
-          const SizedBox(width: 12),
+          if (leading != null) ...[
+            leading,
+            const SizedBox(width: 12),
+          ],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,30 +134,32 @@ class QuestionPreview extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 12),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CustomButton(
-                onPressed: onEdit,
-                text: AppStrings.questionPreviewEditButton,
-                variant: CustomColorVariant.gray,
-              ),
-              const SizedBox(width: 8),
-              CustomButton(
-                onPressed: () {
-                  AppBlocs.surveyBuilderBloc.add(
-                    RemoveQuestion(question.order),
-                  );
-                },
-                variant: CustomColorVariant.gray,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 3),
-                  child: Icon(Icons.delete, color: colorScheme.error),
+          if (showActions) ...[
+            const SizedBox(width: 12),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CustomButton(
+                  onPressed: onEdit,
+                  text: AppStrings.questionPreviewEditButton,
+                  variant: CustomColorVariant.gray,
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(width: 8),
+                CustomButton(
+                  onPressed: () {
+                    AppBlocs.surveyBuilderBloc.add(
+                      RemoveQuestion(question.order),
+                    );
+                  },
+                  variant: CustomColorVariant.gray,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3),
+                    child: Icon(Icons.delete, color: colorScheme.error),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
