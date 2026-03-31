@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
+import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_event.dart';
 import 'package:survey_app_flutter/presentation/question_builder/question_builder_page.dart';
+import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_event.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/sections/questions_widgets/add_question_dashed_button.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/sections/questions_widgets/question_preview.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
+import 'package:survey_app_flutter/utils/app_blocs.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// A widget that displays the questions section of the survey builder page.
@@ -45,25 +48,12 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
               alignment: WrapAlignment.end,
               children: [
                 CustomButton(
-                  onPressed: () {
-                    showDialog<void>(
-                      context: context,
-                      builder: (context) => const QuestionBuilderPage(
-                        initialIsMultiChoiceSelected: true,
-                      ),
-                    );
-                  },
+                  onPressed: () => _showAddQuestionDialog(context),
                   text: '+ ${AppStrings.multiChoiceTab}',
                 ),
                 CustomButton(
-                  onPressed: () {
-                    showDialog<void>(
-                      context: context,
-                      builder: (context) => const QuestionBuilderPage(
-                        initialIsMultiChoiceSelected: false,
-                      ),
-                    );
-                  },
+                  onPressed: () =>
+                      _showAddQuestionDialog(context, isMultiChoice: false),
                   text: '+ ${AppStrings.freeTextTab}',
                 ),
               ],
@@ -79,14 +69,7 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         AddQuestionDashedButton(
-          onTap: () {
-            showDialog<void>(
-              context: context,
-              builder: (context) => const QuestionBuilderPage(
-                initialIsMultiChoiceSelected: true,
-              ),
-            );
-          },
+          onTap: () => _showAddQuestionDialog(context),
         ),
       ],
     );
@@ -96,5 +79,23 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
     }
 
     return Expanded(child: content);
+  }
+
+  Future<void> _showAddQuestionDialog(
+    BuildContext context, {
+    bool isMultiChoice = true,
+  }) async {
+    final question = await showDialog<QuestionEntity?>(
+      context: context,
+      builder: (context) => QuestionBuilderPage(
+        orderNumber: questions.length + 1,
+        initialIsMultiChoiceSelected: isMultiChoice,
+      ),
+    );
+
+    AppBlocs.questionBuilderBloc.add(QuestionBuilderReset());
+    if (question == null) return;
+
+    AppBlocs.surveyBuilderBloc.add(AddQuestion(question));
   }
 }

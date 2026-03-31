@@ -7,6 +7,7 @@ import 'package:survey_app_flutter/domain/use_cases/survey_use_case.dart';
 import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_bloc.dart';
 import 'package:survey_app_flutter/presentation/authentication/bloc/authentication_bloc.dart';
+import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_bloc.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_bloc.dart';
 
 /// Instance of getIt
@@ -45,7 +46,10 @@ void _loadBlocs() {
       userUseCase: getIt.get<UserUseCase>(),
     ),
   );
-  getIt.registerFactory(
+  getIt.registerLazySingleton(
     () => SurveyBuilderBloc(getIt.get<SurveyUseCase>()),
+  );
+  getIt.registerLazySingleton(
+    () => QuestionBuilderBloc(getIt.get<SurveyUseCase>()),
   );
 }

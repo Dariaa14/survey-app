@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_bloc.dart';
+import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_event.dart';
+import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_state.dart';
 import 'package:survey_app_flutter/presentation/question_builder/widgets/question_builder_action_buttons.dart';
 import 'package:survey_app_flutter/presentation/question_builder/widgets/question_limit_input_widget.dart';
 import 'package:survey_app_flutter/presentation/question_builder/widgets/required_limit_section.dart';
 import 'package:survey_app_flutter/shared/custom_textfield.dart';
+import 'package:survey_app_flutter/utils/app_blocs.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// A section widget for building free text questions in the survey builder.
@@ -16,8 +21,6 @@ class FreeTextQuestionSection extends StatefulWidget {
 }
 
 class _FreeTextQuestionSectionState extends State<FreeTextQuestionSection> {
-  bool _isRequired = false;
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -35,23 +38,43 @@ class _FreeTextQuestionSectionState extends State<FreeTextQuestionSection> {
               ),
             ),
             const SizedBox(height: 8),
-            const CustomTextfield(
+            CustomTextfield(
               hintText: AppStrings.questionTextPlaceholder,
+              onChanged: (value) {
+                AppBlocs.questionBuilderBloc.add(QuestionTitleChanged(value));
+              },
             ),
             const SizedBox(height: 16),
-            RequiredLimitSection(
-              isRequired: _isRequired,
-              onRequiredChanged: ({bool? required}) {
-                setState(() {
-                  _isRequired = required ?? false;
-                });
+            BlocBuilder<QuestionBuilderBloc, QuestionBuilderState>(
+              bloc: AppBlocs.questionBuilderBloc,
+              buildWhen: (previous, current) =>
+                  previous.required != current.required,
+              builder: (context, state) {
+                return RequiredLimitSection(
+                  isRequired: state.required,
+                  onRequiredChanged: ({bool? required}) {
+                    AppBlocs.questionBuilderBloc.add(
+                      QuestionRequiredChanged(required: required ?? false),
+                    );
+                  },
+                  limitType: QuestionLimitType.maxCharacters,
+                  onLimitChanged: (value) {
+                    final int maxCharacters = int.tryParse(value) ?? 0;
+                    AppBlocs.questionBuilderBloc.add(
+                      QuestionMaxLengthChanged(maxCharacters),
+                    );
+                  },
+                );
               },
-              limitType: QuestionLimitType.maxCharacters,
-              onLimitChanged: (value) {},
             ),
             const SizedBox(height: 20),
             QuestionBuilderActionButtons(
-              onSave: () {},
+              onSave: () {
+                Navigator.pop(
+                  context,
+                  AppBlocs.questionBuilderBloc.buildQuestionEntity(),
+                );
+              },
             ),
           ],
         );

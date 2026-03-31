@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_bloc.dart';
+import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_event.dart';
+import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_state.dart';
 import 'package:survey_app_flutter/presentation/question_builder/widgets/question_builder_action_buttons.dart';
 import 'package:survey_app_flutter/presentation/question_builder/widgets/question_limit_input_widget.dart';
 import 'package:survey_app_flutter/presentation/question_builder/widgets/required_limit_section.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/shared/custom_textfield.dart';
+import 'package:survey_app_flutter/utils/app_blocs.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
-/// A section widget for building multiple choice questions in the survey builder.
-class MultiChoiceQuestionSection extends StatefulWidget {
+/// A section widget for building multiple choice questions
+///  in the survey builder.
+class MultiChoiceQuestionSection extends StatelessWidget {
   /// Constructs a [MultiChoiceQuestionSection].
   const MultiChoiceQuestionSection({super.key});
 
-  @override
-  State<MultiChoiceQuestionSection> createState() =>
-      _MultiChoiceQuestionSectionState();
-}
-
-class _MultiChoiceQuestionSectionState
-    extends State<MultiChoiceQuestionSection> {
-  bool _isRequired = false;
-  int _maxOptions = 2;
+  static const int _minOptions = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -38,23 +36,40 @@ class _MultiChoiceQuestionSectionState
               ),
             ),
             const SizedBox(height: 8),
-            const CustomTextfield(
+            CustomTextfield(
               hintText: AppStrings.questionTextPlaceholder,
+              onChanged: (value) {
+                AppBlocs.questionBuilderBloc.add(QuestionTitleChanged(value));
+              },
             ),
             const SizedBox(height: 16),
-            RequiredLimitSection(
-              isRequired: _isRequired,
-              onRequiredChanged: ({bool? required}) {
-                setState(() {
-                  _isRequired = required ?? false;
-                });
+            BlocBuilder<QuestionBuilderBloc, QuestionBuilderState>(
+              bloc: AppBlocs.questionBuilderBloc,
+              buildWhen: (previous, current) =>
+                  previous.required != current.required,
+              builder: (context, state) {
+                return RequiredLimitSection(
+                  isRequired: state.required,
+                  onRequiredChanged: ({bool? required}) {
+                    if (required != null) {
+                      AppBlocs.questionBuilderBloc.add(
+                        QuestionRequiredChanged(required: required),
+                      );
+                    }
+                  },
+                  limitType: QuestionLimitType.maxOptions,
+                  onLimitChanged: (value) {
+                    final int maxSelections = int.tryParse(value) ?? 0;
+                    AppBlocs.questionBuilderBloc.add(
+                      QuestionMaxSelectionsChanged(maxSelections),
+                    );
+                  },
+                );
               },
-              limitType: QuestionLimitType.maxOptions,
-              onLimitChanged: (value) {},
             ),
             const SizedBox(height: 16),
             Text(
-              AppStrings.numberOfOptionsLabel(_maxOptions),
+              AppStrings.numberOfOptionsLabel(_minOptions),
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -66,7 +81,12 @@ class _MultiChoiceQuestionSectionState
             ),
             const SizedBox(height: 20),
             QuestionBuilderActionButtons(
-              onSave: () {},
+              onSave: () {
+                Navigator.pop(
+                  context,
+                  AppBlocs.questionBuilderBloc.buildQuestionEntity(),
+                );
+              },
             ),
           ],
         );

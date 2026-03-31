@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/bloc_listeners/bloc_providers.dart';
+import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_bloc.dart';
+import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_state.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/sections/survey_builder_details_section.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/sections/survey_builder_questions_section.dart';
+import 'package:survey_app_flutter/utils/app_blocs.dart';
 
 /// A page for building and editing surveys in the admin section.
 class SurveyBuilderPage extends StatefulWidget {
@@ -60,9 +64,16 @@ class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SurveyBuilderQuestionsSection(
-                              questions: widget.survey?.questions ?? [],
-                              expand: false,
+                            BlocBuilder<SurveyBuilderBloc, SurveyBuilderState>(
+                              bloc: AppBlocs.surveyBuilderBloc,
+                              buildWhen: (previous, current) =>
+                                  previous.questions != current.questions,
+                              builder: (context, state) {
+                                return SurveyBuilderQuestionsSection(
+                                  questions: state.questions,
+                                  expand: false,
+                                );
+                              },
                             ),
                             const SizedBox(height: 16),
                             Divider(
@@ -90,8 +101,15 @@ class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
                               ),
                             ),
                             const SizedBox(width: 24),
-                            SurveyBuilderQuestionsSection(
-                              questions: widget.survey?.questions ?? [],
+                            BlocBuilder<SurveyBuilderBloc, SurveyBuilderState>(
+                              bloc: AppBlocs.surveyBuilderBloc,
+                              buildWhen: (previous, current) =>
+                                  previous.questions != current.questions,
+                              builder: (context, state) {
+                                return SurveyBuilderQuestionsSection(
+                                  questions: state.questions,
+                                );
+                              },
                             ),
                           ],
                         ),
