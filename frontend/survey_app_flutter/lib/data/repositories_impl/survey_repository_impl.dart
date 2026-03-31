@@ -62,11 +62,23 @@ class SurveyRepositoryImpl implements SurveyRepository {
   }
 
   @override
-  Future<SurveyEntity> createSurvey(SurveyEntity survey) async {
+  Future<SurveyEntity> createSurvey({
+    required String ownerId,
+    required String title,
+    required String description,
+    required String slug,
+    required SurveyStatus status,
+  }) async {
     final response = await http.post(
       Uri.parse(baseUrl),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode((survey as SurveyEntityImpl).toJson()),
+      body: jsonEncode({
+        'ownerId': ownerId,
+        'title': title,
+        'description': description,
+        'slug': slug,
+        'status': status.toString(),
+      }),
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {

@@ -1,20 +1,20 @@
 import 'package:bloc/bloc.dart';
-import 'package:survey_app_flutter/domain/repositories/survey_repository.dart';
-import 'package:survey_app_flutter/domain/repositories/user_repository.dart';
+import 'package:survey_app_flutter/domain/use_cases/survey_use_case.dart';
+import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_state.dart';
 
 /// Bloc for managing admin-related state and events.
 class AdminBloc extends Bloc<AdminEvent, AdminState> {
-  final SurveyRepository _surveyRepository;
-  final UserRepository _userRepository;
+  final SurveyUseCase _surveyUseCase;
+  final UserUseCase _userUseCase;
 
   /// Constructs an [AdminBloc] with the initial state of [AdminState].
   AdminBloc({
-    required SurveyRepository surveyRepository,
-    required UserRepository userRepository,
-  }) : _surveyRepository = surveyRepository,
-       _userRepository = userRepository,
+    required SurveyUseCase surveyUseCase,
+    required UserUseCase userUseCase,
+  }) : _surveyUseCase = surveyUseCase,
+       _userUseCase = userUseCase,
        super(const AdminState()) {
     on<AdminAccountRequested>(_onAccountRequested);
     on<AdminSurveysRequested>(_onSurveysRequested);
@@ -33,7 +33,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     );
 
     try {
-      final adminUser = await _userRepository.getCurrentUser();
+      final adminUser = await _userUseCase.getCurrentUser();
 
       emit(
         state
@@ -72,12 +72,12 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     );
 
     try {
-      final token = await _userRepository.getAuthToken();
+      final token = await _userUseCase.getAuthToken();
       if (token == null || token.isEmpty) {
         throw Exception('No auth token available.');
       }
 
-      final surveys = await _surveyRepository.getSurveysByUser(
+      final surveys = await _surveyUseCase.getSurveysByUser(
         adminUser.id,
         token,
       );
@@ -113,12 +113,12 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
 
     try {
-      final token = await _userRepository.getAuthToken();
+      final token = await _userUseCase.getAuthToken();
       if (token == null || token.isEmpty) {
         throw Exception('No auth token available.');
       }
 
-      final surveys = await _surveyRepository.getSurveysByUser(
+      final surveys = await _surveyUseCase.getSurveysByUser(
         adminUser.id,
         token,
       );

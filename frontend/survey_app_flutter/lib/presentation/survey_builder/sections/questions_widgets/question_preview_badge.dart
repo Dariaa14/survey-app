@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/presentation/survey_builder/sections/questions_widgets/question_preview_data.dart';
+import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/shared/custom_labeled_container.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';

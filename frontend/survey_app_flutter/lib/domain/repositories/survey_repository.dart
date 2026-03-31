@@ -13,7 +13,13 @@ abstract class SurveyRepository {
   Future<SurveyEntity> getSurveyById(String surveyId);
 
   /// Creates a new survey in the data source.
-  Future<SurveyEntity> createSurvey(SurveyEntity survey);
+  Future<SurveyEntity> createSurvey({
+    required String ownerId,
+    required String title,
+    required String description,
+    required String slug,
+    required SurveyStatus status,
+  });
 
   /// Updates an existing survey in the data source.
   Future<SurveyEntity> updateSurvey(SurveyEntity survey);
