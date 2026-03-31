@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/bloc_listeners/bloc_providers.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_bloc.dart';
+import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_event.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_state.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/sections/survey_builder_details_section.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/sections/survey_builder_questions_section.dart';
@@ -28,6 +29,13 @@ class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.survey != null) {
+      AppBlocs.surveyBuilderBloc.add(LoadSurveyForEditing(widget.survey!));
+    } else {
+      AppBlocs.surveyBuilderBloc.add(ResetSurveyBuilder());
+    }
+
     _surveyTitleController = TextEditingController(
       text: widget.survey?.title ?? '',
     );
@@ -41,6 +49,7 @@ class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
 
   @override
   void dispose() {
+    AppBlocs.surveyBuilderBloc.add(ResetSurveyBuilder());
     _surveyTitleController.dispose();
     _surveyDescriptionController.dispose();
     _surveySlugController.dispose();

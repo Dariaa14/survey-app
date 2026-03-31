@@ -32,6 +32,7 @@ class SurveyUseCase {
 
   /// Creates a new survey.
   Future<SurveyEntity> createSurvey({
+    required String token,
     required String ownerId,
     required String title,
     required String description,
@@ -39,6 +40,7 @@ class SurveyUseCase {
     required SurveyStatus status,
   }) async {
     return _surveyRepository.createSurvey(
+      token: token,
       ownerId: ownerId,
       title: title,
       description: description,
@@ -48,8 +50,24 @@ class SurveyUseCase {
   }
 
   /// Updates an existing survey.
-  Future<SurveyEntity> updateSurvey(SurveyEntity survey) async {
-    return _surveyRepository.updateSurvey(survey);
+  Future<SurveyEntity> updateSurvey(String token, SurveyEntity survey) async {
+    return _surveyRepository.updateSurvey(token, survey);
+  }
+
+  /// Publishes a draft survey.
+  Future<void> publishSurvey({
+    required String token,
+    required String surveyId,
+  }) async {
+    return _surveyRepository.publishSurvey(token: token, surveyId: surveyId);
+  }
+
+  /// Deletes a survey.
+  Future<void> deleteSurvey({
+    required String token,
+    required String surveyId,
+  }) async {
+    return _surveyRepository.deleteSurvey(token: token, surveyId: surveyId);
   }
 
   /// Creates a new question in the specified survey.

@@ -16,6 +16,7 @@ abstract class SurveyRepository {
 
   /// Creates a new survey in the data source.
   Future<SurveyEntity> createSurvey({
+    required String token,
     required String ownerId,
     required String title,
     required String description,
@@ -24,7 +25,13 @@ abstract class SurveyRepository {
   });
 
   /// Updates an existing survey in the data source.
-  Future<SurveyEntity> updateSurvey(SurveyEntity survey);
+  Future<SurveyEntity> updateSurvey(String token, SurveyEntity survey);
+
+  /// Publishes a draft survey.
+  Future<void> publishSurvey({required String token, required String surveyId});
+
+  /// Deletes a survey.
+  Future<void> deleteSurvey({required String token, required String surveyId});
 
   /// Creates a new question in the specified survey.
   Future<QuestionEntity> createQuestion({

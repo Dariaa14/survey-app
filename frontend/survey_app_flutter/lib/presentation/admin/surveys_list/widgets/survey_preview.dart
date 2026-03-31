@@ -21,8 +21,8 @@ class SurveyPreview extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        context.go(
-          AppRoutes.adminSurveyEditPath(survey.id.toString()),
+        context.push(
+          AppRoutes.adminSurveyEditPath(survey.id),
           extra: survey,
         );
       },

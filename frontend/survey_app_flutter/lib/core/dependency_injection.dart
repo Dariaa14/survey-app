@@ -47,7 +47,8 @@ void _loadBlocs() {
     ),
   );
   getIt.registerLazySingleton(
-    () => SurveyBuilderBloc(getIt.get<SurveyUseCase>()),
+    () =>
+        SurveyBuilderBloc(getIt.get<SurveyUseCase>(), getIt.get<UserUseCase>()),
   );
   getIt.registerLazySingleton(
     () => QuestionBuilderBloc(getIt.get<SurveyUseCase>()),

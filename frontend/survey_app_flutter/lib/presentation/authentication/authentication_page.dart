@@ -52,7 +52,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
             ..add(const AuthenticationPasswordChanged(''));
 
           if (AppBlocs.authenticationBloc.state.isAdmin) {
-            context.go(AppRoutes.adminSurveys);
+            context.push(AppRoutes.adminSurveys);
           } else {}
         },
         listenWhen: (previous, current) =>

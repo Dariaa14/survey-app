@@ -66,6 +66,7 @@ class SurveyRepositoryImpl implements SurveyRepository {
 
   @override
   Future<SurveyEntity> createSurvey({
+    required String token,
     required String ownerId,
     required String title,
     required String description,
@@ -74,13 +75,16 @@ class SurveyRepositoryImpl implements SurveyRepository {
   }) async {
     final response = await http.post(
       Uri.parse(baseUrl),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
       body: jsonEncode({
-        'ownerId': ownerId,
+        'owner_id': ownerId,
         'title': title,
         'description': description,
         'slug': slug,
-        'status': status.toString(),
+        'status': _surveyStatusToJson(status),
       }),
     );
 
@@ -89,15 +93,29 @@ class SurveyRepositoryImpl implements SurveyRepository {
         jsonDecode(response.body) as Map<String, dynamic>,
       );
     } else {
-      throw Exception('Failed to create survey');
+      throw Exception('Failed to create survey: ${response.body}');
+    }
+  }
+
+  String _surveyStatusToJson(SurveyStatus status) {
+    switch (status) {
+      case SurveyStatus.draft:
+        return 'draft';
+      case SurveyStatus.published:
+        return 'published';
+      case SurveyStatus.closed:
+        return 'closed';
     }
   }
 
   @override
-  Future<SurveyEntity> updateSurvey(SurveyEntity survey) async {
+  Future<SurveyEntity> updateSurvey(String token, SurveyEntity survey) async {
     final response = await http.put(
       Uri.parse('$baseUrl/${survey.id}'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
       body: jsonEncode((survey as SurveyEntityImpl).toJson()),
     );
 
@@ -107,6 +125,42 @@ class SurveyRepositoryImpl implements SurveyRepository {
       );
     } else {
       throw Exception('Failed to update survey');
+    }
+  }
+
+  @override
+  Future<void> publishSurvey({
+    required String token,
+    required String surveyId,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/$surveyId/publish'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to publish survey: ${response.body}');
+    }
+  }
+
+  @override
+  Future<void> deleteSurvey({
+    required String token,
+    required String surveyId,
+  }) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/$surveyId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete survey: ${response.body}');
     }
   }
 
@@ -122,9 +176,7 @@ class SurveyRepositoryImpl implements SurveyRepository {
     int? maxSelections,
     List<OptionEntity>? options,
   }) async {
-    final questionTypeString = type == QuestionType.text
-        ? 'text'
-        : 'multipleChoice';
+    final questionTypeString = type == QuestionType.text ? 'text' : 'choice';
 
     final requestBody = {
       'type': questionTypeString,

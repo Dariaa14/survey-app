@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_event.dart';
 import 'package:survey_app_flutter/presentation/question_builder/question_builder_page.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_event.dart';
+import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_state.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/sections/questions_widgets/add_question_dashed_button.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/sections/questions_widgets/question_preview.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
@@ -32,12 +35,33 @@ class SurveyBuilderQuestionsSection extends StatefulWidget {
 class _SurveyBuilderQuestionsSectionState
     extends State<SurveyBuilderQuestionsSection> {
   late List<QuestionEntity> _visibleQuestions;
+  StreamSubscription<SurveyBuilderState>? _questionsSubscription;
   bool _awaitingBlocReorderSync = false;
 
   @override
   void initState() {
     super.initState();
     _visibleQuestions = List<QuestionEntity>.from(widget.questions);
+    _questionsSubscription = AppBlocs.surveyBuilderBloc.stream.listen((state) {
+      if (!mounted) {
+        return;
+      }
+
+      if (_hasSameIdentityOrder(state.questions, _visibleQuestions)) {
+        return;
+      }
+
+      setState(() {
+        _visibleQuestions = List<QuestionEntity>.from(state.questions);
+        _awaitingBlocReorderSync = false;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _questionsSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -136,10 +160,9 @@ class _SurveyBuilderQuestionsSectionState
           itemBuilder: (context, index) {
             final q = _visibleQuestions[index];
             return Padding(
-              key: ValueKey('${q.id}-${q.order}'),
+              key: ObjectKey(q),
               padding: const EdgeInsets.only(bottom: 12),
               child: QuestionPreview(
-                key: ValueKey('preview-${q.id}-${q.order}-$index'),
                 question: q,
                 onEdit: () => _showAddQuestionDialog(context, question: q),
                 dragHandle: ReorderableDragStartListener(

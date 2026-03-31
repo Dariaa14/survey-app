@@ -1,5 +1,5 @@
 const authService = require('../services/authService');
-const User = require('../models/user');
+const { User } = require('../models/user');
 
 async function login(req, res) {
   try {

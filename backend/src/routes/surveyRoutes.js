@@ -4,6 +4,7 @@ const router = express.Router();
 const { Survey } = require('../models/survey');
 const { Question } = require('../models/question');
 const { Option } = require('../models/option');
+const { User } = require('../models/user');
 
 const models = require('../models/associations');
 
@@ -18,7 +19,7 @@ router.post('/', verifyToken, requireAdmin, async (req, res) => {
 
         if (!owner_id || !title || !slug) {
             return res.status(400).json({ error: 'owner_id, title, and slug are required' });
-        }
+        }        
 
         const owner = await User.findByPk(owner_id);
         if (!owner) return res.status(404).json({ error: 'Owner user not found' });
@@ -37,6 +38,7 @@ router.post('/', verifyToken, requireAdmin, async (req, res) => {
 
         res.status(201).json(survey);
     } catch (err) {
+        console.log(err);
         console.error(err);
         res.status(500).json({ error: 'Failed to create survey' });
     }

@@ -57,7 +57,7 @@ class SurveyPreviewActionButtons extends StatelessWidget {
         return [
           CustomButton(
             onPressed: () {
-              context.go(
+              context.push(
                 AppRoutes.adminSurveyEditPath(survey.id),
                 extra: survey,
               );

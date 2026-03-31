@@ -90,3 +90,15 @@ class SaveSurvey extends SurveyBuilderEvent {
   /// Creates a [SaveSurvey] event.
   SaveSurvey(this.status, this.ownerId);
 }
+
+/// Event to reset survey save status to initial.
+class ResetSurveySaveStatus extends SurveyBuilderEvent {
+  /// Creates a [ResetSurveySaveStatus] event.
+  ResetSurveySaveStatus();
+}
+
+/// Event to reset the whole survey builder state.
+class ResetSurveyBuilder extends SurveyBuilderEvent {
+  /// Creates a [ResetSurveyBuilder] event.
+  ResetSurveyBuilder();
+}

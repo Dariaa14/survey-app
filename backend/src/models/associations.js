@@ -1,5 +1,5 @@
 const { Survey } = require('./survey');
-const User = require('./user');
+const { User } = require('./user');
 const { Question } = require('./question');
 const { Option } = require('./option');
 const { EmailList } = require('./emailList');

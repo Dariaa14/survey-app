@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
+import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_bloc.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_event.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_state.dart';
@@ -33,7 +34,26 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    return Column(
+    return BlocListener<SurveyBuilderBloc, SurveyBuilderState>(
+      bloc: AppBlocs.surveyBuilderBloc,
+      listenWhen: (previous, current) =>
+          previous.saveStatus != current.saveStatus,
+      listener: (context, state) {
+        if (state.saveStatus == SurveySaveStatus.success) {
+          AppBlocs.adminBloc.add(const AdminSurveysRefreshed());
+          AppBlocs.surveyBuilderBloc.add(ResetSurveySaveStatus());
+          Navigator.of(context).pop();
+        }
+
+        if (state.saveStatus == SurveySaveStatus.failure) {
+          final message = state.saveErrorMessage ?? 'Failed to save survey';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
+          );
+          AppBlocs.surveyBuilderBloc.add(ResetSurveySaveStatus());
+        }
+      },
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -191,6 +211,7 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
           },
         ),
       ],
+      ),
     );
   }
 }

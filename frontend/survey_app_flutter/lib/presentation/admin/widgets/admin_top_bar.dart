@@ -64,7 +64,7 @@ class AdminTopBar extends StatelessWidget {
                 width: double.infinity,
                 child: CustomButton(
                   onPressed: () {
-                    context.go(AppRoutes.adminSurveyCreatePath());
+                    context.push(AppRoutes.adminSurveyCreatePath());
                   },
                   text: AppStrings.createSurveyButton,
                   variant: CustomColorVariant.primary,
@@ -72,7 +72,7 @@ class AdminTopBar extends StatelessWidget {
               )
             : CustomButton(
                 onPressed: () {
-                  context.go(AppRoutes.adminSurveyCreatePath());
+                  context.push(AppRoutes.adminSurveyCreatePath());
                 },
                 text: AppStrings.createSurveyButton,
                 variant: CustomColorVariant.primary,

@@ -1,16 +1,20 @@
 import 'package:bloc/bloc.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
+import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/domain/use_cases/survey_use_case.dart';
+import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_event.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_state.dart';
 
 /// Bloc for managing the state of the survey builder page.
 class SurveyBuilderBloc extends Bloc<SurveyBuilderEvent, SurveyBuilderState> {
   final SurveyUseCase _surveyUseCase;
+  final UserUseCase _userUseCase;
 
   /// Constructs a [SurveyBuilderBloc] with the initial state
   /// of [SurveyBuilderState].
-  SurveyBuilderBloc(this._surveyUseCase) : super(const SurveyBuilderState()) {
+  SurveyBuilderBloc(this._surveyUseCase, this._userUseCase)
+    : super(const SurveyBuilderState()) {
     on<LoadSurveyForEditing>(_onLoadSurveyForEditing);
 
     on<UpdateSurveyTitle>(_onUpdateSurveyTitle);
@@ -22,6 +26,8 @@ class SurveyBuilderBloc extends Bloc<SurveyBuilderEvent, SurveyBuilderState> {
     on<ReorderQuestions>(_onReorderQuestions);
 
     on<SaveSurvey>(_onSaveSurvey);
+    on<ResetSurveySaveStatus>(_onResetSurveySaveStatus);
+    on<ResetSurveyBuilder>(_onResetSurveyBuilder);
   }
 
   void _onLoadSurveyForEditing(
@@ -112,10 +118,10 @@ class SurveyBuilderBloc extends Bloc<SurveyBuilderEvent, SurveyBuilderState> {
     emit(state.copyWith(questions: reindexedQuestions));
   }
 
-  void _onSaveSurvey(
+  Future<void> _onSaveSurvey(
     SaveSurvey event,
     Emitter<SurveyBuilderState> emit,
-  ) {
+  ) async {
     final hasRequiredFields =
         state.title.trim().isNotEmpty &&
         state.description.trim().isNotEmpty &&
@@ -126,17 +132,101 @@ class SurveyBuilderBloc extends Bloc<SurveyBuilderEvent, SurveyBuilderState> {
       return;
     }
 
-    if (state.survey == null) {
-      _surveyUseCase.createSurvey(
-        ownerId: event.ownerId,
-        title: state.title,
-        description: state.description,
-        slug: state.slug,
-        status: event.status,
+    emit(
+      state
+          .copyWith(saveStatus: SurveySaveStatus.saving)
+          .copyWithNull(nullSaveErrorMessage: true),
+    );
+
+    try {
+      final token = await _userUseCase.getAuthToken();
+      if (token == null || token.isEmpty) {
+        throw Exception('No auth token available.');
+      }
+
+      if (state.survey == null) {
+        final createdSurvey = await _surveyUseCase.createSurvey(
+          token: token,
+          ownerId: event.ownerId,
+          title: state.title,
+          description: state.description,
+          slug: state.slug,
+          status: SurveyStatus.draft,
+        );
+
+        try {
+          for (final question in state.questions) {
+            await _surveyUseCase.createQuestion(
+              surveyId: createdSurvey.id,
+              token: token,
+              type: question.type,
+              title: question.title,
+              required: question.required,
+              order: question.order,
+              maxLength: question.maxLength,
+              maxSelections: question.maxSelections,
+              options: question.options,
+            );
+          }
+        } catch (e) {
+          await _surveyUseCase.deleteSurvey(
+            token: token,
+            surveyId: createdSurvey.id,
+          );
+          throw Exception(
+            'Failed to add questions. Created survey was rolled back. $e',
+          );
+        }
+
+        if (event.status == SurveyStatus.published) {
+          await _surveyUseCase.publishSurvey(
+            token: token,
+            surveyId: createdSurvey.id,
+          );
+        }
+
+        emit(
+          state
+              .copyWith(
+                survey: createdSurvey,
+                saveStatus: SurveySaveStatus.success,
+              )
+              .copyWithNull(nullSaveErrorMessage: true),
+        );
+      } else {
+        // Handle updating an existing survey
+        emit(
+          state
+              .copyWith(saveStatus: SurveySaveStatus.success)
+              .copyWithNull(nullSaveErrorMessage: true),
+        );
+      }
+    } catch (e) {
+      emit(
+        state.copyWith(
+          saveStatus: SurveySaveStatus.failure,
+          saveErrorMessage: e.toString(),
+        ),
       );
-    } else {
-      // Handle updating an existing survey
     }
+  }
+
+  void _onResetSurveySaveStatus(
+    ResetSurveySaveStatus event,
+    Emitter<SurveyBuilderState> emit,
+  ) {
+    emit(
+      state
+          .copyWith(saveStatus: SurveySaveStatus.initial)
+          .copyWithNull(nullSaveErrorMessage: true),
+    );
+  }
+
+  void _onResetSurveyBuilder(
+    ResetSurveyBuilder event,
+    Emitter<SurveyBuilderState> emit,
+  ) {
+    emit(const SurveyBuilderState());
   }
 
   String _generateSlug(String input) {
