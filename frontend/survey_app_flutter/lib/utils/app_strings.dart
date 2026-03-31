@@ -217,11 +217,19 @@ class AppStrings {
   static String warningMinimumOptions(int minOptions) =>
       "Trebuie minim $minOptions opțiuni.";
 
-    /// Validation message shown when required question fields are invalid.
-    static const String questionBuilderInvalidFieldsMessage =
+  /// Validation message shown when required question fields are invalid.
+  static const String questionBuilderInvalidFieldsMessage =
       "Completează toate câmpurile obligatorii cu valori valide.";
 
-    /// Validation message shown when option labels are empty.
-    static const String questionBuilderEmptyOptionsMessage =
+  /// Validation message shown when option labels are empty.
+  static const String questionBuilderEmptyOptionsMessage =
       "Toate opțiunile trebuie completate.";
+
+  /// Validation message shown when survey required fields are empty.
+  static const String surveyBuilderInvalidFieldsMessage =
+      "Completează titlul, descrierea și slug-ul.";
+
+  /// Validation message shown when a survey has no questions.
+  static const String surveyBuilderMissingQuestionsMessage =
+      "Adaugă cel puțin o întrebare înainte de salvare/publicare.";
 }

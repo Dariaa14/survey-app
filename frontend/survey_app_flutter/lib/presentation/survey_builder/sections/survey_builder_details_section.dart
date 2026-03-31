@@ -116,35 +116,79 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: CustomButton(
-            onPressed: () {
-              AppBlocs.surveyBuilderBloc.add(
-                SaveSurvey(
-                  SurveyStatus.draft,
-                  AppBlocs.adminBloc.state.adminUser?.id ?? '',
+        BlocBuilder<SurveyBuilderBloc, SurveyBuilderState>(
+          bloc: AppBlocs.surveyBuilderBloc,
+          buildWhen: (previous, current) =>
+              previous.title != current.title ||
+              previous.description != current.description ||
+              previous.slug != current.slug ||
+              previous.questions != current.questions,
+          builder: (context, state) {
+            final hasRequiredFields =
+                state.title.trim().isNotEmpty &&
+                state.description.trim().isNotEmpty &&
+                state.slug.trim().isNotEmpty;
+            final hasAtLeastOneQuestion = state.questions.isNotEmpty;
+            final canCreateSurvey = hasRequiredFields && hasAtLeastOneQuestion;
+
+            String? validationMessage;
+            if (!hasRequiredFields) {
+              validationMessage = AppStrings.surveyBuilderInvalidFieldsMessage;
+            } else if (!hasAtLeastOneQuestion) {
+              validationMessage =
+                  AppStrings.surveyBuilderMissingQuestionsMessage;
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (validationMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      validationMessage,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.error,
+                      ),
+                    ),
+                  ),
+                SizedBox(
+                  width: double.infinity,
+                  child: CustomButton(
+                    onPressed: canCreateSurvey
+                        ? () {
+                            AppBlocs.surveyBuilderBloc.add(
+                              SaveSurvey(
+                                SurveyStatus.draft,
+                                AppBlocs.adminBloc.state.adminUser?.id ?? '',
+                              ),
+                            );
+                          }
+                        : null,
+                    text: '💾   ${AppStrings.saveSurveyButton}',
+                  ),
                 ),
-              );
-            },
-            text: '💾   ${AppStrings.saveSurveyButton}',
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: CustomButton(
-            onPressed: () {
-              AppBlocs.surveyBuilderBloc.add(
-                SaveSurvey(
-                  SurveyStatus.published,
-                  AppBlocs.adminBloc.state.adminUser?.id ?? '',
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: CustomButton(
+                    onPressed: canCreateSurvey
+                        ? () {
+                            AppBlocs.surveyBuilderBloc.add(
+                              SaveSurvey(
+                                SurveyStatus.published,
+                                AppBlocs.adminBloc.state.adminUser?.id ?? '',
+                              ),
+                            );
+                          }
+                        : null,
+                    text: '🚀   ${AppStrings.publishSurveyButton}',
+                    variant: CustomColorVariant.primary,
+                  ),
                 ),
-              );
-            },
-            text: '🚀   ${AppStrings.publishSurveyButton}',
-            variant: CustomColorVariant.primary,
-          ),
+              ],
+            );
+          },
         ),
       ],
     );

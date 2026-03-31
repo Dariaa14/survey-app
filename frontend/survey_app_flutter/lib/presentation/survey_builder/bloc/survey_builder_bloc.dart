@@ -116,6 +116,16 @@ class SurveyBuilderBloc extends Bloc<SurveyBuilderEvent, SurveyBuilderState> {
     SaveSurvey event,
     Emitter<SurveyBuilderState> emit,
   ) {
+    final hasRequiredFields =
+        state.title.trim().isNotEmpty &&
+        state.description.trim().isNotEmpty &&
+        state.slug.trim().isNotEmpty;
+    final hasAtLeastOneQuestion = state.questions.isNotEmpty;
+
+    if (!hasRequiredFields || !hasAtLeastOneQuestion) {
+      return;
+    }
+
     if (state.survey == null) {
       _surveyUseCase.createSurvey(
         ownerId: event.ownerId,
