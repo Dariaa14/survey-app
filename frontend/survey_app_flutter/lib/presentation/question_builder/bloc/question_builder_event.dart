@@ -60,12 +60,35 @@ class QuestionMaxSelectionsChanged extends QuestionBuilderEvent {
 
 /// Event triggered when the options for a multiple choice question
 ///  are changed in the question builder.
-class QuestionOptionsChanged extends QuestionBuilderEvent {
-  /// The new list of options for a multiple choice question.
-  final List<OptionEntity> options;
+class QuestionOptionsAdded extends QuestionBuilderEvent {
+  /// The new option added to a multiple choice question.
+  final String option;
 
-  /// Constructs a [QuestionOptionsChanged] event with the given [options].
-  QuestionOptionsChanged(this.options);
+  /// Constructs a [QuestionOptionsAdded] event with the given [option].
+  QuestionOptionsAdded(this.option);
+}
+
+/// Event triggered when an option for a multiple choice question is edited
+/// in the question builder.
+class QuestionOptionChanged extends QuestionBuilderEvent {
+  /// The option edited for a multiple choice question.
+  final OptionEntity option;
+
+  /// The new value of the edited option.
+  final String newOption;
+
+  /// Constructs a [QuestionOptionChanged] event with the given [option] and [newOption].
+  QuestionOptionChanged(this.option, this.newOption);
+}
+
+/// Event triggered when an option for a multiple choice question is removed
+/// in the question builder.
+class QuestionOptionRemoved extends QuestionBuilderEvent {
+  /// The option removed from a multiple choice question.
+  final OptionEntity option;
+
+  /// Constructs a [QuestionOptionRemoved] event with the given [option].
+  QuestionOptionRemoved(this.option);
 }
 
 /// Event triggered when the order of the question is changed in the

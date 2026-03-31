@@ -10,7 +10,8 @@ enum QuestionType {
   multipleChoice,
 }
 
-/// This file defines the [QuestionEntity] class, which represents a question in the survey application.
+/// This file defines the [QuestionEntity] class, which represents a question
+/// in the survey application.
 abstract class QuestionEntity {
   /// Unique identifier for the question.
   String get id;
@@ -35,6 +36,7 @@ abstract class QuestionEntity {
   int? get maxLength;
 
   /// For multiple choice questions, the maximum number of options that can be
+  /// selected by respondents.
   int? get maxSelections;
 
   /// For multiple choice questions, the list of options that respondents can

@@ -81,7 +81,7 @@ class SurveyBuilderBloc extends Bloc<SurveyBuilderEvent, SurveyBuilderState> {
     Emitter<SurveyBuilderState> emit,
   ) {
     final updatedQuestions = List<QuestionEntity>.from(state.questions)
-      ..removeWhere((q) => q.id == event.questionId);
+      ..removeWhere((q) => q.order == event.orderNumber);
     emit(state.copyWith(questions: updatedQuestions));
   }
 

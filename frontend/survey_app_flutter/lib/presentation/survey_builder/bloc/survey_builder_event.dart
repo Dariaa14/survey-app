@@ -51,11 +51,11 @@ class AddQuestion extends SurveyBuilderEvent {
 
 /// Event to remove a question from the survey in the survey builder.
 class RemoveQuestion extends SurveyBuilderEvent {
-  /// The id of the question to be removed from the survey.
-  final String questionId;
+  /// The order number of the question to be removed from the survey.
+  final int orderNumber;
 
-  /// Creates a [RemoveQuestion] event with the given [questionId].
-  RemoveQuestion(this.questionId);
+  /// Creates a [RemoveQuestion] event with the given [orderNumber].
+  RemoveQuestion(this.orderNumber);
 }
 
 /// Event to update an existing question in the survey builder.

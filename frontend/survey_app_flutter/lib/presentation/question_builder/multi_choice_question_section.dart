@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_bloc.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_event.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_state.dart';
+import 'package:survey_app_flutter/presentation/question_builder/widgets/options_builder.dart';
 import 'package:survey_app_flutter/presentation/question_builder/widgets/question_builder_action_buttons.dart';
 import 'package:survey_app_flutter/presentation/question_builder/widgets/question_limit_input_widget.dart';
 import 'package:survey_app_flutter/presentation/question_builder/widgets/required_limit_section.dart';
@@ -75,13 +77,51 @@ class MultiChoiceQuestionSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
+            BlocBuilder<QuestionBuilderBloc, QuestionBuilderState>(
+              bloc: AppBlocs.questionBuilderBloc,
+              buildWhen: (previous, current) =>
+                  previous.options != current.options,
+              builder: (context, state) {
+                return Column(
+                  children: [
+                    for (final option in state.options)
+                      OptionsBuilder(
+                        onDelete: () {
+                          AppBlocs.questionBuilderBloc.add(
+                            QuestionOptionRemoved(option),
+                          );
+                        },
+                        onOptionChanged: (value) {
+                          AppBlocs.questionBuilderBloc.add(
+                            QuestionOptionChanged(option, value),
+                          );
+                        },
+                      ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 12),
             CustomButton(
-              onPressed: () {},
+              onPressed: () {
+                AppBlocs.questionBuilderBloc.add(QuestionOptionsAdded(''));
+              },
               text: '+ ${AppStrings.addOptionButton}',
             ),
             const SizedBox(height: 20),
             QuestionBuilderActionButtons(
               onSave: () {
+                if (AppBlocs.questionBuilderBloc.state.options.length <
+                    _minOptions) {
+                  Fluttertoast.showToast(
+                    msg: AppStrings.warningMinimumOptions(_minOptions),
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    textColor: Theme.of(context).colorScheme.onError,
+                  );
+                  return;
+                }
                 Navigator.pop(
                   context,
                   AppBlocs.questionBuilderBloc.buildQuestionEntity(),

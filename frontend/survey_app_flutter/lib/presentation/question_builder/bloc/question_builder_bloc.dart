@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
+import 'package:survey_app_flutter/data/entities_impl/option_entity_impl.dart';
 import 'package:survey_app_flutter/data/entities_impl/question_entity_impl.dart';
+import 'package:survey_app_flutter/domain/entities/option_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/use_cases/survey_use_case.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_event.dart';
@@ -20,7 +22,11 @@ class QuestionBuilderBloc
     on<QuestionRequiredChanged>(_onQuestionRequiredChanged);
     on<QuestionMaxLengthChanged>(_onQuestionMaxLengthChanged);
     on<QuestionMaxSelectionsChanged>(_onQuestionMaxSelectionsChanged);
-    on<QuestionOptionsChanged>(_onQuestionOptionsChanged);
+
+    on<QuestionOptionsAdded>(_onQuestionOptionsAdded);
+    on<QuestionOptionChanged>(_onQuestionOptionChanged);
+    on<QuestionOptionRemoved>(_onQuestionOptionRemoved);
+
     on<QuestionOrderChanged>(_onQuestionOrderChanged);
     on<SaveQuestion>(_onSaveQuestion);
     on<QuestionBuilderReset>(_onQuestionBuilderReset);
@@ -69,11 +75,43 @@ class QuestionBuilderBloc
     emit(state.copyWith(maxSelections: event.maxSelections));
   }
 
-  void _onQuestionOptionsChanged(
-    QuestionOptionsChanged event,
+  _onQuestionOptionsAdded(
+    QuestionOptionsAdded event,
     Emitter<QuestionBuilderState> emit,
   ) {
-    emit(state.copyWith(options: event.options));
+    final updatedOptions = List<OptionEntity>.from(state.options)
+      ..add(
+        OptionEntityImpl(
+          id: '',
+          questionId: '',
+          label: event.option,
+          order: state.options.length,
+        ),
+      );
+    emit(state.copyWith(options: updatedOptions));
+  }
+
+  void _onQuestionOptionChanged(
+    QuestionOptionChanged event,
+    Emitter<QuestionBuilderState> emit,
+  ) {
+    final updatedOptions = List<OptionEntity>.from(state.options)
+      ..[state.options.indexOf(event.option)] = OptionEntityImpl(
+        id: event.option.id,
+        questionId: event.option.questionId,
+        label: event.newOption,
+        order: event.option.order,
+      );
+    emit(state.copyWith(options: updatedOptions));
+  }
+
+  void _onQuestionOptionRemoved(
+    QuestionOptionRemoved event,
+    Emitter<QuestionBuilderState> emit,
+  ) {
+    final updatedOptions = List<OptionEntity>.from(state.options)
+      ..remove(event.option);
+    emit(state.copyWith(options: updatedOptions));
   }
 
   void _onQuestionOrderChanged(

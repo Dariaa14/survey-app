@@ -64,7 +64,10 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
         ...questions.map(
           (q) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: QuestionPreview(question: q),
+            child: QuestionPreview(
+              question: q,
+              onEdit: () => _showAddQuestionDialog(context, question: q),
+            ),
           ),
         ),
         const SizedBox(height: 4),
@@ -84,18 +87,25 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
   Future<void> _showAddQuestionDialog(
     BuildContext context, {
     bool isMultiChoice = true,
+    QuestionEntity? question,
   }) async {
-    final question = await showDialog<QuestionEntity?>(
+    final newQuestion = await showDialog<QuestionEntity?>(
       context: context,
       builder: (context) => QuestionBuilderPage(
         orderNumber: questions.length + 1,
         initialIsMultiChoiceSelected: isMultiChoice,
+        question: question,
       ),
     );
 
     AppBlocs.questionBuilderBloc.add(QuestionBuilderReset());
-    if (question == null) return;
+    if (newQuestion == null) return;
 
-    AppBlocs.surveyBuilderBloc.add(AddQuestion(question));
+    if (question != null) {
+      /// TODO: add edit question functionality instead of just adding a
+      /// new question when editing an existing one
+      return;
+    }
+    AppBlocs.surveyBuilderBloc.add(AddQuestion(newQuestion));
   }
 }

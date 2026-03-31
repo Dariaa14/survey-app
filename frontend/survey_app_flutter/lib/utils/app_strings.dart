@@ -185,6 +185,15 @@ class AppStrings {
   static String questionPreviewMaxCharacters(int value) =>
       "max $value caractere";
 
+  /// Formats the options text in question preview.
+  static String questionPreviewOptions(List<String> labels) {
+    if (labels.isEmpty) {
+      return 'Opțiuni: -';
+    }
+
+    return 'Opțiuni: ${labels.join(' · ')}';
+  }
+
   /// The label for the maximum numbers of options field in the multi-choice
   /// question builder.
   static const String maxOptionsLabel = "Selecții maxime";
@@ -202,4 +211,9 @@ class AppStrings {
   /// builder.
   static String numberOfOptionsLabel(int minOptions) =>
       "Opțiuni (minim $minOptions)";
+
+  /// Warning message when trying to save a multi-choice question with less than
+  /// the minimum required options.
+  static String warningMinimumOptions(int minOptions) =>
+      "Trebuie minim $minOptions opțiuni.";
 }

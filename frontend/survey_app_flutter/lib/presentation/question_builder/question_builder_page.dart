@@ -17,6 +17,7 @@ class QuestionBuilderPage extends StatelessWidget {
   const QuestionBuilderPage({
     required this.orderNumber,
     this.initialIsMultiChoiceSelected = true,
+    this.question,
     super.key,
   });
 
@@ -25,6 +26,9 @@ class QuestionBuilderPage extends StatelessWidget {
 
   /// Order number of the question being edited, used for display purposes.
   final int orderNumber;
+
+  /// The question being edited, null if a new question is being created.
+  final QuestionEntity? question;
 
   @override
   Widget build(BuildContext context) {
