@@ -95,12 +95,17 @@ class QuestionBuilderBloc
     QuestionOptionChanged event,
     Emitter<QuestionBuilderState> emit,
   ) {
+    if (event.index < 0 || event.index >= state.options.length) {
+      return;
+    }
+
+    final currentOption = state.options[event.index];
     final updatedOptions = List<OptionEntity>.from(state.options)
-      ..[state.options.indexOf(event.option)] = OptionEntityImpl(
-        id: event.option.id,
-        questionId: event.option.questionId,
+      ..[event.index] = OptionEntityImpl(
+        id: currentOption.id,
+        questionId: currentOption.questionId,
         label: event.newOption,
-        order: event.option.order,
+        order: currentOption.order,
       );
     emit(state.copyWith(options: updatedOptions));
   }
@@ -109,8 +114,12 @@ class QuestionBuilderBloc
     QuestionOptionRemoved event,
     Emitter<QuestionBuilderState> emit,
   ) {
+    if (event.index < 0 || event.index >= state.options.length) {
+      return;
+    }
+
     final updatedOptions = List<OptionEntity>.from(state.options)
-      ..remove(event.option);
+      ..removeAt(event.index);
     emit(state.copyWith(options: updatedOptions));
   }
 

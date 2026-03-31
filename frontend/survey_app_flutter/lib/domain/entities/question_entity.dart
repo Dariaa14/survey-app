@@ -42,4 +42,17 @@ abstract class QuestionEntity {
   /// For multiple choice questions, the list of options that respondents can
   /// select from.
   List<OptionEntity>? get options;
+
+  /// Returns a new question entity with updated fields.
+  QuestionEntity copyWith({
+    String? id,
+    String? surveyId,
+    QuestionType? type,
+    String? title,
+    bool? required,
+    int? order,
+    int? maxLength,
+    int? maxSelections,
+    List<OptionEntity>? options,
+  });
 }

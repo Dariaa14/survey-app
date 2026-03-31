@@ -10,7 +10,7 @@ import 'package:survey_app_flutter/utils/app_blocs.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// A widget that displays the questions section of the survey builder page.
-class SurveyBuilderQuestionsSection extends StatelessWidget {
+class SurveyBuilderQuestionsSection extends StatefulWidget {
   /// Constructs a [SurveyBuilderQuestionsSection].
   const SurveyBuilderQuestionsSection({
     required this.questions,
@@ -25,6 +25,53 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
   final bool expand;
 
   @override
+  State<SurveyBuilderQuestionsSection> createState() =>
+      _SurveyBuilderQuestionsSectionState();
+}
+
+class _SurveyBuilderQuestionsSectionState
+    extends State<SurveyBuilderQuestionsSection> {
+  late List<QuestionEntity> _visibleQuestions;
+  bool _awaitingBlocReorderSync = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _visibleQuestions = List<QuestionEntity>.from(widget.questions);
+  }
+
+  @override
+  void didUpdateWidget(covariant SurveyBuilderQuestionsSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_awaitingBlocReorderSync) {
+      if (_hasSameIdentityOrder(widget.questions, _visibleQuestions)) {
+        _awaitingBlocReorderSync = false;
+      }
+      return;
+    }
+
+    _visibleQuestions = List<QuestionEntity>.from(widget.questions);
+  }
+
+  bool _hasSameIdentityOrder(
+    List<QuestionEntity> a,
+    List<QuestionEntity> b,
+  ) {
+    if (a.length != b.length) {
+      return false;
+    }
+
+    for (var i = 0; i < a.length; i++) {
+      if (!identical(a[i], b[i])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -35,7 +82,7 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
         Row(
           children: [
             Text(
-              '${AppStrings.questionsTitle} (${questions.length})',
+              '${AppStrings.questionsTitle} (${_visibleQuestions.length})',
               style: textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
@@ -61,14 +108,50 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-        ...questions.map(
-          (q) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: QuestionPreview(
-              question: q,
-              onEdit: () => _showAddQuestionDialog(context, question: q),
-            ),
-          ),
+        ReorderableListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          buildDefaultDragHandles: false,
+          itemCount: _visibleQuestions.length,
+          onReorder: (oldIndex, newIndex) {
+            var targetIndex = newIndex;
+            if (newIndex > oldIndex) {
+              targetIndex -= 1;
+            }
+
+            if (oldIndex == targetIndex) {
+              return;
+            }
+
+            setState(() {
+              final moved = _visibleQuestions.removeAt(oldIndex);
+              _visibleQuestions.insert(targetIndex, moved);
+              _awaitingBlocReorderSync = true;
+            });
+
+            AppBlocs.surveyBuilderBloc.add(
+              ReorderQuestions(oldIndex: oldIndex, newIndex: targetIndex),
+            );
+          },
+          itemBuilder: (context, index) {
+            final q = _visibleQuestions[index];
+            return Padding(
+              key: ValueKey('${q.id}-${q.order}'),
+              padding: const EdgeInsets.only(bottom: 12),
+              child: QuestionPreview(
+                key: ValueKey('preview-${q.id}-${q.order}-$index'),
+                question: q,
+                onEdit: () => _showAddQuestionDialog(context, question: q),
+                dragHandle: ReorderableDragStartListener(
+                  index: index,
+                  child: Icon(
+                    Icons.drag_indicator,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            );
+          },
         ),
         const SizedBox(height: 4),
         AddQuestionDashedButton(
@@ -77,7 +160,7 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
       ],
     );
 
-    if (!expand) {
+    if (!widget.expand) {
       return content;
     }
 
@@ -92,7 +175,7 @@ class SurveyBuilderQuestionsSection extends StatelessWidget {
     final newQuestion = await showDialog<QuestionEntity?>(
       context: context,
       builder: (context) => QuestionBuilderPage(
-        orderNumber: questions.length + 1,
+        orderNumber: widget.questions.length + 1,
         initialIsMultiChoiceSelected: isMultiChoice,
         question: question,
       ),

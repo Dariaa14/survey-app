@@ -84,16 +84,18 @@ class MultiChoiceQuestionSection extends StatelessWidget {
               builder: (context, state) {
                 return Column(
                   children: [
-                    for (final option in state.options)
+                    for (final entry in state.options.asMap().entries)
                       OptionsBuilder(
+                        key: ValueKey(entry.key),
+                        initialValue: entry.value.label,
                         onDelete: () {
                           AppBlocs.questionBuilderBloc.add(
-                            QuestionOptionRemoved(option),
+                            QuestionOptionRemoved(entry.key),
                           );
                         },
                         onOptionChanged: (value) {
                           AppBlocs.questionBuilderBloc.add(
-                            QuestionOptionChanged(option, value),
+                            QuestionOptionChanged(entry.key, value),
                           );
                         },
                       ),

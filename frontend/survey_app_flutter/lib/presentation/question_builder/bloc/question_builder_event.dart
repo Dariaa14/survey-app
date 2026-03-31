@@ -1,4 +1,3 @@
-import 'package:survey_app_flutter/domain/entities/option_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 
 /// This file defines the events for the QuestionBuilderBloc,
@@ -71,24 +70,24 @@ class QuestionOptionsAdded extends QuestionBuilderEvent {
 /// Event triggered when an option for a multiple choice question is edited
 /// in the question builder.
 class QuestionOptionChanged extends QuestionBuilderEvent {
-  /// The option edited for a multiple choice question.
-  final OptionEntity option;
+  /// The index of the edited option.
+  final int index;
 
   /// The new value of the edited option.
   final String newOption;
 
-  /// Constructs a [QuestionOptionChanged] event with the given [option] and [newOption].
-  QuestionOptionChanged(this.option, this.newOption);
+  /// Constructs a [QuestionOptionChanged] event.
+  QuestionOptionChanged(this.index, this.newOption);
 }
 
 /// Event triggered when an option for a multiple choice question is removed
 /// in the question builder.
 class QuestionOptionRemoved extends QuestionBuilderEvent {
-  /// The option removed from a multiple choice question.
-  final OptionEntity option;
+  /// The index of the removed option.
+  final int index;
 
-  /// Constructs a [QuestionOptionRemoved] event with the given [option].
-  QuestionOptionRemoved(this.option);
+  /// Constructs a [QuestionOptionRemoved] event.
+  QuestionOptionRemoved(this.index);
 }
 
 /// Event triggered when the order of the question is changed in the

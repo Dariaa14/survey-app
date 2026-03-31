@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/shared/custom_textfield.dart';
@@ -9,6 +11,7 @@ class OptionsBuilder extends StatefulWidget {
   const OptionsBuilder({
     required this.onDelete,
     required this.onOptionChanged,
+    this.initialValue = '',
     super.key,
   });
 
@@ -18,22 +21,48 @@ class OptionsBuilder extends StatefulWidget {
   /// Callback when the delete button is pressed.
   final VoidCallback onDelete;
 
+  /// The initial text displayed in the option field.
+  final String initialValue;
+
   @override
   State<OptionsBuilder> createState() => _OptionsBuilderState();
 }
 
 class _OptionsBuilderState extends State<OptionsBuilder> {
-  final TextEditingController _controller = TextEditingController();
+  late final TextEditingController _controller;
+  Timer? _debounceTimer;
 
   @override
   void initState() {
     super.initState();
+    _controller = TextEditingController(text: widget.initialValue);
+  }
+
+  @override
+  void didUpdateWidget(covariant OptionsBuilder oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue &&
+        widget.initialValue != _controller.text) {
+      _controller.text = widget.initialValue;
+      _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controller.text.length),
+      );
+    }
   }
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _onDebouncedChanged(String value) {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 250), () {
+      if (!mounted) return;
+      widget.onOptionChanged(value);
+    });
   }
 
   @override
@@ -49,7 +78,7 @@ class _OptionsBuilderState extends State<OptionsBuilder> {
               controller: _controller,
               hintText: 'Option text',
               onChanged: (value) {
-                widget.onOptionChanged(value);
+                _onDebouncedChanged(value);
               },
             ),
           ),

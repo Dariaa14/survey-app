@@ -59,6 +59,31 @@ class QuestionEntityImpl implements QuestionEntity {
   @override
   final List<OptionEntity>? options;
 
+  @override
+  QuestionEntityImpl copyWith({
+    String? id,
+    String? surveyId,
+    QuestionType? type,
+    String? title,
+    bool? required,
+    int? order,
+    int? maxLength,
+    int? maxSelections,
+    List<OptionEntity>? options,
+  }) {
+    return QuestionEntityImpl(
+      id: id ?? this.id,
+      surveyId: surveyId ?? this.surveyId,
+      type: type ?? this.type,
+      title: title ?? this.title,
+      required: required ?? this.required,
+      order: order ?? this.order,
+      maxLength: maxLength ?? this.maxLength,
+      maxSelections: maxSelections ?? this.maxSelections,
+      options: options ?? this.options,
+    );
+  }
+
   /// Serializes this entity to backend-compatible JSON.
   Map<String, dynamic> toJson() {
     return {

@@ -19,6 +19,7 @@ class SurveyBuilderBloc extends Bloc<SurveyBuilderEvent, SurveyBuilderState> {
 
     on<AddQuestion>(_onAddQuestion);
     on<RemoveQuestion>(_onRemoveQuestion);
+    on<ReorderQuestions>(_onReorderQuestions);
 
     on<SaveSurvey>(_onSaveSurvey);
   }
@@ -83,6 +84,32 @@ class SurveyBuilderBloc extends Bloc<SurveyBuilderEvent, SurveyBuilderState> {
     final updatedQuestions = List<QuestionEntity>.from(state.questions)
       ..removeWhere((q) => q.order == event.orderNumber);
     emit(state.copyWith(questions: updatedQuestions));
+  }
+
+  void _onReorderQuestions(
+    ReorderQuestions event,
+    Emitter<SurveyBuilderState> emit,
+  ) {
+    final updatedQuestions = List<QuestionEntity>.from(state.questions);
+
+    if (event.oldIndex < 0 || event.oldIndex >= updatedQuestions.length) {
+      return;
+    }
+
+    if (event.newIndex < 0 || event.newIndex >= updatedQuestions.length) {
+      return;
+    }
+
+    final item = updatedQuestions.removeAt(event.oldIndex);
+    updatedQuestions.insert(event.newIndex, item);
+
+    final reindexedQuestions = updatedQuestions
+        .asMap()
+        .entries
+        .map((entry) => entry.value.copyWith(order: entry.key + 1))
+        .toList();
+
+    emit(state.copyWith(questions: reindexedQuestions));
   }
 
   void _onSaveSurvey(

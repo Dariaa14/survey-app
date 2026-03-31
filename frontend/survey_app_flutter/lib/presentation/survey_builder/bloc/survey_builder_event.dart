@@ -58,6 +58,18 @@ class RemoveQuestion extends SurveyBuilderEvent {
   RemoveQuestion(this.orderNumber);
 }
 
+/// Event to reorder questions in the survey builder.
+class ReorderQuestions extends SurveyBuilderEvent {
+  /// The original index of the question.
+  final int oldIndex;
+
+  /// The destination index of the question.
+  final int newIndex;
+
+  /// Creates a [ReorderQuestions] event.
+  ReorderQuestions({required this.oldIndex, required this.newIndex});
+}
+
 /// Event to update an existing question in the survey builder.
 class UpdateQuestion extends SurveyBuilderEvent {
   /// The updated question entity with the same id as the question being updated.

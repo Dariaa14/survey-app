@@ -13,6 +13,7 @@ class QuestionPreview extends StatelessWidget {
   const QuestionPreview({
     required this.question,
     required this.onEdit,
+    this.dragHandle,
 
     super.key,
   });
@@ -22,6 +23,9 @@ class QuestionPreview extends StatelessWidget {
 
   /// Callback when the edit button is pressed.
   final VoidCallback onEdit;
+
+  /// Optional drag handle widget displayed at the start of the preview.
+  final Widget? dragHandle;
 
   String _maxLimitText() {
     if (question.type == QuestionType.multipleChoice) {
@@ -66,10 +70,11 @@ class QuestionPreview extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.drag_indicator,
-            color: colorScheme.onSurfaceVariant,
-          ),
+          dragHandle ??
+              Icon(
+                Icons.drag_indicator,
+                color: colorScheme.onSurfaceVariant,
+              ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
