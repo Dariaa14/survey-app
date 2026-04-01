@@ -1,10 +1,98 @@
 import 'package:bloc/bloc.dart';
+import 'package:survey_app_flutter/domain/use_cases/email_list_use_case.dart';
+import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
 import 'package:survey_app_flutter/presentation/email_list_builder/bloc/email_list_builder_event.dart';
 import 'package:survey_app_flutter/presentation/email_list_builder/bloc/email_list_builder_state.dart';
 
 /// Bloc for the email list builder feature
 class EmailListBuilderBloc
     extends Bloc<EmailListBuilderEvent, EmailListBuilderState> {
+  final EmailListUseCase _emailListUseCase;
+  final UserUseCase _userUseCase;
+
   /// Constructs an [EmailListBuilderBloc] with the initial state of [EmailListBuilderState].
-  EmailListBuilderBloc() : super(EmailListBuilderState()) {}
+  EmailListBuilderBloc({
+    required EmailListUseCase emailListUseCase,
+    required UserUseCase userUseCase,
+  }) : _emailListUseCase = emailListUseCase,
+       _userUseCase = userUseCase,
+       super(const EmailListBuilderState()) {
+    on<EmailListNameChanged>(_onNameChanged);
+    on<EmailListCreateRequested>(_onCreateRequested);
+    on<EmailListBuilderStatusReset>(_onStatusReset);
+  }
+
+  void _onNameChanged(
+    EmailListNameChanged event,
+    Emitter<EmailListBuilderState> emit,
+  ) {
+    emit(
+      state
+          .copyWith(name: event.name)
+          .copyWithNull(nullErrorMessage: true, nullCreatedList: true),
+    );
+  }
+
+  Future<void> _onCreateRequested(
+    EmailListCreateRequested event,
+    Emitter<EmailListBuilderState> emit,
+  ) async {
+    if (!state.isFormValid) {
+      emit(
+        state.copyWith(
+          status: EmailListBuilderStatus.failure,
+          errorMessage: 'Email list name is required.',
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state
+          .copyWith(status: EmailListBuilderStatus.saving)
+          .copyWithNull(nullErrorMessage: true),
+    );
+
+    try {
+      final user = await _userUseCase.getCurrentUser();
+      final token = await _userUseCase.getAuthToken();
+
+      if (token == null || token.isEmpty) {
+        throw Exception('No auth token available.');
+      }
+
+      final created = await _emailListUseCase.createEmailList(
+        token: token,
+        ownerId: user.id,
+        name: state.name.trim(),
+      );
+
+      emit(
+        state
+            .copyWith(
+              status: EmailListBuilderStatus.success,
+              createdList: created,
+            )
+            .copyWithNull(nullErrorMessage: true),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: EmailListBuilderStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  void _onStatusReset(
+    EmailListBuilderStatusReset event,
+    Emitter<EmailListBuilderState> emit,
+  ) {
+    emit(
+      state
+          .copyWith(status: EmailListBuilderStatus.initial)
+          .copyWithNull(nullErrorMessage: true, nullCreatedList: true),
+    );
+  }
 }

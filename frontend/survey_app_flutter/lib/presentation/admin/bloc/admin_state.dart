@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:survey_app_flutter/domain/entities/email_list_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/domain/entities/user_entity.dart';
 
@@ -50,6 +51,7 @@ class AdminState extends Equatable {
   const AdminState({
     this.status = AdminStatus.initial,
     this.surveys = const <SurveyEntity>[],
+    this.emailLists = const <EmailListEntity>[],
     this.selectedTab = AdminMainTab.surveys,
     this.selectedFilter = AdminSurveyFilter.all,
     this.usesServerFiltering = false,
@@ -65,6 +67,9 @@ class AdminState extends Equatable {
 
   /// Surveys posted by the current admin.
   final List<SurveyEntity> surveys;
+
+  /// Email lists owned by the current admin.
+  final List<EmailListEntity> emailLists;
 
   /// Selected tab in admin main page.
   final AdminMainTab selectedTab;
@@ -107,6 +112,7 @@ class AdminState extends Equatable {
     UserEntity? adminUser,
     AdminStatus? status,
     List<SurveyEntity>? surveys,
+    List<EmailListEntity>? emailLists,
     AdminMainTab? selectedTab,
     AdminSurveyFilter? selectedFilter,
     bool? usesServerFiltering,
@@ -116,6 +122,7 @@ class AdminState extends Equatable {
       adminUser: adminUser ?? this.adminUser,
       status: status ?? this.status,
       surveys: surveys ?? this.surveys,
+      emailLists: emailLists ?? this.emailLists,
       selectedTab: selectedTab ?? this.selectedTab,
       selectedFilter: selectedFilter ?? this.selectedFilter,
       usesServerFiltering: usesServerFiltering ?? this.usesServerFiltering,
@@ -132,6 +139,7 @@ class AdminState extends Equatable {
       adminUser: nullAdminUser ? null : adminUser,
       status: status,
       surveys: surveys,
+      emailLists: emailLists,
       selectedTab: selectedTab,
       selectedFilter: selectedFilter,
       usesServerFiltering: usesServerFiltering,
@@ -144,6 +152,7 @@ class AdminState extends Equatable {
     adminUser,
     status,
     surveys,
+    emailLists,
     selectedTab,
     selectedFilter,
     usesServerFiltering,

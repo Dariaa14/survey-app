@@ -32,6 +32,7 @@ class _AdminMainPageState extends State<AdminMainPage> {
       child: BlocListener<AdminBloc, AdminState>(
         listener: (context, state) {
           AppBlocs.adminBloc.add(const AdminSurveysRequested());
+          AppBlocs.adminBloc.add(const AdminEmailListsRequested());
         },
         listenWhen: (previous, current) =>
             previous.adminUser != current.adminUser,

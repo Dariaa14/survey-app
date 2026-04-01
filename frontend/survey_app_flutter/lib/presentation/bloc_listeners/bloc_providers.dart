@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_bloc.dart';
 import 'package:survey_app_flutter/presentation/authentication/bloc/authentication_bloc.dart';
+import 'package:survey_app_flutter/presentation/email_list_builder/bloc/email_list_builder_bloc.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_bloc.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_bloc.dart';
 import 'package:survey_app_flutter/utils/app_blocs.dart';
@@ -29,6 +30,9 @@ class BlocProviders extends StatelessWidget {
         ),
         BlocProvider<AuthenticationBloc>.value(
           value: AppBlocs.authenticationBloc,
+        ),
+        BlocProvider<EmailListBuilderBloc>.value(
+          value: AppBlocs.emailListBuilderBloc,
         ),
       ],
       child: child,

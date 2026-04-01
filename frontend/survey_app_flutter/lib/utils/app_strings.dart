@@ -97,6 +97,10 @@ class AppStrings {
   static const String surveyCloseConfirmMessage =
       "Ești sigur? Respondenții nu vor mai putea accesa sondajul.";
 
+  /// Confirmation message shown before deleting an email list.
+  static const String emailListDeleteConfirmMessage =
+      "Ești sigur? Lista de contacte va fi ștearsă definitiv.";
+
   /// Confirmation option for closing a survey.
   static const String yesOption = "Da";
 
@@ -247,11 +251,11 @@ class AppStrings {
   /// Action label for importing contacts from CSV.
   static const String contactListPreviewImportCsvButton = 'Importă CSV';
 
-    /// Title for add contact list modal.
-    static const String addContactListTitle = 'Adaugă listă de contacte';
+  /// Title for add contact list modal.
+  static const String addContactListTitle = 'Adaugă listă de contacte';
 
-    /// Hint for contact list name field.
-    static const String addContactListNameHint = 'Nume listă';
+  /// Hint for contact list name field.
+  static const String addContactListNameHint = 'Nume listă';
 
   // CSV import page:
   /// Title for contacts CSV import page.

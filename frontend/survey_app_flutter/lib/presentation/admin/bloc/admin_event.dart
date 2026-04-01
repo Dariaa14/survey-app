@@ -24,6 +24,51 @@ class AdminSurveysRefreshed extends AdminEvent {
   const AdminSurveysRefreshed();
 }
 
+/// Triggered when the admin email lists should be loaded.
+class AdminEmailListsRequested extends AdminEvent {
+  /// Creates [AdminEmailListsRequested].
+  const AdminEmailListsRequested();
+}
+
+/// Triggered when the admin explicitly refreshes email lists.
+class AdminEmailListsRefreshed extends AdminEvent {
+  /// Creates [AdminEmailListsRefreshed].
+  const AdminEmailListsRefreshed();
+}
+
+/// Triggered to create a new admin email list.
+class AdminEmailListCreateRequested extends AdminEvent {
+  /// New email list name.
+  final String name;
+
+  /// Creates [AdminEmailListCreateRequested].
+  const AdminEmailListCreateRequested(this.name);
+}
+
+/// Triggered to update an existing admin email list.
+class AdminEmailListUpdateRequested extends AdminEvent {
+  /// Email list id.
+  final String listId;
+
+  /// New email list name.
+  final String name;
+
+  /// Creates [AdminEmailListUpdateRequested].
+  const AdminEmailListUpdateRequested({
+    required this.listId,
+    required this.name,
+  });
+}
+
+/// Triggered to delete an admin email list.
+class AdminEmailListDeleteRequested extends AdminEvent {
+  /// Email list id.
+  final String listId;
+
+  /// Creates [AdminEmailListDeleteRequested].
+  const AdminEmailListDeleteRequested(this.listId);
+}
+
 /// Triggered to clear any error message from admin state.
 class AdminErrorCleared extends AdminEvent {
   /// Creates [AdminErrorCleared].

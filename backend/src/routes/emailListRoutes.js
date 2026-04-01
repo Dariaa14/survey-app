@@ -175,3 +175,5 @@ router.delete('/:id/contacts/:contactId', verifyToken, requireAdmin, async (req,
         res.status(500).json({ error: 'Failed to delete contact' });
     }
 });
+
+module.exports = router;

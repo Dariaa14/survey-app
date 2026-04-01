@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
+import 'package:survey_app_flutter/presentation/email_list_builder/bloc/email_list_builder_event.dart';
 import 'package:survey_app_flutter/presentation/email_list_builder/email_list_builder.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/shared/custom_color_variant.dart';
+import 'package:survey_app_flutter/utils/app_blocs.dart';
 import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
@@ -67,7 +70,12 @@ class AdminTopBar extends StatelessWidget {
 
         final VoidCallback onPrimaryButtonPressed = isContactsTab
             ? () {
-                showDialog<void>(
+                AppBlocs.emailListBuilderBloc.add(
+                  const EmailListBuilderStatusReset(),
+                );
+                AppBlocs.emailListBuilderBloc.add(const EmailListNameChanged(''));
+
+                showDialog<Object?>(
                   context: context,
                   builder: (dialogContext) {
                     return Dialog(
@@ -84,7 +92,11 @@ class AdminTopBar extends StatelessWidget {
                       ),
                     );
                   },
-                );
+                ).then((result) {
+                  if (result != null) {
+                    AppBlocs.adminBloc.add(const AdminEmailListsRefreshed());
+                  }
+                });
               }
             : () {
                 context.push(AppRoutes.adminSurveyCreatePath());
