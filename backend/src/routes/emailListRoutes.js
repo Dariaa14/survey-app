@@ -5,6 +5,12 @@ const { EmailList, EmailContact } = require('../models');
 const { verifyToken } = require('../utils/authMiddleware');
 const { requireAdmin } = require('../utils/adminMiddleware');
 
+const multer = require('multer');
+const csv = require('csv-parser');
+const stream = require('stream');
+const upload = multer();
+
+
 /// CREATE
 router.post('/', verifyToken, requireAdmin, async (req, res) => {
     try {
@@ -173,6 +179,93 @@ router.delete('/:id/contacts/:contactId', verifyToken, requireAdmin, async (req,
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to delete contact' });
+    }
+});
+
+const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+/// IMPORT from CSV
+router.post('/:id/contacts/import-csv', upload.single('file'), async (req, res) => {
+    const listId = req.params.id;
+    const preview = req.query.preview === 'true';
+
+    try {
+        const results = [];
+
+        const bufferStream = new stream.PassThrough();
+        bufferStream.end(req.file.buffer);
+
+        bufferStream
+            .pipe(csv())
+            .on('data', (row) => results.push(row))
+            .on('end', async () => {
+
+                const valid = [];
+                const invalid = [];
+                const duplicates = [];
+
+                const existingContacts = await EmailContact.findAll({
+                    where: { list_id: listId },
+                    attributes: ['email']
+                });
+
+                const existingEmails = new Set(existingContacts.map(c => c.email.toLowerCase()));
+                const seenInFile = new Set();
+
+                results.forEach((row, index) => {
+                    const email = row.email?.trim();
+                    const name = row.name?.trim() || null;
+                    const rowNumber = index + 2; 
+
+                    if (!email) {
+                        invalid.push({ row: rowNumber, error: 'Email is required' });
+                        return;
+                    }
+
+                    if (!isValidEmail(email)) {
+                        invalid.push({ row: rowNumber, email, error: 'Invalid email format' });
+                        return;
+                    }
+
+                    if (existingEmails.has(email.toLowerCase()) || seenInFile.has(email.toLowerCase())) {
+                        duplicates.push({ row: rowNumber, email });
+                        return;
+                    }
+
+                    seenInFile.add(email.toLowerCase());
+
+                    valid.push({ email, name });
+                });
+
+                if (!preview && valid.length > 0) {
+                    const contactsToInsert = valid.map(c => ({
+                        list_id: listId,
+                        email: c.email,
+                        name: c.name,
+                        created_at: new Date()
+                    }));
+
+                    await EmailContact.bulkCreate(contactsToInsert);
+                }
+
+                res.json({
+                    summary: {
+                        total: results.length,
+                        valid: valid.length,
+                        invalid: invalid.length,
+                        duplicates: duplicates.length
+                    },
+                    valid,
+                    invalid,
+                    duplicates
+                });
+            });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to import CSV' });
     }
 });
 

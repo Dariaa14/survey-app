@@ -107,4 +107,21 @@ class EmailListUseCase {
       contactId: contactId,
     );
   }
+
+  /// Imports contacts from a CSV file into an email list.
+  Future<void> importContactsCsv({
+    required String token,
+    required String listId,
+    required String fileName,
+    required List<int> csvBytes,
+    required bool preview,
+  }) async {
+    return _emailListRepository.importContactsCsv(
+      token: token,
+      listId: listId,
+      fileName: fileName,
+      csvBytes: csvBytes,
+      preview: preview,
+    );
+  }
 }

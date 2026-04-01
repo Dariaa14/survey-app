@@ -1,8 +1,10 @@
 import 'package:bloc/bloc.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:survey_app_flutter/domain/use_cases/email_list_use_case.dart';
 import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
 import 'package:survey_app_flutter/presentation/email_list_builder/bloc/email_list_builder_event.dart';
 import 'package:survey_app_flutter/presentation/email_list_builder/bloc/email_list_builder_state.dart';
+import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Bloc for the email list builder feature
 class EmailListBuilderBloc
@@ -20,6 +22,9 @@ class EmailListBuilderBloc
     on<EmailListNameChanged>(_onNameChanged);
     on<EmailListCreateRequested>(_onCreateRequested);
     on<EmailListBuilderStatusReset>(_onStatusReset);
+    on<CsvImportFilePickRequested>(_onCsvFilePickRequested);
+    on<CsvImportRequested>(_onCsvImportRequested);
+    on<CsvImportStateReset>(_onCsvImportStateReset);
   }
 
   void _onNameChanged(
@@ -93,6 +98,102 @@ class EmailListBuilderBloc
       state
           .copyWith(status: EmailListBuilderStatus.initial)
           .copyWithNull(nullErrorMessage: true, nullCreatedList: true),
+    );
+  }
+
+  Future<void> _onCsvFilePickRequested(
+    CsvImportFilePickRequested event,
+    Emitter<EmailListBuilderState> emit,
+  ) async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const <String>['csv'],
+      withData: true,
+    );
+
+    if (result == null || result.files.isEmpty) {
+      return;
+    }
+
+    final file = result.files.single;
+    final bytes = file.bytes;
+
+    if (bytes == null) {
+      emit(
+        state.copyWith(
+          csvImportStatus: CsvImportStatus.failure,
+          csvImportErrorMessage: AppStrings.csvImportReadFileErrorMessage,
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state
+          .copyWith(
+            selectedCsvBytes: bytes,
+            selectedCsvName: file.name,
+            csvImportStatus: CsvImportStatus.idle,
+          )
+          .copyWithNull(nullCsvImportErrorMessage: true),
+    );
+  }
+
+  Future<void> _onCsvImportRequested(
+    CsvImportRequested event,
+    Emitter<EmailListBuilderState> emit,
+  ) async {
+    if (!state.canImportCsv) {
+      return;
+    }
+
+    emit(
+      state
+          .copyWith(csvImportStatus: CsvImportStatus.uploading)
+          .copyWithNull(nullCsvImportErrorMessage: true),
+    );
+
+    try {
+      final token = await _userUseCase.getAuthToken();
+      if (token == null || token.isEmpty) {
+        throw Exception(AppStrings.csvImportMissingTokenMessage);
+      }
+
+      await _emailListUseCase.importContactsCsv(
+        token: token,
+        listId: event.listId,
+        fileName: state.selectedCsvName!,
+        csvBytes: state.selectedCsvBytes!,
+        preview: true,
+      );
+
+      emit(
+        state
+            .copyWith(csvImportStatus: CsvImportStatus.success)
+            .copyWithNull(nullCsvImportErrorMessage: true),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          csvImportStatus: CsvImportStatus.failure,
+          csvImportErrorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  void _onCsvImportStateReset(
+    CsvImportStateReset event,
+    Emitter<EmailListBuilderState> emit,
+  ) {
+    emit(
+      state
+          .copyWith(
+            csvImportStatus: CsvImportStatus.idle,
+            selectedCsvName: null,
+            selectedCsvBytes: null,
+          )
+          .copyWithNull(nullCsvImportErrorMessage: true),
     );
   }
 }

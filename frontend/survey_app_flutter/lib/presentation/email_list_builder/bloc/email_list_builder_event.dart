@@ -24,3 +24,24 @@ class EmailListBuilderStatusReset extends EmailListBuilderEvent {
 	/// Creates [EmailListBuilderStatusReset].
 	const EmailListBuilderStatusReset();
 }
+
+/// Triggered when user wants to pick a CSV file for import.
+class CsvImportFilePickRequested extends EmailListBuilderEvent {
+	/// Creates [CsvImportFilePickRequested].
+	const CsvImportFilePickRequested();
+}
+
+/// Triggered when user requests importing currently selected CSV.
+class CsvImportRequested extends EmailListBuilderEvent {
+	/// Target email list id.
+	final String listId;
+
+	/// Creates [CsvImportRequested].
+	const CsvImportRequested(this.listId);
+}
+
+/// Triggered to clear CSV import transient state.
+class CsvImportStateReset extends EmailListBuilderEvent {
+	/// Creates [CsvImportStateReset].
+	const CsvImportStateReset();
+}

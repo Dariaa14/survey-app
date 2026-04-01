@@ -303,4 +303,18 @@ class AppStrings {
 
   /// Confirm action for CSV import page.
   static const String csvImportImportButton = 'Importă';
+
+    /// Button text while CSV is being uploaded.
+    static const String csvImportUploadingButton = 'Se importă...';
+
+    /// Label prefix for selected CSV file.
+    static const String csvImportSelectedFilePrefix = 'Fișier selectat:';
+
+    /// Message shown when selected file cannot be read.
+    static const String csvImportReadFileErrorMessage =
+            'Fișierul selectat nu poate fi citit.';
+
+    /// Message shown when authentication token is unavailable.
+    static const String csvImportMissingTokenMessage =
+            'Nu există token de autentificare disponibil.';
 }

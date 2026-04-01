@@ -58,4 +58,13 @@ abstract class EmailListRepository {
     required String listId,
     required String contactId,
   });
+
+  /// Imports contacts from a CSV file into an email list.
+  Future<void> importContactsCsv({
+    required String token,
+    required String listId,
+    required String fileName,
+    required List<int> csvBytes,
+    required bool preview,
+  });
 }

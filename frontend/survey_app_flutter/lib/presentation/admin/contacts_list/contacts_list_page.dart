@@ -14,7 +14,7 @@ class ContactsListPage extends StatelessWidget {
   /// Constructs a [ContactsListPage].
   const ContactsListPage({super.key});
 
-  Future<void> _openCsvImportModal(BuildContext context) {
+  Future<void> _openCsvImportModal(BuildContext context, String listId) {
     return showDialog<void>(
       context: context,
       builder: (dialogContext) {
@@ -28,7 +28,7 @@ class ContactsListPage extends StatelessWidget {
           ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 900, maxHeight: 760),
-            child: const CsvImportPage(),
+            child: CsvImportPage(listId: listId),
           ),
         );
       },
@@ -50,7 +50,7 @@ class ContactsListPage extends StatelessWidget {
                   emailList: emailList,
                   onView: () {},
                   onImportCsv: () {
-                    _openCsvImportModal(context);
+                    _openCsvImportModal(context, emailList.id);
                   },
                   onDelete: () {
                     _showDeleteListDialog(context, emailList);
