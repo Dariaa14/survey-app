@@ -9,7 +9,11 @@ abstract class SurveyRepository {
   Future<List<SurveyEntity>> getAllSurveys();
 
   /// Fetches surveys owned by a specific user.
-  Future<List<SurveyEntity>> getSurveysByUser(String userId, String token);
+  Future<List<SurveyEntity>> getSurveysByUser(
+    String userId,
+    String token, {
+    String? status,
+  });
 
   /// Fetches a survey by its unique identifier.
   Future<SurveyEntity> getSurveyById(String surveyId);

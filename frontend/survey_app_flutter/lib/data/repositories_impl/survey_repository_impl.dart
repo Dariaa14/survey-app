@@ -31,10 +31,15 @@ class SurveyRepositoryImpl implements SurveyRepository {
   @override
   Future<List<SurveyEntity>> getSurveysByUser(
     String userId,
-    String token,
-  ) async {
+    String token, {
+    String? status,
+  }) async {
+    final uri = Uri.parse('$baseUrl/user/$userId').replace(
+      queryParameters: status == null ? null : <String, String>{'status': status},
+    );
+
     final response = await http.get(
-      Uri.parse('$baseUrl/user/$userId'),
+      uri,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

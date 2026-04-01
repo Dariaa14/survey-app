@@ -34,11 +34,15 @@ enum AdminStatus {
 
 /// State for admin area containing the current user's posted surveys.
 class AdminState extends Equatable {
+  /// Maximum number of surveys for client-side real-time filtering.
+  static const int clientSideFilterThreshold = 200;
+
   /// Creates an [AdminState].
   const AdminState({
     this.status = AdminStatus.initial,
     this.surveys = const <SurveyEntity>[],
     this.selectedFilter = AdminSurveyFilter.all,
+    this.usesServerFiltering = false,
     this.errorMessage,
     this.adminUser,
   });
@@ -55,19 +59,30 @@ class AdminState extends Equatable {
   /// Selected surveys filter.
   final AdminSurveyFilter selectedFilter;
 
+  /// Whether filter changes should be resolved server-side.
+  final bool usesServerFiltering;
+
   /// Surveys after applying [selectedFilter].
   List<SurveyEntity> get filteredSurveys {
+    if (usesServerFiltering) {
+      return surveys;
+    }
+
     switch (selectedFilter) {
       case AdminSurveyFilter.all:
         return surveys;
       case AdminSurveyFilter.draft:
-        return surveys.where((survey) => survey.status == SurveyStatus.draft).toList();
+        return surveys
+            .where((survey) => survey.status == SurveyStatus.draft)
+            .toList();
       case AdminSurveyFilter.published:
         return surveys
             .where((survey) => survey.status == SurveyStatus.published)
             .toList();
       case AdminSurveyFilter.closed:
-        return surveys.where((survey) => survey.status == SurveyStatus.closed).toList();
+        return surveys
+            .where((survey) => survey.status == SurveyStatus.closed)
+            .toList();
     }
   }
 
@@ -80,6 +95,7 @@ class AdminState extends Equatable {
     AdminStatus? status,
     List<SurveyEntity>? surveys,
     AdminSurveyFilter? selectedFilter,
+    bool? usesServerFiltering,
     String? errorMessage,
   }) {
     return AdminState(
@@ -87,6 +103,7 @@ class AdminState extends Equatable {
       status: status ?? this.status,
       surveys: surveys ?? this.surveys,
       selectedFilter: selectedFilter ?? this.selectedFilter,
+      usesServerFiltering: usesServerFiltering ?? this.usesServerFiltering,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -101,6 +118,7 @@ class AdminState extends Equatable {
       status: status,
       surveys: surveys,
       selectedFilter: selectedFilter,
+      usesServerFiltering: usesServerFiltering,
       errorMessage: nullErrorMessage ? null : errorMessage,
     );
   }
@@ -111,6 +129,7 @@ class AdminState extends Equatable {
     status,
     surveys,
     selectedFilter,
+    usesServerFiltering,
     errorMessage,
   ];
 }

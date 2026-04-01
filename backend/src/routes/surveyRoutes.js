@@ -8,6 +8,7 @@ const { User } = require('../models/user');
 const models = require('../models/associations');
 
 const { sequelize } = require('../db');
+const { Op } = require('sequelize');
 
 const { requireAdmin } = require('../utils/adminMiddleware');
 const { verifyToken } = require('../utils/authMiddleware');
@@ -61,11 +62,20 @@ router.get('/', async (req, res) => {
 router.get('/user/:ownerId', verifyToken, requireAdmin, async (req, res) => {
     try {
         const { ownerId } = req.params;
-
+        const { status } = req.query;
+        
         console.log('Fetching surveys for user ID:', ownerId);
+        console.log('Filter:', { status });
+
+        const where = { owner_id: ownerId };
+
+        if (status) {
+            where.status = status;
+        }
+
 
         const surveys = await Survey.findAll({
-            where: { owner_id: ownerId },
+            where: where,
             include: [
                 {
                     model: Question,

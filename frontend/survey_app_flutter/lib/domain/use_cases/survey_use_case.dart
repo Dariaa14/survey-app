@@ -25,9 +25,14 @@ class SurveyUseCase {
   /// Fetches surveys created by a specific user.
   Future<List<SurveyEntity>> getSurveysByUser(
     String ownerId,
-    String token,
-  ) async {
-    return _surveyRepository.getSurveysByUser(ownerId, token);
+    String token, {
+    String? status,
+  }) async {
+    return _surveyRepository.getSurveysByUser(
+      ownerId,
+      token,
+      status: status,
+    );
   }
 
   /// Creates a new survey.

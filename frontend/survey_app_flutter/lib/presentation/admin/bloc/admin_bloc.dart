@@ -85,9 +85,16 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         token,
       );
 
+      final shouldUseServerFiltering =
+          surveys.length >= AdminState.clientSideFilterThreshold;
+
       emit(
         state
-            .copyWith(status: AdminStatus.success, surveys: surveys)
+            .copyWith(
+              status: AdminStatus.success,
+              surveys: surveys,
+              usesServerFiltering: shouldUseServerFiltering,
+            )
             .copyWithNull(nullErrorMessage: true),
       );
     } catch (e) {
@@ -121,9 +128,80 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         throw Exception('No auth token available.');
       }
 
+      final status = state.usesServerFiltering
+          ? _filterToStatusQuery(state.selectedFilter)
+          : null;
       final surveys = await _surveyUseCase.getSurveysByUser(
         adminUser.id,
         token,
+        status: status,
+      );
+
+      final shouldUseServerFiltering =
+          state.usesServerFiltering ||
+          (status == null &&
+              surveys.length >= AdminState.clientSideFilterThreshold);
+
+      emit(
+        state
+            .copyWith(
+              status: AdminStatus.success,
+              surveys: surveys,
+              usesServerFiltering: shouldUseServerFiltering,
+            )
+            .copyWithNull(nullErrorMessage: true),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: AdminStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  void _onErrorCleared(AdminErrorCleared event, Emitter<AdminState> emit) {
+    emit(state.copyWithNull(nullErrorMessage: true));
+  }
+
+  Future<void> _onSurveyFilterChanged(
+    AdminSurveyFilterChanged event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(state.copyWith(selectedFilter: event.filter));
+
+    if (!state.usesServerFiltering) {
+      return;
+    }
+
+    final adminUser = state.adminUser;
+    if (adminUser == null) {
+      emit(
+        state.copyWith(
+          status: AdminStatus.failure,
+          errorMessage: 'Admin user not found',
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state
+          .copyWith(status: AdminStatus.loading)
+          .copyWithNull(nullErrorMessage: true),
+    );
+
+    try {
+      final token = await _userUseCase.getAuthToken();
+      if (token == null || token.isEmpty) {
+        throw Exception('No auth token available.');
+      }
+
+      final surveys = await _surveyUseCase.getSurveysByUser(
+        adminUser.id,
+        token,
+        status: _filterToStatusQuery(event.filter),
       );
 
       emit(
@@ -141,15 +219,17 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
   }
 
-  void _onErrorCleared(AdminErrorCleared event, Emitter<AdminState> emit) {
-    emit(state.copyWithNull(nullErrorMessage: true));
-  }
-
-  void _onSurveyFilterChanged(
-    AdminSurveyFilterChanged event,
-    Emitter<AdminState> emit,
-  ) {
-    emit(state.copyWith(selectedFilter: event.filter));
+  String? _filterToStatusQuery(AdminSurveyFilter filter) {
+    switch (filter) {
+      case AdminSurveyFilter.all:
+        return null;
+      case AdminSurveyFilter.draft:
+        return 'draft';
+      case AdminSurveyFilter.published:
+        return 'published';
+      case AdminSurveyFilter.closed:
+        return 'closed';
+    }
   }
 
   Future<void> _onSurveyPublishRequested(
