@@ -56,7 +56,7 @@ class ContactListPreview extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   AppStrings.contactsListPreviewMeta(
-                    0, // TODO: add actual contacts count when available
+                    emailList.contacts.length,
                     emailList.createdAt,
                   ),
                   style: theme.textTheme.bodySmall?.copyWith(

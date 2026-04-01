@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:survey_app_flutter/presentation/email_list_builder/email_list_builder.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/utils/app_routes.dart';
@@ -66,13 +67,30 @@ class AdminTopBar extends StatelessWidget {
 
         final VoidCallback onPrimaryButtonPressed = isContactsTab
             ? () {
-                // context.push(AppRoutes.adminEmailListCreatePath());
+                showDialog<void>(
+                  context: context,
+                  builder: (dialogContext) {
+                    return Dialog(
+                      insetPadding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 24,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 520),
+                        child: const EmailListBuilder(),
+                      ),
+                    );
+                  },
+                );
               }
             : () {
                 context.push(AppRoutes.adminSurveyCreatePath());
               };
 
-        final Widget createSurveyButton = isCompact
+        final Widget createButton = isCompact
             ? SizedBox(
                 width: double.infinity,
                 child: CustomButton(
@@ -102,7 +120,7 @@ class AdminTopBar extends StatelessWidget {
                     const SizedBox(height: 12),
                     tabs,
                     const SizedBox(height: 12),
-                    createSurveyButton,
+                    createButton,
                   ],
                 )
               : Row(
@@ -111,7 +129,7 @@ class AdminTopBar extends StatelessWidget {
                     const SizedBox(width: 24),
                     tabs,
                     const Spacer(),
-                    createSurveyButton,
+                    createButton,
                   ],
                 ),
         );

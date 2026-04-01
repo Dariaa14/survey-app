@@ -10,36 +10,14 @@ final List<EmailListEntity> _mockEmailLists = <EmailListEntity>[
     ownerId: 'owner-001',
     name: 'Weekly Product Updates',
     createdAt: DateTime(2026, 1, 12),
+    contacts: [],
   ),
   EmailListEntityImpl(
     id: 'list-002',
     ownerId: 'owner-001',
     name: 'New User Onboarding',
     createdAt: DateTime(2026, 1, 20),
-  ),
-  EmailListEntityImpl(
-    id: 'list-003',
-    ownerId: 'owner-001',
-    name: 'Survey Reminders',
-    createdAt: DateTime(2026, 2, 4),
-  ),
-  EmailListEntityImpl(
-    id: 'list-004',
-    ownerId: 'owner-002',
-    name: 'Quarterly Newsletter',
-    createdAt: DateTime(2026, 2, 15),
-  ),
-  EmailListEntityImpl(
-    id: 'list-005',
-    ownerId: 'owner-002',
-    name: 'Beta Program',
-    createdAt: DateTime(2026, 3, 1),
-  ),
-  EmailListEntityImpl(
-    id: 'list-006',
-    ownerId: 'owner-003',
-    name: 'Churn Prevention',
-    createdAt: DateTime(2026, 3, 10),
+    contacts: [],
   ),
 ];
 

@@ -247,6 +247,12 @@ class AppStrings {
   /// Action label for importing contacts from CSV.
   static const String contactListPreviewImportCsvButton = 'Importă CSV';
 
+    /// Title for add contact list modal.
+    static const String addContactListTitle = 'Adaugă listă de contacte';
+
+    /// Hint for contact list name field.
+    static const String addContactListNameHint = 'Nume listă';
+
   // CSV import page:
   /// Title for contacts CSV import page.
   static const String csvImportTitle = 'Importă contacte';
