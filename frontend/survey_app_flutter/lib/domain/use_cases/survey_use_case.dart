@@ -94,4 +94,26 @@ class SurveyUseCase {
       options: options,
     );
   }
+
+  /// Updates an existing question in the specified survey.
+  Future<QuestionEntity> updateQuestion(
+    String token,
+    QuestionEntity question,
+    String surveyId,
+  ) async {
+    return _surveyRepository.updateQuestion(token, question, surveyId);
+  }
+
+  /// Deletes a question from the specified survey.
+  Future<void> deleteQuestion({
+    required String token,
+    required String surveyId,
+    required String questionId,
+  }) async {
+    return _surveyRepository.deleteQuestion(
+      token: token,
+      surveyId: surveyId,
+      questionId: questionId,
+    );
+  }
 }

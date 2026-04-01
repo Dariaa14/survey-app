@@ -17,6 +17,7 @@ class QuestionLimitInputWidget extends StatelessWidget {
   const QuestionLimitInputWidget({
     required this.type,
     required this.onChanged,
+    required this.controller,
     super.key,
   });
 
@@ -25,6 +26,9 @@ class QuestionLimitInputWidget extends StatelessWidget {
 
   /// Callback fired when the input value changes.
   final void Function(String) onChanged;
+
+  /// Controller for the input field.
+  final TextEditingController controller;
 
   String get _label {
     switch (type) {
@@ -62,6 +66,7 @@ class QuestionLimitInputWidget extends StatelessWidget {
         CustomTextfield(
           hintText: _placeholder,
           onChanged: onChanged,
+          controller: controller,
         ),
       ],
     );

@@ -56,7 +56,7 @@ class QuestionBuilderPage extends StatelessWidget {
                       : QuestionType.text,
                 ),
               )
-              ..add(QuestionOrderChanged(orderNumber)),
+              ..add(QuestionOrderChanged(question?.order ?? orderNumber)),
             buildWhen: (previous, current) => previous.type != current.type,
             builder: (context, state) {
               return Column(

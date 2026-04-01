@@ -45,4 +45,18 @@ abstract class SurveyRepository {
     int? maxSelections,
     List<OptionEntity>? options,
   });
+
+  /// Updates an existing question in the specified survey.
+  Future<QuestionEntity> updateQuestion(
+    String token,
+    QuestionEntity question,
+    String surveyId,
+  );
+
+  /// Deletes a question from the specified survey.
+  Future<void> deleteQuestion({
+    required String token,
+    required String surveyId,
+    required String questionId,
+  });
 }

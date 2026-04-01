@@ -5,6 +5,15 @@ import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 /// app.
 abstract class QuestionBuilderEvent {}
 
+/// Event triggered when a question is loaded for editing in the question builder.
+class LoadQuestionForEditing extends QuestionBuilderEvent {
+  /// The question entity that is being loaded for editing.
+  final QuestionEntity question;
+
+  /// Constructs a [LoadQuestionForEditing] event with the given [question].
+  LoadQuestionForEditing(this.question);
+}
+
 /// Event triggered when the question type is changed in the question builder.
 class QuestionTypeChanged extends QuestionBuilderEvent {
   /// The new question type selected by the user.

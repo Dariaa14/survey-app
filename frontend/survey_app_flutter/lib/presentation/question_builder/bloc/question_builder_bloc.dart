@@ -17,6 +17,8 @@ class QuestionBuilderBloc
   /// state.
   QuestionBuilderBloc(this._surveyUseCase)
     : super(const QuestionBuilderState()) {
+    on<LoadQuestionForEditing>(_onLoadQuestionForEditing);
+
     on<QuestionTypeChanged>(_onQuestionTypeChanged);
     on<QuestionTitleChanged>(_onQuestionTitleChanged);
     on<QuestionRequiredChanged>(_onQuestionRequiredChanged);
@@ -30,6 +32,23 @@ class QuestionBuilderBloc
     on<QuestionOrderChanged>(_onQuestionOrderChanged);
     on<SaveQuestion>(_onSaveQuestion);
     on<QuestionBuilderReset>(_onQuestionBuilderReset);
+  }
+
+  void _onLoadQuestionForEditing(
+    LoadQuestionForEditing event,
+    Emitter<QuestionBuilderState> emit,
+  ) {
+    final question = event.question;
+    emit(
+      state.copyWith(
+        type: question.type,
+        title: question.title,
+        required: question.required,
+        maxLength: question.maxLength,
+        maxSelections: question.maxSelections,
+        options: question.options,
+      ),
+    );
   }
 
   void _onQuestionTypeChanged(

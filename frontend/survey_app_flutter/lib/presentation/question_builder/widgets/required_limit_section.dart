@@ -10,6 +10,7 @@ class RequiredLimitSection extends StatelessWidget {
     required this.onRequiredChanged,
     required this.limitType,
     required this.onLimitChanged,
+    required this.limitController,
     super.key,
   });
 
@@ -24,6 +25,9 @@ class RequiredLimitSection extends StatelessWidget {
 
   /// Called when limit input changes.
   final void Function(String) onLimitChanged;
+
+  /// Controller for the limit input field.
+  final TextEditingController limitController;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +45,7 @@ class RequiredLimitSection extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               QuestionLimitInputWidget(
+                controller: limitController,
                 type: limitType,
                 onChanged: onLimitChanged,
               ),
@@ -59,6 +64,7 @@ class RequiredLimitSection extends StatelessWidget {
               child: QuestionLimitInputWidget(
                 type: limitType,
                 onChanged: onLimitChanged,
+                controller: limitController,
               ),
             ),
           ],

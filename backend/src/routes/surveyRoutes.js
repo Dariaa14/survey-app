@@ -5,8 +5,9 @@ const { Survey } = require('../models/survey');
 const { Question } = require('../models/question');
 const { Option } = require('../models/option');
 const { User } = require('../models/user');
-
 const models = require('../models/associations');
+
+const { sequelize } = require('../db');
 
 const { requireAdmin } = require('../utils/adminMiddleware');
 const { verifyToken } = require('../utils/authMiddleware');
@@ -200,25 +201,95 @@ router.post('/:id/questions', verifyToken, requireAdmin, async (req, res) => {
 
 /// UPDATE question
 router.put('/:id/questions/:qid', verifyToken, requireAdmin, async (req, res) => {
+    const t = await sequelize.transaction();
+
     try {
         const { id, qid } = req.params;
+        const {
+            title,
+            type,
+            required,
+            order,
+            max_length,
+            max_selections,
+            options
+        } = req.body;
 
-        const survey = await Survey.findByPk(id);
-        if (!survey) return res.status(404).json({ error: 'Survey not found' });
+        const survey = await Survey.findByPk(id, { transaction: t });
+        if (!survey) {
+            await t.rollback();
+            return res.status(404).json({ error: 'Survey not found' });
+        }
 
         if (survey.status !== 'draft') {
+            await t.rollback();
             return res.status(400).json({ error: 'Can only edit draft surveys' });
         }
 
+        const question = await Question.findByPk(qid, { transaction: t });
+        if (!question) {
+            await t.rollback();
+            return res.status(404).json({ error: 'Question not found' });
+        }
+
+        await question.update({
+            title,
+            type,
+            required,
+            order,
+            max_length,
+            max_selections
+        }, { transaction: t });
+
+        if (type === 'multiple_choice' && Array.isArray(options)) {
+
+            await Option.destroy({
+                where: { question_id: qid },
+                transaction: t
+            });
+
+            const newOptions = options.map((opt, index) => ({
+                question_id: qid,
+                label: opt.label,
+                order: opt.order ?? index
+            }));
+
+            await Option.bulkCreate(newOptions, { transaction: t });
+        }
+
+        await t.commit();
+
+        const updatedQuestion = await Question.findByPk(qid, {
+            include: [{ model: Option, as: 'options' }]
+        });
+
+        res.json(updatedQuestion);
+
+    } catch (err) {
+        console.log(err);
+        await t.rollback();
+        console.error(err);
+        res.status(500).json({ error: 'Failed to update question: ', message: err.message });
+    }
+});
+
+router.delete('/:id/questions/:qid', verifyToken, requireAdmin, async (req, res) => {
+    try {
+        const { qid } = req.params;
+
         const question = await Question.findByPk(qid);
-        if (!question) return res.status(404).json({ error: 'Question not found' });
 
-        await question.update(req.body);
+        if (!question) {
+            return res.status(404).json({ error: 'Question not found' });
+        }
 
-        res.json(question);
+        await question.destroy();
+
+        res.json({ message: 'Question deleted successfully' });
+
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Failed to update question' });
+        res.status(500).json({ error: 'Failed to delete question' });
     }
 });
 

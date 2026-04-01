@@ -14,11 +14,38 @@ import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// A section widget for building multiple choice questions
 ///  in the survey builder.
-class MultiChoiceQuestionSection extends StatelessWidget {
+class MultiChoiceQuestionSection extends StatefulWidget {
   /// Constructs a [MultiChoiceQuestionSection].
   const MultiChoiceQuestionSection({super.key});
 
   static const int _minOptions = 2;
+
+  @override
+  State<MultiChoiceQuestionSection> createState() =>
+      _MultiChoiceQuestionSectionState();
+}
+
+class _MultiChoiceQuestionSectionState
+    extends State<MultiChoiceQuestionSection> {
+  final TextEditingController _questionTitleController =
+      TextEditingController();
+  final TextEditingController _maxSelectionsController =
+      TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final state = AppBlocs.questionBuilderBloc.state;
+    _questionTitleController.text = state.title;
+    _maxSelectionsController.text = state.maxSelections?.toString() ?? '';
+  }
+
+  @override
+  void dispose() {
+    _questionTitleController.dispose();
+    _maxSelectionsController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +65,7 @@ class MultiChoiceQuestionSection extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             CustomTextfield(
+              controller: _questionTitleController,
               hintText: AppStrings.questionTextPlaceholder,
               onChanged: (value) {
                 AppBlocs.questionBuilderBloc.add(QuestionTitleChanged(value));
@@ -65,12 +93,15 @@ class MultiChoiceQuestionSection extends StatelessWidget {
                       QuestionMaxSelectionsChanged(maxSelections),
                     );
                   },
+                  limitController: _maxSelectionsController,
                 );
               },
             ),
             const SizedBox(height: 16),
             Text(
-              AppStrings.numberOfOptionsLabel(_minOptions),
+              AppStrings.numberOfOptionsLabel(
+                MultiChoiceQuestionSection._minOptions,
+              ),
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -120,11 +151,14 @@ class MultiChoiceQuestionSection extends StatelessWidget {
                 final isTitleValid = state.title.trim().isNotEmpty;
                 final isMaxSelectionsValid =
                     state.maxSelections != null && state.maxSelections! > 0;
-                final hasMinimumOptions = state.options.length >= _minOptions;
+                final hasMinimumOptions =
+                    state.options.length >=
+                    MultiChoiceQuestionSection._minOptions;
                 final hasOnlyNonEmptyOptions = state.options.every(
                   (option) => option.label.trim().isNotEmpty,
                 );
-                final canSave = isTitleValid &&
+                final canSave =
+                    isTitleValid &&
                     isMaxSelectionsValid &&
                     hasMinimumOptions &&
                     hasOnlyNonEmptyOptions;
@@ -132,7 +166,7 @@ class MultiChoiceQuestionSection extends StatelessWidget {
                 String? validationMessage;
                 if (!hasMinimumOptions) {
                   validationMessage = AppStrings.warningMinimumOptions(
-                    _minOptions,
+                    MultiChoiceQuestionSection._minOptions,
                   );
                 } else if (!hasOnlyNonEmptyOptions) {
                   validationMessage =

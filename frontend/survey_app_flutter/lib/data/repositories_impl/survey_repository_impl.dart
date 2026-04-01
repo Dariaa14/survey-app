@@ -208,4 +208,47 @@ class SurveyRepositoryImpl implements SurveyRepository {
       throw Exception('Failed to create question');
     }
   }
+
+  @override
+  Future<QuestionEntity> updateQuestion(
+    String token,
+    QuestionEntity question,
+    String surveyId,
+  ) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/$surveyId/questions/${question.id}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode((question as QuestionEntityImpl).toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return QuestionEntityImpl.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+    } else {
+      throw Exception('Failed to update question');
+    }
+  }
+
+  @override
+  Future<void> deleteQuestion({
+    required String token,
+    required String surveyId,
+    required String questionId,
+  }) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/$surveyId/questions/$questionId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete question: ${response.body}');
+    }
+  }
 }

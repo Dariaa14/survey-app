@@ -220,11 +220,18 @@ class _SurveyBuilderQuestionsSectionState
     bool isMultiChoice = true,
     QuestionEntity? question,
   }) async {
+    if (question != null) {
+      AppBlocs.questionBuilderBloc.add(LoadQuestionForEditing(question));
+    }
+    final questionTypeIsMultiChoice = question != null
+        ? question.type == QuestionType.multipleChoice
+        : isMultiChoice;
+
     final newQuestion = await showDialog<QuestionEntity?>(
       context: context,
       builder: (context) => QuestionBuilderPage(
         orderNumber: widget.questions.length + 1,
-        initialIsMultiChoiceSelected: isMultiChoice,
+        initialIsMultiChoiceSelected: questionTypeIsMultiChoice,
         question: question,
       ),
     );
@@ -233,8 +240,7 @@ class _SurveyBuilderQuestionsSectionState
     if (newQuestion == null) return;
 
     if (question != null) {
-      /// TODO: add edit question functionality instead of just adding a
-      /// new question when editing an existing one
+      AppBlocs.surveyBuilderBloc.add(EditQuestion(newQuestion));
       return;
     }
     AppBlocs.surveyBuilderBloc.add(AddQuestion(newQuestion));

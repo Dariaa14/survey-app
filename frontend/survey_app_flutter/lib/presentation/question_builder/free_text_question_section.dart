@@ -21,6 +21,25 @@ class FreeTextQuestionSection extends StatefulWidget {
 }
 
 class _FreeTextQuestionSectionState extends State<FreeTextQuestionSection> {
+  final TextEditingController _questionTitleController =
+      TextEditingController();
+  final TextEditingController _maxLengthController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final state = AppBlocs.questionBuilderBloc.state;
+    _questionTitleController.text = state.title;
+    _maxLengthController.text = state.maxLength?.toString() ?? '';
+  }
+
+  @override
+  void dispose() {
+    _questionTitleController.dispose();
+    _maxLengthController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -43,6 +62,7 @@ class _FreeTextQuestionSectionState extends State<FreeTextQuestionSection> {
               onChanged: (value) {
                 AppBlocs.questionBuilderBloc.add(QuestionTitleChanged(value));
               },
+              controller: _questionTitleController,
             ),
             const SizedBox(height: 16),
             BlocBuilder<QuestionBuilderBloc, QuestionBuilderState>(
@@ -64,6 +84,7 @@ class _FreeTextQuestionSectionState extends State<FreeTextQuestionSection> {
                       QuestionMaxLengthChanged(maxCharacters),
                     );
                   },
+                  limitController: _maxLengthController,
                 );
               },
             ),

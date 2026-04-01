@@ -40,6 +40,15 @@ class UpdateSurveySlug extends SurveyBuilderEvent {
   UpdateSurveySlug(this.slug);
 }
 
+/// Event to edit an existing question in the survey builder.
+class EditQuestion extends SurveyBuilderEvent {
+  /// The question to be edited in the survey builder.
+  final QuestionEntity question;
+
+  /// Creates an [EditQuestion] event with the given [question].
+  EditQuestion(this.question);
+}
+
 /// Event to add a new question to the survey in the survey builder.
 class AddQuestion extends SurveyBuilderEvent {
   /// The question to be added to the survey.
