@@ -38,3 +38,21 @@ class AdminSurveyFilterChanged extends AdminEvent {
   /// Creates [AdminSurveyFilterChanged].
   const AdminSurveyFilterChanged(this.filter);
 }
+
+/// Triggered when an admin publishes a survey.
+class AdminSurveyPublishRequested extends AdminEvent {
+  /// Survey id to publish.
+  final String surveyId;
+
+  /// Creates [AdminSurveyPublishRequested].
+  const AdminSurveyPublishRequested(this.surveyId);
+}
+
+/// Triggered when an admin closes a survey.
+class AdminSurveyCloseRequested extends AdminEvent {
+  /// Survey id to close.
+  final String surveyId;
+
+  /// Creates [AdminSurveyCloseRequested].
+  const AdminSurveyCloseRequested(this.surveyId);
+}

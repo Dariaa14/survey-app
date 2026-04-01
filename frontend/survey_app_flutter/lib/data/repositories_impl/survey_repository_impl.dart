@@ -147,6 +147,24 @@ class SurveyRepositoryImpl implements SurveyRepository {
   }
 
   @override
+  Future<void> closeSurvey({
+    required String token,
+    required String surveyId,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/$surveyId/close'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to close survey: ${response.body}');
+    }
+  }
+
+  @override
   Future<void> deleteSurvey({
     required String token,
     required String surveyId,

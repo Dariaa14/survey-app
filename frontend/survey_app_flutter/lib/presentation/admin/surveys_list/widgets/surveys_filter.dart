@@ -70,7 +70,7 @@ class SurveysFilter extends StatelessWidget {
                     text: AppStrings.publishedFilterButton,
                     variant: state.selectedFilter == AdminSurveyFilter.published
                         ? CustomColorVariant.primary
-                        : CustomColorVariant.gray,
+                        : CustomColorVariant.invertedSecondary,
                   ),
                   CustomButton(
                     onPressed: () {
@@ -83,7 +83,7 @@ class SurveysFilter extends StatelessWidget {
                     text: AppStrings.closedFilterButton,
                     variant: state.selectedFilter == AdminSurveyFilter.closed
                         ? CustomColorVariant.primary
-                        : CustomColorVariant.gray,
+                        : CustomColorVariant.invertedRed,
                   ),
                 ],
               ),

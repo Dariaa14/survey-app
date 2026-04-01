@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
+import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/shared/custom_color_variant.dart';
+import 'package:survey_app_flutter/utils/app_blocs.dart';
 import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
@@ -28,6 +30,7 @@ class SurveyPreviewActionButtons extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
+              AppBlocs.adminBloc.add(AdminSurveyCloseRequested(survey.id));
               Navigator.of(context).pop();
             },
             child: const Text(AppStrings.yesOption),
@@ -65,7 +68,9 @@ class SurveyPreviewActionButtons extends StatelessWidget {
             text: AppStrings.surveyEditButton,
           ),
           CustomButton(
-            onPressed: () {},
+            onPressed: () {
+              AppBlocs.adminBloc.add(AdminSurveyPublishRequested(survey.id));
+            },
             text: AppStrings.surveyPublishButton,
             variant: CustomColorVariant.invertedSecondary,
           ),

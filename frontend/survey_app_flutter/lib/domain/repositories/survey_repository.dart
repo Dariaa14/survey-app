@@ -30,6 +30,9 @@ abstract class SurveyRepository {
   /// Publishes a draft survey.
   Future<void> publishSurvey({required String token, required String surveyId});
 
+  /// Closes a published survey.
+  Future<void> closeSurvey({required String token, required String surveyId});
+
   /// Deletes a survey.
   Future<void> deleteSurvey({required String token, required String surveyId});
 

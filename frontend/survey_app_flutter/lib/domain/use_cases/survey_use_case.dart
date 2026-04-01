@@ -62,6 +62,14 @@ class SurveyUseCase {
     return _surveyRepository.publishSurvey(token: token, surveyId: surveyId);
   }
 
+  /// Closes a published survey.
+  Future<void> closeSurvey({
+    required String token,
+    required String surveyId,
+  }) async {
+    return _surveyRepository.closeSurvey(token: token, surveyId: surveyId);
+  }
+
   /// Deletes a survey.
   Future<void> deleteSurvey({
     required String token,

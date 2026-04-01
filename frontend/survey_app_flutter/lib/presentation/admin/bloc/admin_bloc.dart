@@ -21,6 +21,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<AdminSurveysRefreshed>(_onSurveysRefreshed);
     on<AdminErrorCleared>(_onErrorCleared);
     on<AdminSurveyFilterChanged>(_onSurveyFilterChanged);
+    on<AdminSurveyPublishRequested>(_onSurveyPublishRequested);
+    on<AdminSurveyCloseRequested>(_onSurveyCloseRequested);
   }
 
   Future<void> _onAccountRequested(
@@ -148,5 +150,69 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     Emitter<AdminState> emit,
   ) {
     emit(state.copyWith(selectedFilter: event.filter));
+  }
+
+  Future<void> _onSurveyPublishRequested(
+    AdminSurveyPublishRequested event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(
+      state
+          .copyWith(status: AdminStatus.loading)
+          .copyWithNull(nullErrorMessage: true),
+    );
+
+    try {
+      final token = await _userUseCase.getAuthToken();
+      if (token == null || token.isEmpty) {
+        throw Exception('No auth token available.');
+      }
+
+      await _surveyUseCase.publishSurvey(
+        token: token,
+        surveyId: event.surveyId,
+      );
+
+      add(const AdminSurveysRefreshed());
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: AdminStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  Future<void> _onSurveyCloseRequested(
+    AdminSurveyCloseRequested event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(
+      state
+          .copyWith(status: AdminStatus.loading)
+          .copyWithNull(nullErrorMessage: true),
+    );
+
+    try {
+      final token = await _userUseCase.getAuthToken();
+      if (token == null || token.isEmpty) {
+        throw Exception('No auth token available.');
+      }
+
+      await _surveyUseCase.closeSurvey(
+        token: token,
+        surveyId: event.surveyId,
+      );
+
+      add(const AdminSurveysRefreshed());
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: AdminStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
   }
 }
