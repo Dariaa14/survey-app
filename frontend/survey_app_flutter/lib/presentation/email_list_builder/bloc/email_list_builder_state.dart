@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:survey_app_flutter/domain/entities/email_list_csv_import_result_entity.dart';
 import 'package:survey_app_flutter/domain/entities/email_list_entity.dart';
 
 /// Save status for the email list builder feature.
@@ -39,6 +40,7 @@ class EmailListBuilderState extends Equatable {
 		this.name = '',
 		this.createdList,
 		this.errorMessage,
+		this.csvImportResult,
 		this.selectedCsvBytes,
 		this.selectedCsvName,
 		this.csvImportStatus = CsvImportStatus.idle,
@@ -56,6 +58,9 @@ class EmailListBuilderState extends Equatable {
 
 	/// Optional failure message.
 	final String? errorMessage;
+
+	/// Parsed backend result for CSV import preview/import.
+	final EmailListCsvImportResultEntity? csvImportResult;
 
 	/// Selected CSV bytes for import.
 	final List<int>? selectedCsvBytes;
@@ -87,6 +92,7 @@ class EmailListBuilderState extends Equatable {
 		String? name,
 		EmailListEntity? createdList,
 		String? errorMessage,
+		EmailListCsvImportResultEntity? csvImportResult,
 		List<int>? selectedCsvBytes,
 		String? selectedCsvName,
 		CsvImportStatus? csvImportStatus,
@@ -97,6 +103,7 @@ class EmailListBuilderState extends Equatable {
 			name: name ?? this.name,
 			createdList: createdList ?? this.createdList,
 			errorMessage: errorMessage ?? this.errorMessage,
+			csvImportResult: csvImportResult ?? this.csvImportResult,
 			selectedCsvBytes: selectedCsvBytes ?? this.selectedCsvBytes,
 			selectedCsvName: selectedCsvName ?? this.selectedCsvName,
 			csvImportStatus: csvImportStatus ?? this.csvImportStatus,
@@ -109,6 +116,7 @@ class EmailListBuilderState extends Equatable {
 	EmailListBuilderState copyWithNull({
 		bool nullCreatedList = false,
 		bool nullErrorMessage = false,
+		bool nullCsvImportResult = false,
 		bool nullSelectedCsvBytes = false,
 		bool nullSelectedCsvName = false,
 		bool nullCsvImportErrorMessage = false,
@@ -118,6 +126,7 @@ class EmailListBuilderState extends Equatable {
 			name: name,
 			createdList: nullCreatedList ? null : createdList,
 			errorMessage: nullErrorMessage ? null : errorMessage,
+			csvImportResult: nullCsvImportResult ? null : csvImportResult,
 			selectedCsvBytes: nullSelectedCsvBytes ? null : selectedCsvBytes,
 			selectedCsvName: nullSelectedCsvName ? null : selectedCsvName,
 			csvImportStatus: csvImportStatus,
@@ -133,6 +142,7 @@ class EmailListBuilderState extends Equatable {
 			name,
 			createdList,
 			errorMessage,
+			csvImportResult,
 			selectedCsvName,
 			selectedCsvBytes,
 			csvImportStatus,

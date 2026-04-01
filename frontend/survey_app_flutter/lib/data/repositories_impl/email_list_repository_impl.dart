@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:survey_app_flutter/data/entities_impl/email_contact_entity_impl.dart';
+import 'package:survey_app_flutter/data/entities_impl/email_list_csv_import_result_entity_impl.dart';
 import 'package:survey_app_flutter/data/entities_impl/email_list_entity_impl.dart';
 import 'package:survey_app_flutter/domain/entities/email_contact_entity.dart';
+import 'package:survey_app_flutter/domain/entities/email_list_csv_import_result_entity.dart';
 import 'package:survey_app_flutter/domain/entities/email_list_entity.dart';
 import 'package:survey_app_flutter/domain/repositories/email_list_repository.dart';
 
@@ -183,7 +185,7 @@ class EmailListRepositoryImpl implements EmailListRepository {
   }
 
   @override
-  Future<void> importContactsCsv({
+  Future<EmailListCsvImportResultEntity> importContactsCsv({
     required String token,
     required String listId,
     required String fileName,
@@ -216,6 +218,10 @@ class EmailListRepositoryImpl implements EmailListRepository {
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to import CSV contacts: ${response.body}');
     }
+
+    return EmailListCsvImportResultEntityImpl.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
   }
 
   Map<String, String> _headers(String token) {

@@ -135,7 +135,10 @@ class EmailListBuilderBloc
             selectedCsvName: file.name,
             csvImportStatus: CsvImportStatus.idle,
           )
-          .copyWithNull(nullCsvImportErrorMessage: true),
+          .copyWithNull(
+            nullCsvImportErrorMessage: true,
+            nullCsvImportResult: true,
+          ),
     );
   }
 
@@ -159,7 +162,7 @@ class EmailListBuilderBloc
         throw Exception(AppStrings.csvImportMissingTokenMessage);
       }
 
-      await _emailListUseCase.importContactsCsv(
+      final result = await _emailListUseCase.importContactsCsv(
         token: token,
         listId: event.listId,
         fileName: state.selectedCsvName!,
@@ -169,7 +172,10 @@ class EmailListBuilderBloc
 
       emit(
         state
-            .copyWith(csvImportStatus: CsvImportStatus.success)
+            .copyWith(
+              csvImportStatus: CsvImportStatus.success,
+              csvImportResult: result,
+            )
             .copyWithNull(nullCsvImportErrorMessage: true),
       );
     } catch (e) {
@@ -193,7 +199,10 @@ class EmailListBuilderBloc
             selectedCsvName: null,
             selectedCsvBytes: null,
           )
-          .copyWithNull(nullCsvImportErrorMessage: true),
+          .copyWithNull(
+            nullCsvImportErrorMessage: true,
+            nullCsvImportResult: true,
+          ),
     );
   }
 }

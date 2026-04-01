@@ -1,4 +1,5 @@
 import 'package:survey_app_flutter/domain/entities/email_contact_entity.dart';
+import 'package:survey_app_flutter/domain/entities/email_list_csv_import_result_entity.dart';
 import 'package:survey_app_flutter/domain/entities/email_list_entity.dart';
 import 'package:survey_app_flutter/domain/repositories/email_list_repository.dart';
 
@@ -109,7 +110,7 @@ class EmailListUseCase {
   }
 
   /// Imports contacts from a CSV file into an email list.
-  Future<void> importContactsCsv({
+  Future<EmailListCsvImportResultEntity> importContactsCsv({
     required String token,
     required String listId,
     required String fileName,
