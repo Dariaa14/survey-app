@@ -1,3 +1,5 @@
+import 'package:survey_app_flutter/presentation/admin/bloc/admin_state.dart';
+
 /// Base class for all admin feature events.
 abstract class AdminEvent {
   /// Creates an [AdminEvent].
@@ -26,4 +28,13 @@ class AdminSurveysRefreshed extends AdminEvent {
 class AdminErrorCleared extends AdminEvent {
   /// Creates [AdminErrorCleared].
   const AdminErrorCleared();
+}
+
+/// Triggered when surveys filter changes.
+class AdminSurveyFilterChanged extends AdminEvent {
+  /// Selected filter.
+  final AdminSurveyFilter filter;
+
+  /// Creates [AdminSurveyFilterChanged].
+  const AdminSurveyFilterChanged(this.filter);
 }

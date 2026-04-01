@@ -20,6 +20,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<AdminSurveysRequested>(_onSurveysRequested);
     on<AdminSurveysRefreshed>(_onSurveysRefreshed);
     on<AdminErrorCleared>(_onErrorCleared);
+    on<AdminSurveyFilterChanged>(_onSurveyFilterChanged);
   }
 
   Future<void> _onAccountRequested(
@@ -140,5 +141,12 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
 
   void _onErrorCleared(AdminErrorCleared event, Emitter<AdminState> emit) {
     emit(state.copyWithNull(nullErrorMessage: true));
+  }
+
+  void _onSurveyFilterChanged(
+    AdminSurveyFilterChanged event,
+    Emitter<AdminState> emit,
+  ) {
+    emit(state.copyWith(selectedFilter: event.filter));
   }
 }
