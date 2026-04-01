@@ -59,22 +59,31 @@ class AdminTopBar extends StatelessWidget {
           ),
         );
 
+        final bool isContactsTab = selectedTabIndex == 1;
+        final String primaryButtonText = isContactsTab
+            ? AppStrings.createEmailListButton
+            : AppStrings.createSurveyButton;
+
+        final VoidCallback onPrimaryButtonPressed = isContactsTab
+            ? () {
+                // context.push(AppRoutes.adminEmailListCreatePath());
+              }
+            : () {
+                context.push(AppRoutes.adminSurveyCreatePath());
+              };
+
         final Widget createSurveyButton = isCompact
             ? SizedBox(
                 width: double.infinity,
                 child: CustomButton(
-                  onPressed: () {
-                    context.push(AppRoutes.adminSurveyCreatePath());
-                  },
-                  text: AppStrings.createSurveyButton,
+                  onPressed: onPrimaryButtonPressed,
+                  text: primaryButtonText,
                   variant: CustomColorVariant.primary,
                 ),
               )
             : CustomButton(
-                onPressed: () {
-                  context.push(AppRoutes.adminSurveyCreatePath());
-                },
-                text: AppStrings.createSurveyButton,
+                onPressed: onPrimaryButtonPressed,
+                text: primaryButtonText,
                 variant: CustomColorVariant.primary,
               );
 

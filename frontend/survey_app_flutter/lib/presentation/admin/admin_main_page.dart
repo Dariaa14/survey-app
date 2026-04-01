@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_bloc.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_state.dart';
+import 'package:survey_app_flutter/presentation/admin/contacts_list/contacts_list_page.dart';
 import 'package:survey_app_flutter/presentation/admin/surveys_list/survey_list_page.dart';
 import 'package:survey_app_flutter/presentation/admin/widgets/admin_top_bar.dart';
 import 'package:survey_app_flutter/presentation/bloc_listeners/bloc_providers.dart';
@@ -19,8 +20,6 @@ class AdminMainPage extends StatefulWidget {
 }
 
 class _AdminMainPageState extends State<AdminMainPage> {
-  int _selectedTabIndex = 0;
-
   @override
   void initState() {
     super.initState();
@@ -36,31 +35,47 @@ class _AdminMainPageState extends State<AdminMainPage> {
         },
         listenWhen: (previous, current) =>
             previous.adminUser != current.adminUser,
-        child: Scaffold(
-          body: SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AdminTopBar(
-                      onTabSelected: (index) {
-                        setState(() {
-                          _selectedTabIndex = index;
-                        });
-                      },
-                      selectedTabIndex: _selectedTabIndex,
+        child: BlocBuilder<AdminBloc, AdminState>(
+          bloc: AppBlocs.adminBloc,
+          buildWhen: (previous, current) =>
+              previous.selectedTab != current.selectedTab,
+          builder: (context, state) {
+            final int selectedTabIndex = switch (state.selectedTab) {
+              AdminMainTab.surveys => 0,
+              AdminMainTab.contacts => 1,
+            };
+
+            return Scaffold(
+              body: SafeArea(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AdminTopBar(
+                          onTabSelected: (index) {
+                            final tab = switch (index) {
+                              1 => AdminMainTab.contacts,
+                              _ => AdminMainTab.surveys,
+                            };
+
+                            AppBlocs.adminBloc.add(AdminMainTabChanged(tab));
+                          },
+                          selectedTabIndex: selectedTabIndex,
+                        ),
+                        const SizedBox(height: 24),
+                        if (state.selectedTab == AdminMainTab.surveys)
+                          const SurveyListPage(),
+                        if (state.selectedTab == AdminMainTab.contacts)
+                          const ContactsListPage(),
+                      ],
                     ),
-                    if (_selectedTabIndex == 0) ...[
-                      const SizedBox(height: 24),
-                      const SurveyListPage(),
-                    ],
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

@@ -20,9 +20,17 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<AdminSurveysRequested>(_onSurveysRequested);
     on<AdminSurveysRefreshed>(_onSurveysRefreshed);
     on<AdminErrorCleared>(_onErrorCleared);
+    on<AdminMainTabChanged>(_onMainTabChanged);
     on<AdminSurveyFilterChanged>(_onSurveyFilterChanged);
     on<AdminSurveyPublishRequested>(_onSurveyPublishRequested);
     on<AdminSurveyCloseRequested>(_onSurveyCloseRequested);
+  }
+
+  void _onMainTabChanged(
+    AdminMainTabChanged event,
+    Emitter<AdminState> emit,
+  ) {
+    emit(state.copyWith(selectedTab: event.tab));
   }
 
   Future<void> _onAccountRequested(

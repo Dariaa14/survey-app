@@ -39,6 +39,15 @@ class AdminSurveyFilterChanged extends AdminEvent {
   const AdminSurveyFilterChanged(this.filter);
 }
 
+/// Triggered when admin changes selected main tab.
+class AdminMainTabChanged extends AdminEvent {
+  /// Selected tab.
+  final AdminMainTab tab;
+
+  /// Creates [AdminMainTabChanged].
+  const AdminMainTabChanged(this.tab);
+}
+
 /// Triggered when an admin publishes a survey.
 class AdminSurveyPublishRequested extends AdminEvent {
   /// Survey id to publish.

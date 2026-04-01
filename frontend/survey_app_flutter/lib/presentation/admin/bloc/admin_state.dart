@@ -17,6 +17,15 @@ enum AdminSurveyFilter {
   closed,
 }
 
+/// Selected tab for admin main page.
+enum AdminMainTab {
+  /// Surveys management tab.
+  surveys,
+
+  /// Contacts lists management tab.
+  contacts,
+}
+
 /// Loading status for admin surveys screen.
 enum AdminStatus {
   /// Initial idle state.
@@ -41,6 +50,7 @@ class AdminState extends Equatable {
   const AdminState({
     this.status = AdminStatus.initial,
     this.surveys = const <SurveyEntity>[],
+    this.selectedTab = AdminMainTab.surveys,
     this.selectedFilter = AdminSurveyFilter.all,
     this.usesServerFiltering = false,
     this.errorMessage,
@@ -55,6 +65,9 @@ class AdminState extends Equatable {
 
   /// Surveys posted by the current admin.
   final List<SurveyEntity> surveys;
+
+  /// Selected tab in admin main page.
+  final AdminMainTab selectedTab;
 
   /// Selected surveys filter.
   final AdminSurveyFilter selectedFilter;
@@ -94,6 +107,7 @@ class AdminState extends Equatable {
     UserEntity? adminUser,
     AdminStatus? status,
     List<SurveyEntity>? surveys,
+    AdminMainTab? selectedTab,
     AdminSurveyFilter? selectedFilter,
     bool? usesServerFiltering,
     String? errorMessage,
@@ -102,6 +116,7 @@ class AdminState extends Equatable {
       adminUser: adminUser ?? this.adminUser,
       status: status ?? this.status,
       surveys: surveys ?? this.surveys,
+      selectedTab: selectedTab ?? this.selectedTab,
       selectedFilter: selectedFilter ?? this.selectedFilter,
       usesServerFiltering: usesServerFiltering ?? this.usesServerFiltering,
       errorMessage: errorMessage ?? this.errorMessage,
@@ -117,6 +132,7 @@ class AdminState extends Equatable {
       adminUser: nullAdminUser ? null : adminUser,
       status: status,
       surveys: surveys,
+      selectedTab: selectedTab,
       selectedFilter: selectedFilter,
       usesServerFiltering: usesServerFiltering,
       errorMessage: nullErrorMessage ? null : errorMessage,
@@ -128,6 +144,7 @@ class AdminState extends Equatable {
     adminUser,
     status,
     surveys,
+    selectedTab,
     selectedFilter,
     usesServerFiltering,
     errorMessage,

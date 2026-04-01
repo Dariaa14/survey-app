@@ -29,6 +29,9 @@ class AppStrings {
   /// The text for the "Create Survey" button.
   static const String createSurveyButton = "+    Sondaj nou";
 
+  /// The text for the create email list button.
+  static const String createEmailListButton = "+    Listă nouă";
+
   /// The title for the "My Surveys" section.
   static const String mySurveysTitle = "Sondajele mele";
 
@@ -232,4 +235,62 @@ class AppStrings {
   /// Validation message shown when a survey has no questions.
   static const String surveyBuilderMissingQuestionsMessage =
       "Adaugă cel puțin o întrebare înainte de salvare/publicare.";
+
+  /// Formats the contact list preview metadata line.
+  static String contactsListPreviewMeta(int contactsCount, DateTime createdAt) {
+    return "$contactsCount contacte · creată ${_formatShortRoDate(createdAt)}";
+  }
+
+  /// Action label for visualizing a contact list.
+  static const String contactListPreviewViewButton = 'Vizualizează';
+
+  /// Action label for importing contacts from CSV.
+  static const String contactListPreviewImportCsvButton = 'Importă CSV';
+
+  // CSV import page:
+  /// Title for contacts CSV import page.
+  static const String csvImportTitle = 'Importă contacte';
+
+  /// Helper prefix text describing required CSV columns.
+  static const String csvImportColumnsPrefix =
+      'Fișierul CSV trebuie să aibă coloanele';
+
+  /// CSV required email column label.
+  static const String csvImportEmailColumn = 'email';
+
+  /// Connector between required CSV columns.
+  static const String csvImportColumnsConnector = 'și';
+
+  /// CSV optional name column label.
+  static const String csvImportNameColumn = 'name';
+
+  /// Suffix text for optional CSV name column.
+  static const String csvImportNameOptionalSuffix = '(name opțional).';
+
+  /// Folder emoji used in CSV dropzone.
+  static const String csvImportDropzoneFolderEmoji = '📁';
+
+  /// CSV dropzone drag-and-drop helper text.
+  static const String csvImportDropzoneText = 'Trage fișierul CSV aici sau';
+
+  /// CSV dropzone call-to-action text.
+  static const String csvImportChooseFileText = 'alege fișier';
+
+  /// Maximum supported CSV rows info.
+  static const String csvImportMaxRowsText = 'Max. 10.000 rânduri';
+
+  /// Information emoji used in import notes box.
+  static const String csvImportInfoEmoji = 'ℹ️';
+
+  /// Note explaining duplicate and invalid address handling.
+  static const String csvImportInfoText =
+      'Adresele duplicate (deja existente în listă) vor fi '
+      'ignorate automat. Adresele invalide vor fi afișate '
+      'pentru review înainte de import.';
+
+  /// Cancel action for CSV import page.
+  static const String csvImportCancelButton = 'Anulează';
+
+  /// Confirm action for CSV import page.
+  static const String csvImportImportButton = 'Importă';
 }
