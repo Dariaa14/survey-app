@@ -20,6 +20,9 @@ app.use('/api/users', userRoutes);
 const surveyRoutes = require('./routes/surveyRoutes');
 app.use('/api/surveys', surveyRoutes);
 
+const emailListRoutes = require('./routes/emailListRoutes');
+app.use('/api/email-lists', emailListRoutes);
+
 // DB
 const { sequelize } = require('./db');
 const models = require('./models');
