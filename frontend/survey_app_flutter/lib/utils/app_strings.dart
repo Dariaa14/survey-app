@@ -143,6 +143,59 @@ class AppStrings {
   /// The text for the "Publish" button in the survey builder.
   static const String publishSurveyButton = "Publică sondaj";
 
+  /// The text for the "Manage Invitations" button.
+  static const String manageInvitationsButton = "Vizualizează invitații";
+
+  /// Title line for the survey invitations page.
+  static String surveyInvitationsTitle(String surveyTitle) =>
+      "Invitații - $surveyTitle";
+
+  /// Metadata line with survey slug for invitations page.
+  static String surveyInvitationsSlug(String slug) => " ·  slug: $slug";
+
+  /// Section title for invitation sending card.
+  static const String sendInvitationsTitle = "Trimite invitații";
+
+  /// Label for contact list selector.
+  static const String selectContactListLabel = "Selectează lista de contacte";
+
+  /// Placeholder for contact list dropdown.
+  static const String chooseContactListPlaceholder = "- alege o listă -";
+
+  /// Action label for preview send button.
+  static const String previewSendingButton = "Preview trimitere";
+
+  /// Warning emoji used in invitation preview banner.
+  static const String previewWarningEmoji = "⚠️";
+
+  /// Preview summary line for invitation sending.
+  static String invitationsPreviewText(int newEmails, int alreadyInvited) =>
+      "Preview: $newEmails emailuri noi vor fi trimise · $alreadyInvited contacte au primit deja invitația (skip)";
+
+  /// Action label for final invitation send button.
+  static String sendInvitationsButton(int count) => "Trimite $count invitații";
+
+  /// Title for sent invitations section with total count.
+  static String sentInvitationsTitle(int count) => "INVITAȚII TRIMISE ($count)";
+
+  /// Placeholder for searching invitations by email.
+  static const String searchByEmailPlaceholder = "Caută după email...";
+
+  /// Header title for invitation table email column.
+  static const String invitationsHeaderEmail = "Email";
+
+  /// Header title for invitation table email open column.
+  static const String invitationsHeaderEmailOpen = "Email open";
+
+  /// Header title for invitation table survey open column.
+  static const String invitationsHeaderSurveyOpen = "Survey open";
+
+  /// Header title for invitation table status column.
+  static const String invitationsHeaderStatus = "Status";
+
+  /// Header title for invitation table date column.
+  static const String invitationsHeaderDate = "Data";
+
   /// The title prefix for the survey questions section.
   static const String questionsTitle = "Întrebări";
 

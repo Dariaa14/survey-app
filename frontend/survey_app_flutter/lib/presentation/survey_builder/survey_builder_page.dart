@@ -94,6 +94,7 @@ class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
                             ),
                             const SizedBox(height: 16),
                             SurveyBuilderDetailsSection(
+                              survey: widget.survey,
                               surveyTitleController: _surveyTitleController,
                               surveyDescriptionController:
                                   _surveyDescriptionController,
@@ -108,6 +109,7 @@ class _SurveyBuilderPageState extends State<SurveyBuilderPage> {
                             SizedBox(
                               width: 360,
                               child: SurveyBuilderDetailsSection(
+                                survey: widget.survey,
                                 surveyTitleController: _surveyTitleController,
                                 surveyDescriptionController:
                                     _surveyDescriptionController,
