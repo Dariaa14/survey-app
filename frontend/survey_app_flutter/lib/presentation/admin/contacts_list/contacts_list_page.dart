@@ -5,7 +5,7 @@ import 'package:survey_app_flutter/presentation/admin/bloc/admin_bloc.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_state.dart';
 import 'package:survey_app_flutter/presentation/admin/contacts_list/widgets/contact_list_preview.dart';
-import 'package:survey_app_flutter/presentation/email_list_builder/csv_import/csv_import_page.dart';
+import 'package:survey_app_flutter/presentation/email_list/csv_import/csv_import_page.dart';
 import 'package:survey_app_flutter/utils/app_blocs.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 

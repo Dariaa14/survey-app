@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/domain/entities/email_list_csv_import_result_entity.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
-import 'package:survey_app_flutter/utils/theme.dart';
 
 /// Displays preview/import information parsed from CSV processing results.
 class CsvInformations extends StatelessWidget {
@@ -165,7 +164,7 @@ class _InvalidItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: redContainer,
+        color: const Color.fromRGBO(48, 33, 33, 1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(

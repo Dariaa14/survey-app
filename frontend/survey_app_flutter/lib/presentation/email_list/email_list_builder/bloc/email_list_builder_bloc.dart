@@ -2,8 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:survey_app_flutter/domain/use_cases/email_list_use_case.dart';
 import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
-import 'package:survey_app_flutter/presentation/email_list_builder/bloc/email_list_builder_event.dart';
-import 'package:survey_app_flutter/presentation/email_list_builder/bloc/email_list_builder_state.dart';
+import 'package:survey_app_flutter/presentation/email_list/email_list_builder/bloc/email_list_builder_event.dart';
+import 'package:survey_app_flutter/presentation/email_list/email_list_builder/bloc/email_list_builder_state.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Bloc for the email list builder feature
