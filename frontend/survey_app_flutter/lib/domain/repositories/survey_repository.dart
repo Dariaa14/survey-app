@@ -1,4 +1,5 @@
 import 'package:survey_app_flutter/domain/entities/invitation_entity.dart';
+import 'package:survey_app_flutter/domain/entities/invitation_preview_entity.dart';
 import 'package:survey_app_flutter/domain/entities/option_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
@@ -54,7 +55,7 @@ abstract class SurveyRepository {
   });
 
   /// Previews how many invitations will be inserted or skipped.
-  Future<Map<String, dynamic>> previewInvitations({
+  Future<InvitationPreviewEntity> previewInvitations({
     required String token,
     required String surveyId,
     required String listId,

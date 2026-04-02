@@ -11,6 +11,7 @@ import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_bloc.dart';
 import 'package:survey_app_flutter/presentation/authentication/bloc/authentication_bloc.dart';
 import 'package:survey_app_flutter/presentation/email_list/email_list_builder/bloc/email_list_builder_bloc.dart';
+import 'package:survey_app_flutter/presentation/invitations/bloc/invitations_bloc.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_bloc.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_bloc.dart';
 
@@ -61,11 +62,17 @@ void _loadBlocs() {
       userUseCase: getIt.get<UserUseCase>(),
     ),
   );
-  getIt.registerLazySingleton(
+  getIt.registerLazySingleton<SurveyBuilderBloc>(
     () =>
         SurveyBuilderBloc(getIt.get<SurveyUseCase>(), getIt.get<UserUseCase>()),
   );
-  getIt.registerLazySingleton(
+  getIt.registerLazySingleton<QuestionBuilderBloc>(
     () => QuestionBuilderBloc(getIt.get<SurveyUseCase>()),
+  );
+  getIt.registerLazySingleton<InvitationsBloc>(
+    () => InvitationsBloc(
+      getIt.get<SurveyUseCase>(),
+      getIt.get<UserUseCase>(),
+    ),
   );
 }

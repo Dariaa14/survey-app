@@ -162,6 +162,9 @@ class AppStrings {
   /// Placeholder for contact list dropdown.
   static const String chooseContactListPlaceholder = "- alege o listă -";
 
+  /// Label for contacts count in contact list dropdown.
+  static const String contactsLabel = 'contacte';
+
   /// Action label for preview send button.
   static const String previewSendingButton = "Preview trimitere";
 
@@ -171,6 +174,10 @@ class AppStrings {
   /// Preview summary line for invitation sending.
   static String invitationsPreviewText(int newEmails, int alreadyInvited) =>
       "Preview: $newEmails emailuri noi vor fi trimise · $alreadyInvited contacte au primit deja invitația (skip)";
+
+  /// Helper text shown before a preview has been loaded.
+  static const String previewInvitationsHint =
+      "Apasă Preview trimitere pentru a vedea estimarea";
 
   /// Action label for final invitation send button.
   static String sendInvitationsButton(int count) => "Trimite $count invitații";

@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:survey_app_flutter/data/entities_impl/invitation_entity_impl.dart';
+import 'package:survey_app_flutter/data/entities_impl/invitation_preview_entity_impl.dart';
 import 'package:survey_app_flutter/data/entities_impl/question_entity_impl.dart';
 import 'package:survey_app_flutter/data/entities_impl/survey_entity_impl.dart';
 import 'package:survey_app_flutter/domain/entities/invitation_entity.dart';
+import 'package:survey_app_flutter/domain/entities/invitation_preview_entity.dart';
 import 'package:survey_app_flutter/domain/entities/option_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
@@ -236,7 +238,7 @@ class SurveyRepositoryImpl implements SurveyRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> previewInvitations({
+  Future<InvitationPreviewEntity> previewInvitations({
     required String token,
     required String surveyId,
     required String listId,
@@ -254,7 +256,9 @@ class SurveyRepositoryImpl implements SurveyRepository {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      return InvitationPreviewEntityImpl.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
     }
 
     throw Exception('Failed to preview invitations: ${response.body}');

@@ -113,7 +113,7 @@ router.get('/:id/invitations', verifyToken, requireAdmin, async (req, res) => {
             include,
             limit,
             offset,
-            order: [['created_at', 'DESC']]
+            order: [['sent_at', 'DESC']]
         });
 
         res.json({
