@@ -49,8 +49,12 @@ class SurveyPreviewStatusRow extends StatelessWidget {
 
   String? _statusInfoText() {
     if (survey.status == SurveyStatus.published) {
-      final invitations = 1; // survey.invitationsCount ?? 0;
-      final submitRate = '0'; //survey.submitRate?.toStringAsFixed(0) ?? '0';
+      final invitations = survey.invitationCount;
+      final rate = survey.invitationCount > 0
+          ? (survey.submittedCount / survey.invitationCount * 100)
+                .toStringAsFixed(0)
+          : 0;
+      final submitRate = '$rate%';
       return AppStrings.surveyPublishedInfo(invitations, submitRate);
     }
 

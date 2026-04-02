@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:survey_app_flutter/data/entities_impl/invitation_entity_impl.dart';
 import 'package:survey_app_flutter/data/entities_impl/question_entity_impl.dart';
 import 'package:survey_app_flutter/data/entities_impl/survey_entity_impl.dart';
+import 'package:survey_app_flutter/domain/entities/invitation_entity.dart';
 import 'package:survey_app_flutter/domain/entities/option_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
@@ -35,7 +37,9 @@ class SurveyRepositoryImpl implements SurveyRepository {
     String? status,
   }) async {
     final uri = Uri.parse('$baseUrl/user/$userId').replace(
-      queryParameters: status == null ? null : <String, String>{'status': status},
+      queryParameters: status == null
+          ? null
+          : <String, String>{'status': status},
     );
 
     final response = await http.get(
@@ -167,6 +171,93 @@ class SurveyRepositoryImpl implements SurveyRepository {
     if (response.statusCode != 200) {
       throw Exception('Failed to close survey: ${response.body}');
     }
+  }
+
+  @override
+  Future<Map<String, dynamic>> sendInvitations({
+    required String token,
+    required String surveyId,
+    required String listId,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/$surveyId/invitations/send'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, String>{'list_id': listId}),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    }
+
+    throw Exception('Failed to send invitations: ${response.body}');
+  }
+
+  @override
+  Future<List<InvitationEntity>> getInvitations({
+    required String token,
+    required String surveyId,
+    int page = 1,
+    String? query,
+  }) async {
+    final queryParameters = <String, String>{'page': '$page'};
+    if (query != null && query.trim().isNotEmpty) {
+      queryParameters['q'] = query.trim();
+    }
+
+    final uri = Uri.parse('$baseUrl/$surveyId/invitations').replace(
+      queryParameters: queryParameters,
+    );
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      final rows = body['data'] as List<dynamic>? ?? <dynamic>[];
+
+      return rows
+          .map(
+            (item) => InvitationEntityImpl.fromJson(
+              item as Map<String, dynamic>,
+            ),
+          )
+          .toList();
+    }
+
+    throw Exception('Failed to fetch invitations: ${response.body}');
+  }
+
+  @override
+  Future<Map<String, dynamic>> previewInvitations({
+    required String token,
+    required String surveyId,
+    required String listId,
+  }) async {
+    final uri = Uri.parse('$baseUrl/$surveyId/invitations/preview').replace(
+      queryParameters: <String, String>{'list_id': listId},
+    );
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    }
+
+    throw Exception('Failed to preview invitations: ${response.body}');
   }
 
   @override

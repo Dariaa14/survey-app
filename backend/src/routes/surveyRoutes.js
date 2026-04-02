@@ -7,6 +7,8 @@ const { Option } = require('../models/option');
 const { User } = require('../models/user');
 const models = require('../models/associations');
 
+const { getSurveyStatsAttributes } = require('../controllers/surveyController');
+
 const { sequelize } = require('../db');
 const { Op } = require('sequelize');
 
@@ -21,7 +23,7 @@ router.post('/', verifyToken, requireAdmin, async (req, res) => {
 
         if (!owner_id || !title || !slug) {
             return res.status(400).json({ error: 'owner_id, title, and slug are required' });
-        }        
+        }
 
         const owner = await User.findByPk(owner_id);
         if (!owner) return res.status(404).json({ error: 'Owner user not found' });
@@ -34,8 +36,8 @@ router.post('/', verifyToken, requireAdmin, async (req, res) => {
             title,
             description,
             slug,
-            status: surveyStatus,       
-            created_at: new Date() 
+            status: surveyStatus,
+            created_at: new Date()
         });
 
         res.status(201).json(survey);
@@ -63,9 +65,6 @@ router.get('/user/:ownerId', verifyToken, requireAdmin, async (req, res) => {
     try {
         const { ownerId } = req.params;
         const { status } = req.query;
-        
-        console.log('Fetching surveys for user ID:', ownerId);
-        console.log('Filter:', { status });
 
         const where = { owner_id: ownerId };
 
@@ -73,18 +72,20 @@ router.get('/user/:ownerId', verifyToken, requireAdmin, async (req, res) => {
             where.status = status;
         }
 
-
         const surveys = await Survey.findAll({
             where: where,
+            attributes: {
+                include: getSurveyStatsAttributes()
+            },
             include: [
                 {
                     model: Question,
-                    as: 'questions',       
+                    as: 'questions',
                     include: [
                         {
                             model: Option,
-                            as: 'options', 
-                            order: [['order', 'ASC']] 
+                            as: 'options',
+                            order: [['order', 'ASC']]
                         }
                     ]
                 }
@@ -95,10 +96,13 @@ router.get('/user/:ownerId', verifyToken, requireAdmin, async (req, res) => {
             ]
         });
 
+        console.log(`Fetched ${surveys.length} surveys for user ${ownerId} with status filter: ${status || 'none'}`);
+
         res.json(surveys);
     } catch (err) {
+        console.log(err);
         console.error('Error fetching surveys:', err.stack);
-        res.status(500).json({ error: 'Failed to fetch surveys for user' });
+        res.status(500).json({ error: 'Failed to fetch surveys for user', err });
     }
 });
 
@@ -106,6 +110,9 @@ router.get('/user/:ownerId', verifyToken, requireAdmin, async (req, res) => {
 router.get('/:id', verifyToken, requireAdmin, async (req, res) => {
     try {
         const survey = await Survey.findByPk(req.params.id, {
+            attributes: {
+                include: getSurveyStatsAttributes()
+            },
             include: [
                 {
                     model: Question,
@@ -133,7 +140,7 @@ router.get('/:id', verifyToken, requireAdmin, async (req, res) => {
 });
 
 // UPDATE by ID
-router.put('/:id',verifyToken, requireAdmin, async (req, res) => {
+router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
     try {
         const { title, description, slug, status, published_at, closed_at } = req.body;
         const survey = await Survey.findByPk(req.params.id);
@@ -148,7 +155,7 @@ router.put('/:id',verifyToken, requireAdmin, async (req, res) => {
 });
 
 // DELETE by ID
-router.delete('/:id',verifyToken, requireAdmin, async (req, res) => {
+router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
     try {
         const survey = await Survey.findByPk(req.params.id);
         if (!survey) return res.status(404).json({ error: 'Survey not found' });
@@ -172,7 +179,7 @@ router.post('/:id/questions', verifyToken, requireAdmin, async (req, res) => {
             order,
             max_length,
             max_selections,
-            options 
+            options
         } = req.body;
 
         const survey = await Survey.findByPk(id);

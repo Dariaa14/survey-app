@@ -1,3 +1,4 @@
+import 'package:survey_app_flutter/domain/entities/invitation_entity.dart';
 import 'package:survey_app_flutter/domain/entities/option_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
@@ -36,6 +37,28 @@ abstract class SurveyRepository {
 
   /// Closes a published survey.
   Future<void> closeSurvey({required String token, required String surveyId});
+
+  /// Sends invitations for all contacts in a list that are not yet invited.
+  Future<Map<String, dynamic>> sendInvitations({
+    required String token,
+    required String surveyId,
+    required String listId,
+  });
+
+  /// Retrieves paginated invitations for a survey.
+  Future<List<InvitationEntity>> getInvitations({
+    required String token,
+    required String surveyId,
+    int page,
+    String? query,
+  });
+
+  /// Previews how many invitations will be inserted or skipped.
+  Future<Map<String, dynamic>> previewInvitations({
+    required String token,
+    required String surveyId,
+    required String listId,
+  });
 
   /// Deletes a survey.
   Future<void> deleteSurvey({required String token, required String surveyId});

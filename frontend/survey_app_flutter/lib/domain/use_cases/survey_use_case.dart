@@ -1,3 +1,4 @@
+import 'package:survey_app_flutter/domain/entities/invitation_entity.dart';
 import 'package:survey_app_flutter/domain/entities/option_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
@@ -28,11 +29,12 @@ class SurveyUseCase {
     String token, {
     String? status,
   }) async {
-    return _surveyRepository.getSurveysByUser(
+    final surveys = _surveyRepository.getSurveysByUser(
       ownerId,
       token,
       status: status,
     );
+    return surveys;
   }
 
   /// Creates a new survey.
@@ -73,6 +75,47 @@ class SurveyUseCase {
     required String surveyId,
   }) async {
     return _surveyRepository.closeSurvey(token: token, surveyId: surveyId);
+  }
+
+  /// Sends invitations for contacts in the selected email list.
+  Future<Map<String, dynamic>> sendInvitations({
+    required String token,
+    required String surveyId,
+    required String listId,
+  }) async {
+    return _surveyRepository.sendInvitations(
+      token: token,
+      surveyId: surveyId,
+      listId: listId,
+    );
+  }
+
+  /// Retrieves paginated invitations for a survey.
+  Future<List<InvitationEntity>> getInvitations({
+    required String token,
+    required String surveyId,
+    int page = 1,
+    String? query,
+  }) async {
+    return _surveyRepository.getInvitations(
+      token: token,
+      surveyId: surveyId,
+      page: page,
+      query: query,
+    );
+  }
+
+  /// Previews send results before creating invitations.
+  Future<Map<String, dynamic>> previewInvitations({
+    required String token,
+    required String surveyId,
+    required String listId,
+  }) async {
+    return _surveyRepository.previewInvitations(
+      token: token,
+      surveyId: surveyId,
+      listId: listId,
+    );
   }
 
   /// Deletes a survey.

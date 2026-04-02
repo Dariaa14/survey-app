@@ -16,6 +16,8 @@ class SurveyEntityImpl implements SurveyEntity {
     this.description,
     this.publishedAt,
     this.closedAt,
+    this.invitationCount = 0,
+    this.submittedCount = 0,
   });
 
   /// Builds an instance from backend JSON payload.
@@ -31,6 +33,8 @@ class SurveyEntityImpl implements SurveyEntity {
       publishedAt: _parseNullableDate(json['published_at']),
       closedAt: _parseNullableDate(json['closed_at']),
       questions: _parseQuestions(json['questions']),
+      invitationCount: json['invitation_count'] as int? ?? 0,
+      submittedCount: json['submitted_count'] as int? ?? 0,
     );
   }
 
@@ -63,6 +67,12 @@ class SurveyEntityImpl implements SurveyEntity {
 
   @override
   final List<QuestionEntity> questions;
+
+  @override
+  final int invitationCount;
+
+  @override
+  final int submittedCount;
 
   /// Serializes this entity to backend-compatible JSON.
   Map<String, dynamic> toJson() {

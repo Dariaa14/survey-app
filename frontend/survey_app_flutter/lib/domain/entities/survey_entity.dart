@@ -43,4 +43,10 @@ abstract class SurveyEntity {
 
   /// The list of questions associated with this survey.
   List<QuestionEntity> get questions;
+
+  /// The total number of invitations sent for this survey.
+  int get invitationCount;
+
+  /// The total number of submitted responses for this survey.
+  int get submittedCount;
 }
