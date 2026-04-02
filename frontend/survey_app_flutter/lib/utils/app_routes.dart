@@ -1,7 +1,9 @@
 import 'package:go_router/go_router.dart';
+import 'package:survey_app_flutter/domain/entities/email_list_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/admin/admin_main_page.dart';
 import 'package:survey_app_flutter/presentation/authentication/authentication_page.dart';
+import 'package:survey_app_flutter/presentation/email_list/email_list_page.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/survey_builder_page.dart';
 
 /// Route path constants used across the app.
@@ -18,6 +20,9 @@ abstract final class AppRoutes {
   /// The survey builder edit page path pattern.
   static const String adminSurveyEdit = '/admin/surveys/:surveyId/edit';
 
+  /// The email list details page path.
+  static const String adminEmailList = '/admin/contacts/list';
+
   /// Builds a concrete survey edit route from an id.
   static String adminSurveyEditPath(String surveyId) {
     return '/admin/surveys/$surveyId/edit';
@@ -26,6 +31,11 @@ abstract final class AppRoutes {
   /// The survey builder create page route.
   static String adminSurveyCreatePath() {
     return adminSurveyCreate;
+  }
+
+  /// The email list details page route.
+  static String adminEmailListPath() {
+    return adminEmailList;
   }
 }
 
@@ -53,6 +63,20 @@ final GoRouter appRouter = GoRouter(
             : null;
 
         return SurveyBuilderPage(survey: survey);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.adminEmailList,
+      builder: (context, state) {
+        final emailList = state.extra is EmailListEntity
+            ? state.extra as EmailListEntity?
+            : null;
+
+        if (emailList == null) {
+          return const AdminMainPage();
+        }
+
+        return EmailListPage(emailList: emailList);
       },
     ),
   ],

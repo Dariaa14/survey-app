@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:survey_app_flutter/domain/entities/email_list_entity.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_bloc.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
@@ -7,6 +8,7 @@ import 'package:survey_app_flutter/presentation/admin/bloc/admin_state.dart';
 import 'package:survey_app_flutter/presentation/admin/contacts_list/widgets/contact_list_preview.dart';
 import 'package:survey_app_flutter/presentation/email_list/csv_import/csv_import_page.dart';
 import 'package:survey_app_flutter/utils/app_blocs.dart';
+import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// The page displaying the list of contacts in the admin area.
@@ -48,7 +50,14 @@ class ContactsListPage extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: ContactListPreview(
                   emailList: emailList,
-                  onView: () {},
+                  onView: () async {
+                    await context.push(
+                      AppRoutes.adminEmailListPath(),
+                      extra: emailList,
+                    );
+
+                    AppBlocs.adminBloc.add(const AdminEmailListsRefreshed());
+                  },
                   onImportCsv: () {
                     _openCsvImportModal(context, emailList.id);
                   },

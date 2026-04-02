@@ -356,4 +356,22 @@ class AppStrings {
 
   /// Placeholder when email is not available.
   static const String csvImportEmailMissing = 'Lipsește';
+
+  /// Formats the contact count summary on the email list page.
+  static String emailListPageContactsSummary(int count) =>
+      '$count contacte în listă';
+
+  /// Empty state message for the email list page.
+  static const String emailListPageEmptyState =
+      'Nu există contacte în această listă.';
+
+  /// Button label for deleting a contact.
+  static const String emailListPageDeleteContactButton = 'Șterge';
+
+  /// Confirmation message for deleting a contact.
+  static const String emailListPageDeleteConfirmMessage =
+      'Ești sigur? Contactul va fi șters definitiv din listă.';
+
+  /// Placeholder shown when a contact has no name.
+  static const String emailListPageNameMissing = 'Nume indisponibil';
 }

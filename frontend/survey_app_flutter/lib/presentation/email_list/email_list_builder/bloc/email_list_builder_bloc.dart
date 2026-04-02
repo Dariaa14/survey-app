@@ -25,6 +25,7 @@ class EmailListBuilderBloc
     on<CsvImportFilePickRequested>(_onCsvFilePickRequested);
     on<CsvImportRequested>(_onCsvImportRequested);
     on<CsvImportStateReset>(_onCsvImportStateReset);
+    on<EmailListContactDeleteRequested>(_onContactDeleteRequested);
   }
 
   void _onNameChanged(
@@ -209,5 +210,55 @@ class EmailListBuilderBloc
             nullCsvImportResult: true,
           ),
     );
+  }
+
+  Future<void> _onContactDeleteRequested(
+    EmailListContactDeleteRequested event,
+    Emitter<EmailListBuilderState> emit,
+  ) async {
+    emit(
+      state
+          .copyWith(deletingContactId: event.contactId)
+          .copyWithNull(
+            nullDeletedContactId: true,
+            nullDeleteFailedContactId: true,
+            nullContactDeleteErrorMessage: true,
+          ),
+    );
+
+    try {
+      final token = await _userUseCase.getAuthToken();
+      if (token == null || token.isEmpty) {
+        throw Exception(AppStrings.csvImportMissingTokenMessage);
+      }
+
+      await _emailListUseCase.deleteContact(
+        token: token,
+        listId: event.listId,
+        contactId: event.contactId,
+      );
+
+      emit(
+        state
+            .copyWith(deletedContactId: event.contactId)
+            .copyWithNull(
+              nullDeletingContactId: true,
+              nullDeleteFailedContactId: true,
+              nullContactDeleteErrorMessage: true,
+            ),
+      );
+    } catch (e) {
+      emit(
+        state
+            .copyWith(
+              deleteFailedContactId: event.contactId,
+              contactDeleteErrorMessage: e.toString(),
+            )
+            .copyWithNull(
+              nullDeletingContactId: true,
+              nullDeletedContactId: true,
+            ),
+      );
+    }
   }
 }
