@@ -48,28 +48,27 @@ class InvitationEntityImpl implements InvitationEntity {
 
     return InvitationEntityImpl(
       id: json['id'] as String,
-      surveyId: (json['surveyId'] ?? json['survey_id']) as String,
-      contactId: (json['contactId'] ?? json['contact_id']) as String,
-      tokenHash: (json['tokenHash'] ?? json['token_hash']) as String,
+      surveyId: json['survey_id'] as String,
+      contactId: json['contact_id'] as String,
+      tokenHash: json['token_hash'] as String,
       sentAt: DateTime.parse(sentAtValue as String),
-      emailOpenedAt: (json['emailOpenedAt'] ?? json['email_opened_at']) != null
+      emailOpenedAt: json['email_opened_at'] != null
           ? DateTime.parse(
-              (json['emailOpenedAt'] ?? json['email_opened_at']) as String,
+              json['email_opened_at'] as String,
             )
           : null,
-      surveyOpenedAt:
-          (json['surveyOpenedAt'] ?? json['survey_opened_at']) != null
+      surveyOpenedAt: json['survey_opened_at'] != null
           ? DateTime.parse(
-              (json['surveyOpenedAt'] ?? json['survey_opened_at']) as String,
+              json['survey_opened_at'] as String,
             )
           : null,
-      submittedAt: (json['submittedAt'] ?? json['submitted_at']) != null
+      submittedAt: json['submitted_at'] != null
           ? DateTime.parse(
-              (json['submittedAt'] ?? json['submitted_at']) as String,
+              json['submitted_at'] as String,
             )
           : null,
-      bouncedAt: (json['bouncedAt'] ?? json['bounced_at']) != null
-          ? DateTime.parse((json['bouncedAt'] ?? json['bounced_at']) as String)
+      bouncedAt: json['bounced_at'] != null
+          ? DateTime.parse(json['bounced_at'] as String)
           : null,
     );
   }
@@ -78,14 +77,14 @@ class InvitationEntityImpl implements InvitationEntity {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'surveyId': surveyId,
-      'contactId': contactId,
-      'tokenHash': tokenHash,
-      'sentAt': sentAt.toIso8601String(),
-      'emailOpenedAt': emailOpenedAt?.toIso8601String(),
-      'surveyOpenedAt': surveyOpenedAt?.toIso8601String(),
-      'submittedAt': submittedAt?.toIso8601String(),
-      'bouncedAt': bouncedAt?.toIso8601String(),
+      'survey_id': surveyId,
+      'contact_id': contactId,
+      'token_hash': tokenHash,
+      'sent_at': sentAt.toIso8601String(),
+      'email_opened_at': emailOpenedAt?.toIso8601String(),
+      'survey_opened_at': surveyOpenedAt?.toIso8601String(),
+      'submitted_at': submittedAt?.toIso8601String(),
+      'bounced_at': bouncedAt?.toIso8601String(),
     };
   }
 }

@@ -177,7 +177,13 @@ class SendInvitationsSection extends StatelessWidget {
                       child: SizedBox(
                         width: 220,
                         child: CustomButton(
-                          onPressed: () {},
+                          onPressed: preview == null
+                              ? null
+                              : () {
+                                  AppBlocs.invitationsBloc.add(
+                                    SendInvitations(survey),
+                                  );
+                                },
                           text:
                               '✉︎ ${AppStrings.sendInvitationsButton(preview?.total ?? 0)}',
                           variant: CustomColorVariant.primary,

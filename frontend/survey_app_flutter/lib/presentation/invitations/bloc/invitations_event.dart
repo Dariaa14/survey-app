@@ -30,3 +30,12 @@ class LoadInvitationPreview extends InvitationsEvent {
   /// Creates a [LoadInvitationPreview] event.
   LoadInvitationPreview(this.survey);
 }
+
+/// Event for sending invitations to the selected email list.
+class SendInvitations extends InvitationsEvent {
+  /// Survey used to send invitations.
+  final SurveyEntity survey;
+
+  /// Creates a [SendInvitations] event.
+  SendInvitations(this.survey);
+}

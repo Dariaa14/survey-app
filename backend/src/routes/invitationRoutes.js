@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { Op } = require('sequelize');
 
+const pLimit = require('p-limit').default;
+const sendEmail = require('../services/emailService').sendEmail;
+
 const {
     Invitation,
     Survey,
@@ -14,7 +17,7 @@ const { generatePublicToken, hashToken } = require('../services/tokenService');
 const { verifyToken } = require('../utils/authMiddleware');
 const { requireAdmin } = require('../utils/adminMiddleware');
 
-/// CREATE
+/// CREATE and SEND
 router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
@@ -55,7 +58,8 @@ router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res)
             toInsert.push({
                 survey_id: id,
                 contact_id: c.id,
-                token_hash: tokenHash
+                token_hash: tokenHash,
+                sent_at: new Date()
             });
 
             emailPayload.push({
@@ -72,6 +76,27 @@ router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res)
         }
 
         console.log('Emails to send:', emailPayload.length);
+
+        const limit = pLimit(5); 
+
+        await Promise.all(
+            emailPayload.map(payload =>
+                limit(async () => {
+                    const surveyLink = `http://localhost:3000/survey/${survey.id}?token=${payload.token}`;
+
+                    await sendEmail({
+                        to: payload.email,
+                        subject: `You're invited to: ${survey.title}`,
+                        html: `
+                            <p>Hi ${payload.name || ''},</p>
+                            <p>You are invited to take the survey:</p>
+                            <p><strong>${survey.title}</strong></p>
+                            <a href="${surveyLink}">Take Survey</a>
+                        `
+                    });
+                })
+            )
+        );
 
         res.status(201).json({
             inserted: toInsert.length,

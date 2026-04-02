@@ -13,6 +13,7 @@ class InvitationsBloc extends Bloc<InvitationsEvent, InvitationsState> {
     on<InvitationsContactListSelected>(_onInvitationsContactListSelected);
     on<LoadSurveyInvitations>(_onLoadSurveyInvitations);
     on<LoadInvitationPreview>(_onLoadInvitationPreview);
+    on<SendInvitations>(_onSendInvitations);
   }
 
   final SurveyUseCase _surveyUseCase;
@@ -84,5 +85,40 @@ class InvitationsBloc extends Bloc<InvitationsEvent, InvitationsState> {
     );
 
     emit(state.copyWith(invitationPreview: preview));
+  }
+
+  /// Sends invitations for the currently selected email list.
+  Future<void> _onSendInvitations(
+    SendInvitations event,
+    Emitter<InvitationsState> emit,
+  ) async {
+    final selectedEmailList = state.selectedEmailList;
+    if (selectedEmailList == null || state.invitationPreview == null) {
+      return;
+    }
+
+    final token = await _userUseCase.getAuthToken();
+    if (token == null || token.isEmpty) {
+      return;
+    }
+
+    await _surveyUseCase.sendInvitations(
+      token: token,
+      surveyId: event.survey.id,
+      listId: selectedEmailList.id,
+    );
+
+    final invitations = await _surveyUseCase.getInvitations(
+      token: token,
+      surveyId: event.survey.id,
+    );
+
+    emit(
+      state
+          .copyWith(
+            invitations: invitations,
+          )
+          .copyWithNull(nullInvitationPreview: true),
+    );
   }
 }
