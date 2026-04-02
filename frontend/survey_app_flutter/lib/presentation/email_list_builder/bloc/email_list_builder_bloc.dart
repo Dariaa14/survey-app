@@ -134,12 +134,15 @@ class EmailListBuilderBloc
             selectedCsvBytes: bytes,
             selectedCsvName: file.name,
             csvImportStatus: CsvImportStatus.idle,
+            csvImportWasPreview: true,
           )
           .copyWithNull(
             nullCsvImportErrorMessage: true,
             nullCsvImportResult: true,
           ),
     );
+
+    add(CsvImportRequested(event.listId, preview: true));
   }
 
   Future<void> _onCsvImportRequested(
@@ -167,13 +170,14 @@ class EmailListBuilderBloc
         listId: event.listId,
         fileName: state.selectedCsvName!,
         csvBytes: state.selectedCsvBytes!,
-        preview: true,
+        preview: event.preview,
       );
 
       emit(
         state
             .copyWith(
               csvImportStatus: CsvImportStatus.success,
+              csvImportWasPreview: event.preview,
               csvImportResult: result,
             )
             .copyWithNull(nullCsvImportErrorMessage: true),
@@ -196,10 +200,11 @@ class EmailListBuilderBloc
       state
           .copyWith(
             csvImportStatus: CsvImportStatus.idle,
-            selectedCsvName: null,
-            selectedCsvBytes: null,
+            csvImportWasPreview: false,
           )
           .copyWithNull(
+            nullSelectedCsvName: true,
+            nullSelectedCsvBytes: true,
             nullCsvImportErrorMessage: true,
             nullCsvImportResult: true,
           ),

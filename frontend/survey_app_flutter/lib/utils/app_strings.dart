@@ -304,17 +304,56 @@ class AppStrings {
   /// Confirm action for CSV import page.
   static const String csvImportImportButton = 'Importă';
 
-    /// Button text while CSV is being uploaded.
-    static const String csvImportUploadingButton = 'Se importă...';
+  /// Button text while CSV is being uploaded.
+  static const String csvImportUploadingButton = 'Se importă...';
 
-    /// Label prefix for selected CSV file.
-    static const String csvImportSelectedFilePrefix = 'Fișier selectat:';
+  /// Label prefix for selected CSV file.
+  static const String csvImportSelectedFilePrefix = 'Fișier selectat:';
 
-    /// Message shown when selected file cannot be read.
-    static const String csvImportReadFileErrorMessage =
-            'Fișierul selectat nu poate fi citit.';
+  /// Message shown when selected file cannot be read.
+  static const String csvImportReadFileErrorMessage =
+      'Fișierul selectat nu poate fi citit.';
 
-    /// Message shown when authentication token is unavailable.
-    static const String csvImportMissingTokenMessage =
-            'Nu există token de autentificare disponibil.';
+  /// Message shown when authentication token is unavailable.
+  static const String csvImportMissingTokenMessage =
+      'Nu există token de autentificare disponibil.';
+
+  /// Title for CSV preview results area.
+  static const String csvImportPreviewTitle = 'Rezultate fișier CSV';
+
+  /// Formats CSV preview summary counters.
+  static String csvImportSummary(int total, int valid, int invalid) =>
+      'Total: $total · Valide: $valid · Invalide: $invalid';
+
+  /// Formats title for valid contacts section.
+  static String csvImportValidSectionTitle(int count) => 'Valide ($count)';
+
+  /// Formats title for invalid contacts section.
+  static String csvImportInvalidSectionTitle(int count) => 'Invalide ($count)';
+
+  /// Empty label when valid list has no entries.
+  static const String csvImportNoValidContacts =
+      'Nu există contacte valide în preview.';
+
+  /// Empty label when invalid list has no entries.
+  static const String csvImportNoInvalidContacts =
+      'Nu există contacte invalide în preview.';
+
+  /// Label for email field in CSV results rows.
+  static const String csvImportEmailLabel = 'Email';
+
+  /// Label for name field in CSV results rows.
+  static const String csvImportNameLabel = 'Nume';
+
+  /// Label for row field in invalid CSV rows.
+  static const String csvImportRowLabel = 'Rând';
+
+  /// Label for invalid reason field in invalid CSV rows.
+  static const String csvImportInvalidReasonLabel = 'Motiv';
+
+  /// Placeholder when name is not available.
+  static const String csvImportNameMissing = 'Nespecificat';
+
+  /// Placeholder when email is not available.
+  static const String csvImportEmailMissing = 'Lipsește';
 }

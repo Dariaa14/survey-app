@@ -2,10 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
 import 'package:survey_app_flutter/presentation/bloc_listeners/bloc_providers.dart';
 import 'package:survey_app_flutter/presentation/email_list_builder/bloc/email_list_builder_bloc.dart';
 import 'package:survey_app_flutter/presentation/email_list_builder/bloc/email_list_builder_event.dart';
 import 'package:survey_app_flutter/presentation/email_list_builder/bloc/email_list_builder_state.dart';
+import 'package:survey_app_flutter/presentation/email_list_builder/csv_import/csv_informations.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/utils/app_blocs.dart';
@@ -24,10 +26,25 @@ class CsvImportPage extends StatefulWidget {
 }
 
 class _CsvImportPageState extends State<CsvImportPage> {
+  void _resetCsvImportState() {
+    AppBlocs.emailListBuilderBloc.add(const CsvImportStateReset());
+  }
+
+  void _closePage([bool? result]) {
+    _resetCsvImportState();
+    Navigator.of(context).pop(result);
+  }
+
   @override
   void initState() {
     super.initState();
-    AppBlocs.emailListBuilderBloc.add(const CsvImportStateReset());
+    _resetCsvImportState();
+  }
+
+  @override
+  void dispose() {
+    _resetCsvImportState();
+    super.dispose();
   }
 
   @override
@@ -39,10 +56,13 @@ class _CsvImportPageState extends State<CsvImportPage> {
       child: BlocConsumer<EmailListBuilderBloc, EmailListBuilderState>(
         listenWhen: (previous, current) =>
             previous.csvImportStatus != current.csvImportStatus ||
+            previous.csvImportWasPreview != current.csvImportWasPreview ||
             previous.csvImportErrorMessage != current.csvImportErrorMessage,
         listener: (context, state) {
-          if (state.csvImportStatus == CsvImportStatus.success) {
-            Navigator.of(context).pop(true);
+          if (state.csvImportStatus == CsvImportStatus.success &&
+              !state.csvImportWasPreview) {
+            AppBlocs.adminBloc.add(const AdminEmailListsRefreshed());
+            _closePage(true);
           }
 
           if (state.csvImportStatus == CsvImportStatus.failure &&
@@ -102,7 +122,7 @@ class _CsvImportPageState extends State<CsvImportPage> {
                   borderRadius: BorderRadius.circular(10),
                   onTap: () {
                     AppBlocs.emailListBuilderBloc.add(
-                      const CsvImportFilePickRequested(),
+                      CsvImportFilePickRequested(widget.listId),
                     );
                   },
                   child: CustomPaint(
@@ -201,14 +221,16 @@ class _CsvImportPageState extends State<CsvImportPage> {
                     ],
                   ),
                 ),
+                if (state.csvImportResult != null) ...[
+                  const SizedBox(height: 16),
+                  CsvInformations(result: state.csvImportResult!),
+                ],
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     CustomButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+                      onPressed: _closePage,
                       text: AppStrings.csvImportCancelButton,
                     ),
                     const SizedBox(width: 8),
@@ -220,7 +242,10 @@ class _CsvImportPageState extends State<CsvImportPage> {
                       variant: CustomColorVariant.primary,
                       onPressed: () {
                         AppBlocs.emailListBuilderBloc.add(
-                          CsvImportRequested(widget.listId),
+                          CsvImportRequested(
+                            widget.listId,
+                            preview: false,
+                          ),
                         );
                       },
                     ),

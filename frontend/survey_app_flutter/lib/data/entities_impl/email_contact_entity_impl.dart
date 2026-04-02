@@ -32,7 +32,7 @@ class EmailContactEntityImpl implements EmailContactEntity {
       id: json['id'] as String,
       listId: json['list_id'] as String,
       email: json['email'] as String,
-      name: json['name'] as String,
+      name: json['name'] as String? ?? '',
       createdAt: DateTime.parse(json['created_at'] as String),
     );
   }

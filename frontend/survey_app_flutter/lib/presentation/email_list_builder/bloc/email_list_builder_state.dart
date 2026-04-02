@@ -44,6 +44,7 @@ class EmailListBuilderState extends Equatable {
 		this.selectedCsvBytes,
 		this.selectedCsvName,
 		this.csvImportStatus = CsvImportStatus.idle,
+		this.csvImportWasPreview = false,
 		this.csvImportErrorMessage,
 	});
 
@@ -71,6 +72,9 @@ class EmailListBuilderState extends Equatable {
 	/// Current CSV import workflow status.
 	final CsvImportStatus csvImportStatus;
 
+	/// Whether the latest CSV import request was run in preview mode.
+	final bool csvImportWasPreview;
+
 	/// Optional CSV import failure message.
 	final String? csvImportErrorMessage;
 
@@ -96,6 +100,7 @@ class EmailListBuilderState extends Equatable {
 		List<int>? selectedCsvBytes,
 		String? selectedCsvName,
 		CsvImportStatus? csvImportStatus,
+		bool? csvImportWasPreview,
 		String? csvImportErrorMessage,
 	}) {
 		return EmailListBuilderState(
@@ -107,6 +112,7 @@ class EmailListBuilderState extends Equatable {
 			selectedCsvBytes: selectedCsvBytes ?? this.selectedCsvBytes,
 			selectedCsvName: selectedCsvName ?? this.selectedCsvName,
 			csvImportStatus: csvImportStatus ?? this.csvImportStatus,
+			csvImportWasPreview: csvImportWasPreview ?? this.csvImportWasPreview,
 			csvImportErrorMessage:
 					csvImportErrorMessage ?? this.csvImportErrorMessage,
 		);
@@ -130,6 +136,7 @@ class EmailListBuilderState extends Equatable {
 			selectedCsvBytes: nullSelectedCsvBytes ? null : selectedCsvBytes,
 			selectedCsvName: nullSelectedCsvName ? null : selectedCsvName,
 			csvImportStatus: csvImportStatus,
+			csvImportWasPreview: csvImportWasPreview,
 			csvImportErrorMessage: nullCsvImportErrorMessage
 					? null
 					: csvImportErrorMessage,
@@ -146,6 +153,7 @@ class EmailListBuilderState extends Equatable {
 			selectedCsvName,
 			selectedCsvBytes,
 			csvImportStatus,
+			csvImportWasPreview,
 			csvImportErrorMessage,
 		];
 }
