@@ -33,8 +33,8 @@ class SurveyEntityImpl implements SurveyEntity {
       publishedAt: _parseNullableDate(json['published_at']),
       closedAt: _parseNullableDate(json['closed_at']),
       questions: _parseQuestions(json['questions']),
-      invitationCount: json['invitation_count'] as int? ?? 0,
-      submittedCount: json['submitted_count'] as int? ?? 0,
+      invitationCount: _parseInt(json['invitation_count']),
+      submittedCount: _parseInt(json['submitted_count']),
     );
   }
 
@@ -139,5 +139,21 @@ class SurveyEntityImpl implements SurveyEntity {
     }
 
     return DateTime.parse(value as String);
+  }
+
+  static int _parseInt(dynamic value) {
+    if (value == null) {
+      return 0;
+    }
+
+    if (value is int) {
+      return value;
+    }
+
+    if (value is num) {
+      return value.toInt();
+    }
+
+    return int.tryParse(value.toString()) ?? 0;
   }
 }
