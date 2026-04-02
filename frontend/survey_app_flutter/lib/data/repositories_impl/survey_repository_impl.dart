@@ -222,14 +222,11 @@ class SurveyRepositoryImpl implements SurveyRepository {
     );
 
     if (response.statusCode == 200) {
-      final body = jsonDecode(response.body) as Map<String, dynamic>;
-      final rows = body['data'] as List<dynamic>? ?? <dynamic>[];
-
-      return rows
+      final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
+      return data
           .map(
-            (item) => InvitationEntityImpl.fromJson(
-              item as Map<String, dynamic>,
-            ),
+            (json) =>
+                InvitationEntityImpl.fromJson(json as Map<String, dynamic>),
           )
           .toList();
     }

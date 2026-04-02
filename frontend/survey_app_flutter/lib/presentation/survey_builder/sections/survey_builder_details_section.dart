@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_bloc.dart';
@@ -10,7 +9,6 @@ import 'package:survey_app_flutter/shared/custom_button.dart';
 import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/shared/custom_textfield.dart';
 import 'package:survey_app_flutter/utils/app_blocs.dart';
-import 'package:survey_app_flutter/utils/app_routes.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// A widget that displays the details section of the survey builder page.
@@ -20,7 +18,6 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
     required this.surveyTitleController,
     required this.surveyDescriptionController,
     required this.surveySlugController,
-    this.survey,
     this.isReadOnly = false,
     super.key,
   });
@@ -33,9 +30,6 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
 
   /// Controller for the survey slug text field.
   final TextEditingController surveySlugController;
-
-  /// The survey entity, if available.
-  final SurveyEntity? survey;
 
   /// Whether details are read-only.
   final bool isReadOnly;
@@ -146,22 +140,6 @@ class SurveyBuilderDetailsSection extends StatelessWidget {
               color: colorScheme.onSurfaceVariant,
             ),
           ),
-          if (survey != null && survey!.status == SurveyStatus.published) ...[
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: CustomButton(
-                onPressed: () {
-                  context.push(
-                    AppRoutes.adminSurveyInvitationsPath(survey!.id),
-                    extra: survey,
-                  );
-                },
-                text: AppStrings.manageInvitationsButton,
-                variant: CustomColorVariant.primary,
-              ),
-            ),
-          ],
           const SizedBox(height: 20),
           if (!isReadOnly) ...[
             Divider(color: colorScheme.onSurfaceVariant),

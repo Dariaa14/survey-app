@@ -88,10 +88,7 @@ router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res)
 router.get('/:id/invitations', verifyToken, requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
-        const { page = 1, q } = req.query;
-
-        const limit = 20;
-        const offset = (page - 1) * limit;
+        const { q } = req.query;
 
         const include = [
             {
@@ -108,20 +105,13 @@ router.get('/:id/invitations', verifyToken, requireAdmin, async (req, res) => {
             }
         ];
 
-        const { count, rows } = await Invitation.findAndCountAll({
+        const invitations = await Invitation.findAll({
             where: { survey_id: id },
             include,
-            limit,
-            offset,
             order: [['sent_at', 'DESC']]
         });
 
-        res.json({
-            total: count,
-            page: parseInt(page),
-            pages: Math.ceil(count / limit),
-            data: rows
-        });
+        res.json(invitations);
 
     } catch (err) {
         console.error(err);
