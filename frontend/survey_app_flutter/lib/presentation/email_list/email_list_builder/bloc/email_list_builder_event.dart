@@ -34,6 +34,25 @@ class CsvImportFilePickRequested extends EmailListBuilderEvent {
   const CsvImportFilePickRequested(this.listId);
 }
 
+/// Triggered when user drops a CSV file into the import dropzone.
+class CsvImportFileDropped extends EmailListBuilderEvent {
+  /// Target email list id.
+  final String listId;
+
+  /// Dropped file display name.
+  final String fileName;
+
+  /// Dropped file bytes.
+  final List<int> fileBytes;
+
+  /// Creates [CsvImportFileDropped].
+  const CsvImportFileDropped(
+    this.listId, {
+    required this.fileName,
+    required this.fileBytes,
+  });
+}
+
 /// Triggered when user requests importing currently selected CSV.
 class CsvImportRequested extends EmailListBuilderEvent {
   /// Target email list id.

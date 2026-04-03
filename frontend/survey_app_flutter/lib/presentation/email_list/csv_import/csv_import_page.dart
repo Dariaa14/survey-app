@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
@@ -26,6 +27,8 @@ class CsvImportPage extends StatefulWidget {
 }
 
 class _CsvImportPageState extends State<CsvImportPage> {
+  bool _isFileDragging = false;
+
   void _resetCsvImportState() {
     AppBlocs.emailListBuilderBloc.add(const CsvImportStateReset());
   }
@@ -33,6 +36,38 @@ class _CsvImportPageState extends State<CsvImportPage> {
   void _closePage([bool? result]) {
     _resetCsvImportState();
     Navigator.of(context).pop(result);
+  }
+
+  Future<void> _handleDroppedFiles(DropDoneDetails details) async {
+    if (details.files.isEmpty) {
+      return;
+    }
+
+    final droppedFile = details.files.first;
+    final isCsv = droppedFile.name.toLowerCase().endsWith('.csv');
+
+    if (!isCsv) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.csvImportOnlyCsvMessage)),
+      );
+      return;
+    }
+
+    final fileBytes = await droppedFile.readAsBytes();
+    if (!mounted) {
+      return;
+    }
+
+    AppBlocs.emailListBuilderBloc.add(
+      CsvImportFileDropped(
+        widget.listId,
+        fileName: droppedFile.name,
+        fileBytes: fileBytes,
+      ),
+    );
   }
 
   @override
@@ -118,78 +153,107 @@ class _CsvImportPageState extends State<CsvImportPage> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: () {
-                    AppBlocs.emailListBuilderBloc.add(
-                      CsvImportFilePickRequested(widget.listId),
-                    );
+                DropTarget(
+                  onDragEntered: (_) {
+                    setState(() {
+                      _isFileDragging = true;
+                    });
                   },
-                  child: CustomPaint(
-                    painter: _DashedRoundedRectPainter(
-                      color: colorScheme.outline,
-                      radius: 10,
-                      strokeWidth: 1,
-                      dashWidth: 6,
-                      dashGap: 4,
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 40,
+                  onDragExited: (_) {
+                    setState(() {
+                      _isFileDragging = false;
+                    });
+                  },
+                  onDragDone: (details) async {
+                    setState(() {
+                      _isFileDragging = false;
+                    });
+                    await _handleDroppedFiles(details);
+                  },
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(10),
+                    onTap: () {
+                      AppBlocs.emailListBuilderBloc.add(
+                        CsvImportFilePickRequested(widget.listId),
+                      );
+                    },
+                    child: CustomPaint(
+                      painter: _DashedRoundedRectPainter(
+                        color: _isFileDragging
+                            ? colorScheme.primary
+                            : colorScheme.outline,
+                        radius: 10,
+                        strokeWidth: 1,
+                        dashWidth: 6,
+                        dashGap: 4,
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            AppStrings.csvImportDropzoneFolderEmoji,
-                            style: theme.textTheme.headlineMedium,
-                          ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            alignment: WrapAlignment.center,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            spacing: 4,
-                            runSpacing: 4,
-                            children: [
-                              Text(
-                                AppStrings.csvImportDropzoneText,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 40,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _isFileDragging
+                              ? colorScheme.primaryContainer.withAlpha(90)
+                              : null,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              AppStrings.csvImportDropzoneFolderEmoji,
+                              style: theme.textTheme.headlineMedium,
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              alignment: WrapAlignment.center,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 4,
+                              runSpacing: 4,
+                              children: [
+                                Text(
+                                  _isFileDragging
+                                      ? AppStrings.csvImportDropzoneActiveText
+                                      : AppStrings.csvImportDropzoneText,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
+                                if (!_isFileDragging)
+                                  Text(
+                                    AppStrings.csvImportChooseFileText,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              AppStrings.csvImportMaxRowsText,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
                               ),
+                            ),
+                            if (state.selectedCsvName != null) ...[
+                              const SizedBox(height: 10),
                               Text(
-                                AppStrings.csvImportChooseFileText,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.primary,
+                                '${AppStrings.csvImportSelectedFilePrefix} '
+                                '${state.selectedCsvName}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.secondary,
                                   fontWeight: FontWeight.w600,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
                             ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            AppStrings.csvImportMaxRowsText,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          if (state.selectedCsvName != null) ...[
-                            const SizedBox(height: 10),
-                            Text(
-                              '${AppStrings.csvImportSelectedFilePrefix} '
-                              '${state.selectedCsvName}',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.secondary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
                           ],
-                        ],
+                        ),
                       ),
                     ),
                   ),

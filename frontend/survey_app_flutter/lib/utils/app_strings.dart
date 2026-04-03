@@ -363,6 +363,10 @@ class AppStrings {
   /// CSV dropzone call-to-action text.
   static const String csvImportChooseFileText = 'alege fișier';
 
+  /// CSV dropzone helper text while dragging a file over the dropzone.
+  static const String csvImportDropzoneActiveText =
+      'Eliberează fișierul pentru a porni preview-ul';
+
   /// Maximum supported CSV rows info.
   static const String csvImportMaxRowsText = 'Max. 10.000 rânduri';
 
@@ -390,6 +394,10 @@ class AppStrings {
   /// Message shown when selected file cannot be read.
   static const String csvImportReadFileErrorMessage =
       'Fișierul selectat nu poate fi citit.';
+
+  /// Message shown when a non-CSV file is dropped in the dropzone.
+  static const String csvImportOnlyCsvMessage =
+      'Poți încărca doar fișiere .csv.';
 
   /// Message shown when authentication token is unavailable.
   static const String csvImportMissingTokenMessage =

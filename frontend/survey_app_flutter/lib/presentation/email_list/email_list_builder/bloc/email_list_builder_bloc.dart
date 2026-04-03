@@ -23,6 +23,7 @@ class EmailListBuilderBloc
     on<EmailListCreateRequested>(_onCreateRequested);
     on<EmailListBuilderStatusReset>(_onStatusReset);
     on<CsvImportFilePickRequested>(_onCsvFilePickRequested);
+    on<CsvImportFileDropped>(_onCsvFileDropped);
     on<CsvImportRequested>(_onCsvImportRequested);
     on<CsvImportStateReset>(_onCsvImportStateReset);
     on<EmailListContactDeleteRequested>(_onContactDeleteRequested);
@@ -117,6 +118,17 @@ class EmailListBuilderBloc
     }
 
     final file = result.files.single;
+    final isCsv = file.name.toLowerCase().endsWith('.csv');
+    if (!isCsv) {
+      emit(
+        state.copyWith(
+          csvImportStatus: CsvImportStatus.failure,
+          csvImportErrorMessage: AppStrings.csvImportOnlyCsvMessage,
+        ),
+      );
+      return;
+    }
+
     final bytes = file.bytes;
 
     if (bytes == null) {
@@ -129,11 +141,47 @@ class EmailListBuilderBloc
       return;
     }
 
+    _setCsvFileAndRequestPreview(
+      emit,
+      listId: event.listId,
+      fileName: file.name,
+      fileBytes: bytes,
+    );
+  }
+
+  void _onCsvFileDropped(
+    CsvImportFileDropped event,
+    Emitter<EmailListBuilderState> emit,
+  ) {
+    _setCsvFileAndRequestPreview(
+      emit,
+      listId: event.listId,
+      fileName: event.fileName,
+      fileBytes: event.fileBytes,
+    );
+  }
+
+  void _setCsvFileAndRequestPreview(
+    Emitter<EmailListBuilderState> emit, {
+    required String listId,
+    required String fileName,
+    required List<int> fileBytes,
+  }) {
+    if (fileBytes.isEmpty) {
+      emit(
+        state.copyWith(
+          csvImportStatus: CsvImportStatus.failure,
+          csvImportErrorMessage: AppStrings.csvImportReadFileErrorMessage,
+        ),
+      );
+      return;
+    }
+
     emit(
       state
           .copyWith(
-            selectedCsvBytes: bytes,
-            selectedCsvName: file.name,
+            selectedCsvBytes: fileBytes,
+            selectedCsvName: fileName,
             csvImportStatus: CsvImportStatus.idle,
             csvImportWasPreview: true,
           )
@@ -143,7 +191,7 @@ class EmailListBuilderBloc
           ),
     );
 
-    add(CsvImportRequested(event.listId, preview: true));
+    add(CsvImportRequested(listId, preview: true));
   }
 
   Future<void> _onCsvImportRequested(
