@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
-import 'package:survey_app_flutter/utils/theme.dart';
 
 /// Shared status badge used across survey-related views.
 class SurveyStatusBadge extends StatelessWidget {
@@ -18,7 +17,7 @@ class SurveyStatusBadge extends StatelessWidget {
       case SurveyStatus.draft:
         return colorScheme.surfaceContainer;
       case SurveyStatus.closed:
-        return redContainer;
+        return colorScheme.errorContainer;
     }
   }
 

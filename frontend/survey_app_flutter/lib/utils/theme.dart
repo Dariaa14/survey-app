@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// A custom red color for the Survey App
-const Color redContainer = Color.fromARGB(255, 48, 33, 33);
-
 /// A custom dark color scheme for the Survey App
 ColorScheme darkColorScheme = const ColorScheme.dark(
   primary: Color.fromARGB(255, 232, 197, 71),
@@ -25,6 +22,7 @@ ColorScheme darkColorScheme = const ColorScheme.dark(
   outline: Color.fromARGB(255, 42, 42, 53),
 
   error: Color.fromARGB(255, 234, 111, 80),
+  errorContainer: Color.fromARGB(255, 48, 33, 33),
   onError: Color.fromARGB(255, 255, 255, 255),
 );
 

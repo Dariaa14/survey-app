@@ -1,3 +1,5 @@
+import 'package:survey_app_flutter/domain/entities/email_contact_entity.dart';
+
 /// Entity representing an invitation to a survey.
 abstract class InvitationEntity {
   /// Invitation id (UUID).
@@ -30,4 +32,7 @@ abstract class InvitationEntity {
   /// Timestamp of when the invitation bounced back,
   /// null if not bounced.
   DateTime? get bouncedAt;
+
+  /// Associated contact information for the invitation.
+  EmailContactEntity get contact;
 }

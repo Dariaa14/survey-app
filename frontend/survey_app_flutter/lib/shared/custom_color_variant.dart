@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:survey_app_flutter/utils/theme.dart';
 
 /// The visual variant used by custom widgets.
 enum CustomColorVariant {
@@ -39,7 +38,7 @@ Color? backgroundColor(ColorScheme colorScheme, CustomColorVariant variant) {
     case CustomColorVariant.invertedTertiary:
       return colorScheme.tertiaryContainer;
     case CustomColorVariant.invertedRed:
-      return redContainer;
+      return colorScheme.errorContainer;
     case CustomColorVariant.gray:
       return colorScheme.surfaceContainer;
   }

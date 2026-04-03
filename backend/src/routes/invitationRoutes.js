@@ -119,7 +119,6 @@ router.get('/:id/invitations', verifyToken, requireAdmin, async (req, res) => {
             {
                 model: EmailContact,
                 as: 'contact',
-                attributes: ['email', 'name'],
                 where: q
                     ? {
                           email: {

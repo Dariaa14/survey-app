@@ -53,9 +53,10 @@ class AppStrings {
     int questionCount,
     DateTime createdAt,
   ) =>
-      "slug: $slug · $questionCount întrebări · creat ${_formatShortRoDate(createdAt)}";
+      "slug: $slug · $questionCount întrebări · creat ${formatShortRoDate(createdAt)}";
 
-  static String _formatShortRoDate(DateTime date) {
+  /// Formats a date in short Romanian format (e.g. "15 ian").
+  static String formatShortRoDate(DateTime date) {
     const List<String> shortMonths = <String>[
       'ian',
       'feb',
@@ -188,6 +189,22 @@ class AppStrings {
   /// Placeholder for searching invitations by email.
   static const String searchByEmailPlaceholder = "Caută după email...";
 
+  /// Empty state message for the sent invitations table.
+  static const String sentInvitationsEmptyState =
+      'Nu există invitații trimise pentru această listă.';
+
+  /// Status label for a bounced invitation.
+  static const String invitationStatusBounced = 'Bounced';
+
+  /// Status label for a submitted invitation.
+  static const String invitationStatusSubmitted = 'Submitted';
+
+  /// Status label for an invitation where the email was opened.
+  static const String invitationStatusEmailOpened = 'Email opened';
+
+  /// Status label for a sent invitation that has not been opened.
+  static const String invitationStatusSent = 'Sent';
+
   /// Header title for invitation table email column.
   static const String invitationsHeaderEmail = "Email";
 
@@ -302,7 +319,7 @@ class AppStrings {
 
   /// Formats the contact list preview metadata line.
   static String contactsListPreviewMeta(int contactsCount, DateTime createdAt) {
-    return "$contactsCount contacte · creată ${_formatShortRoDate(createdAt)}";
+    return "$contactsCount contacte · creată ${formatShortRoDate(createdAt)}";
   }
 
   /// Action label for visualizing a contact list.
