@@ -14,11 +14,11 @@ const {
 
 const { generatePublicToken, hashToken } = require('../services/tokenService');
 
-const { verifyToken } = require('../utils/authMiddleware');
+const { verifyAuthToken } = require('../utils/authMiddleware');
 const { requireAdmin } = require('../utils/adminMiddleware');
 
 /// CREATE and SEND
-router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res) => {
+router.post('/:id/invitations/send', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const { list_id } = req.body;
@@ -92,7 +92,7 @@ router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res)
         await Promise.all(
             emailPayload.map(payload =>
                 limit(async () => {
-                    const surveyLink = `http://localhost:3000/survey/${survey.id}?t=${payload.token}`;
+                    const surveyLink = `http://localhost:5000/s/${survey.slug}?t=${payload.token}`;
 
                     await sendEmail({
                         to: payload.email,
@@ -126,7 +126,7 @@ router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res)
 });
 
 /// GET by survey_id
-router.get('/:id/invitations', verifyToken, requireAdmin, async (req, res) => {
+router.get('/:id/invitations', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const { q } = req.query;
@@ -160,7 +160,7 @@ router.get('/:id/invitations', verifyToken, requireAdmin, async (req, res) => {
 });
 
 /// PREVIEW
-router.get('/:id/invitations/preview', verifyToken, requireAdmin, async (req, res) => {
+router.get('/:id/invitations/preview', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const { list_id } = req.query;

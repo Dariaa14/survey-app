@@ -13,11 +13,12 @@ const { sequelize } = require('../db');
 const { Op } = require('sequelize');
 
 const { requireAdmin } = require('../utils/adminMiddleware');
-const { verifyToken } = require('../utils/authMiddleware');
+const { verifyAuthToken } = require('../utils/authMiddleware');
+const { validateToken } = require('../utils/tokenValidation');
 
 
 // CREATE 
-router.post('/', verifyToken, requireAdmin, async (req, res) => {
+router.post('/', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { owner_id, title, description, slug, status } = req.body;
 
@@ -61,7 +62,7 @@ router.get('/', async (req, res) => {
 
 
 // GET by owner_id
-router.get('/user/:ownerId', verifyToken, requireAdmin, async (req, res) => {
+router.get('/user/:ownerId', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { ownerId } = req.params;
         const { status } = req.query;
@@ -106,8 +107,42 @@ router.get('/user/:ownerId', verifyToken, requireAdmin, async (req, res) => {
     }
 });
 
+// GET by slug
+router.get('/slug/:slug', validateToken, async (req, res) => {
+    try {
+        const { slug } = req.params;
+
+        const survey = await Survey.findOne({
+            where: { slug },
+            include: [
+                {
+                    model: Question,
+                    as: 'questions',
+                    include: [
+                        {
+                            model: Option,
+                            as: 'options',
+                            order: [['order', 'ASC']]
+                        }
+                    ],
+                    order: [['order', 'ASC']]
+                }
+            ]
+        });
+
+        if (!survey) {
+            return res.status(404).json({ error: 'Survey not found' });
+        }
+
+        res.json(survey);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch survey' });
+    }
+});
+
 // GET by ID
-router.get('/:id', verifyToken, requireAdmin, async (req, res) => {
+router.get('/:id', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const survey = await Survey.findByPk(req.params.id, {
             attributes: {
@@ -140,7 +175,7 @@ router.get('/:id', verifyToken, requireAdmin, async (req, res) => {
 });
 
 // UPDATE by ID
-router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
+router.put('/:id', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { title, description, slug, status, published_at, closed_at } = req.body;
         const survey = await Survey.findByPk(req.params.id);
@@ -155,7 +190,7 @@ router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
 });
 
 // DELETE by ID
-router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
+router.delete('/:id', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const survey = await Survey.findByPk(req.params.id);
         if (!survey) return res.status(404).json({ error: 'Survey not found' });
@@ -169,7 +204,7 @@ router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
 });
 
 /// CREATE question
-router.post('/:id/questions', verifyToken, requireAdmin, async (req, res) => {
+router.post('/:id/questions', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const {
@@ -217,7 +252,7 @@ router.post('/:id/questions', verifyToken, requireAdmin, async (req, res) => {
 });
 
 /// UPDATE question
-router.put('/:id/questions/:qid', verifyToken, requireAdmin, async (req, res) => {
+router.put('/:id/questions/:qid', verifyAuthToken, requireAdmin, async (req, res) => {
     const t = await sequelize.transaction();
 
     try {
@@ -290,7 +325,7 @@ router.put('/:id/questions/:qid', verifyToken, requireAdmin, async (req, res) =>
     }
 });
 
-router.delete('/:id/questions/:qid', verifyToken, requireAdmin, async (req, res) => {
+router.delete('/:id/questions/:qid', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { qid } = req.params;
 
@@ -311,7 +346,7 @@ router.delete('/:id/questions/:qid', verifyToken, requireAdmin, async (req, res)
 });
 
 ///PUBLISH survey
-router.post('/:id/publish', verifyToken, requireAdmin, async (req, res) => {
+router.post('/:id/publish', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -343,7 +378,7 @@ router.post('/:id/publish', verifyToken, requireAdmin, async (req, res) => {
 });
 
 /// CLOSE survey
-router.post('/:id/close', verifyToken, requireAdmin, async (req, res) => {
+router.post('/:id/close', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
 

@@ -24,6 +24,14 @@ class SurveyUseCase {
     return _surveyRepository.getSurveyById(surveyId);
   }
 
+  /// Fetches a public survey by slug and invitation token.
+  Future<SurveyEntity> getPublicSurveyBySlug({
+    required String slug,
+    required String token,
+  }) async {
+    return _surveyRepository.getPublicSurveyBySlug(slug: slug, token: token);
+  }
+
   /// Fetches surveys created by a specific user.
   Future<List<SurveyEntity>> getSurveysByUser(
     String ownerId,

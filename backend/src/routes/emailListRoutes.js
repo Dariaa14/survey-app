@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { EmailList, EmailContact } = require('../models');
-const { verifyToken } = require('../utils/authMiddleware');
+const { verifyAuthToken } = require('../utils/authMiddleware');
 const { requireAdmin } = require('../utils/adminMiddleware');
 
 const multer = require('multer');
@@ -12,7 +12,7 @@ const upload = multer();
 
 
 /// CREATE
-router.post('/', verifyToken, requireAdmin, async (req, res) => {
+router.post('/', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { owner_id, name } = req.body;
 
@@ -35,7 +35,7 @@ router.post('/', verifyToken, requireAdmin, async (req, res) => {
 });
 
 /// GET by id
-router.get('/:id', verifyToken, requireAdmin, async (req, res) => {
+router.get('/:id', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const list = await EmailList.findByPk(req.params.id, {
             include: [
@@ -62,7 +62,7 @@ router.get('/:id', verifyToken, requireAdmin, async (req, res) => {
 });
 
 /// GET by owner_id
-router.get('/user/:ownerId', verifyToken, requireAdmin, async (req, res) => {
+router.get('/user/:ownerId', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { ownerId } = req.params;
 
@@ -89,7 +89,7 @@ router.get('/user/:ownerId', verifyToken, requireAdmin, async (req, res) => {
 });
 
 /// UPDATE
-router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
+router.put('/:id', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { name } = req.body;
 
@@ -105,7 +105,7 @@ router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
 });
 
 /// DELETE
-router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
+router.delete('/:id', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const list = await EmailList.findByPk(req.params.id);
 
@@ -124,7 +124,7 @@ router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
 });
 
 /// CREATE contact
-router.post('/:id/contacts', verifyToken, requireAdmin, async (req, res) => {
+router.post('/:id/contacts', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { email, name } = req.body;
         if (!email) return res.status(400).json({ error: 'Email is required' });
@@ -147,7 +147,7 @@ router.post('/:id/contacts', verifyToken, requireAdmin, async (req, res) => {
 });
 
 /// UPDATE contact
-router.put('/:id/contacts/:contactId', verifyToken, requireAdmin, async (req, res) => {
+router.put('/:id/contacts/:contactId', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const { email, name } = req.body;
 
@@ -166,7 +166,7 @@ router.put('/:id/contacts/:contactId', verifyToken, requireAdmin, async (req, re
 });
 
 /// DELETE contact
-router.delete('/:id/contacts/:contactId', verifyToken, requireAdmin, async (req, res) => {
+router.delete('/:id/contacts/:contactId', verifyAuthToken, requireAdmin, async (req, res) => {
     try {
         const contact = await EmailContact.findOne({
             where: { id: req.params.contactId, list_id: req.params.id }

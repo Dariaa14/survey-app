@@ -20,6 +20,12 @@ abstract class SurveyRepository {
   /// Fetches a survey by its unique identifier.
   Future<SurveyEntity> getSurveyById(String surveyId);
 
+  /// Fetches a public survey by slug and invitation token.
+  Future<SurveyEntity> getPublicSurveyBySlug({
+    required String slug,
+    required String token,
+  });
+
   /// Creates a new survey in the data source.
   Future<SurveyEntity> createSurvey({
     required String token,

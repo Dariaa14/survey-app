@@ -5,6 +5,8 @@ import 'package:survey_app_flutter/presentation/admin/admin_main_page.dart';
 import 'package:survey_app_flutter/presentation/authentication/authentication_page.dart';
 import 'package:survey_app_flutter/presentation/email_list/email_list_page.dart';
 import 'package:survey_app_flutter/presentation/invitations/survey_invitations_page.dart';
+import 'package:survey_app_flutter/presentation/public/survey_formular_page.dart';
+import 'package:survey_app_flutter/presentation/results/results_page.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/survey_builder_page.dart';
 
 /// Route path constants used across the app.
@@ -28,9 +30,25 @@ abstract final class AppRoutes {
   static const String adminSurveyInvitations =
       '/admin/surveys/:surveyId/invitations';
 
+  /// The survey results page path pattern.
+  static const String adminSurveyResults = '/admin/surveys/:surveyId/results';
+
+  /// The public survey page path pattern.
+  static const String publicSurvey = '/s/:slug';
+
+  /// Builds a concrete public survey route from a slug and token.
+  static String publicSurveyPath(String slug, String token) {
+    return '/s/$slug?t=$token';
+  }
+
   /// Builds a concrete survey invitations route from an id.
   static String adminSurveyInvitationsPath(String surveyId) {
     return '/admin/surveys/$surveyId/invitations';
+  }
+
+  /// Builds a concrete survey results route from an id.
+  static String adminSurveyResultsPath(String surveyId) {
+    return '/admin/surveys/$surveyId/results';
   }
 
   /// Builds a concrete survey edit route from an id.
@@ -101,6 +119,31 @@ final GoRouter appRouter = GoRouter(
         }
 
         return SurveyInvitationsPage(survey: survey);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.adminSurveyResults,
+      builder: (context, state) {
+        final survey = state.extra is SurveyEntity
+            ? state.extra as SurveyEntity?
+            : null;
+
+        if (survey == null) {
+          throw Exception('Survey data is required to view results');
+        }
+
+        return ResultsPage(
+          survey: survey,
+        );
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.publicSurvey,
+      builder: (context, state) {
+        final slug = state.pathParameters['slug'] ?? '';
+        final token = state.uri.queryParameters['t'] ?? '';
+
+        return SurveyFormularPage(slug: slug, token: token);
       },
     ),
   ],

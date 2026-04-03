@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const { User } = require('../models/user');
 const userController = require('../controllers/userController');
 
-const { verifyToken } = require('../utils/authMiddleware');
+const { verifyAuthToken } = require('../utils/authMiddleware');
 
 // CREATE
 router.post('/', async (req, res) => {
@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET current authenticated user
-router.get('/me', verifyToken, userController.getCurrentUser);
+router.get('/me', verifyAuthToken, userController.getCurrentUser);
 
 // GET by ID
 router.get('/:id', async (req, res) => {

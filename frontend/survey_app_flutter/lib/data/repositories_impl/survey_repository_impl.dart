@@ -76,6 +76,27 @@ class SurveyRepositoryImpl implements SurveyRepository {
   }
 
   @override
+  Future<SurveyEntity> getPublicSurveyBySlug({
+    required String slug,
+    required String token,
+  }) async {
+    final uri = Uri.parse('$baseUrl/slug/$slug?t=$token');
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      return SurveyEntityImpl.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+    }
+    throw Exception('Failed to fetch public survey: ${response.body}');
+  }
+
+  @override
   Future<SurveyEntity> createSurvey({
     required String token,
     required String ownerId,

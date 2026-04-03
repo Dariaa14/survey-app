@@ -45,7 +45,12 @@ class SurveyPreviewActionButtons extends StatelessWidget {
       case SurveyStatus.published:
         return [
           CustomButton(
-            onPressed: () {},
+            onPressed: () {
+              context.push(
+                AppRoutes.adminSurveyResultsPath(survey.id),
+                extra: survey,
+              );
+            },
             text: AppStrings.surveyResultsButton,
           ),
           CustomButton(
@@ -78,7 +83,12 @@ class SurveyPreviewActionButtons extends StatelessWidget {
       case SurveyStatus.closed:
         return [
           CustomButton(
-            onPressed: () {},
+            onPressed: () {
+              context.push(
+                AppRoutes.adminSurveyResultsPath(survey.id),
+                extra: survey,
+              );
+            },
             text: AppStrings.surveyResultsButton,
           ),
         ];
