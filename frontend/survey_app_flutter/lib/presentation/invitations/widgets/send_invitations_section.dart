@@ -177,17 +177,46 @@ class SendInvitationsSection extends StatelessWidget {
                       child: SizedBox(
                         width: 220,
                         child: CustomButton(
-                          onPressed: preview == null
+                          onPressed:
+                              preview == null ||
+                                  invitationsState.isSendingInvitations
                               ? null
                               : () {
                                   AppBlocs.invitationsBloc.add(
                                     SendInvitations(survey),
                                   );
                                 },
-                          text:
-                              '✉︎ ${AppStrings.sendInvitationsButton(preview?.total ?? 0)}',
                           variant: CustomColorVariant.primary,
-                          isEnabled: preview != null,
+                          isEnabled:
+                              preview != null &&
+                              !invitationsState.isSendingInvitations,
+                          child: invitationsState.isSendingInvitations
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              colorScheme.onPrimary,
+                                            ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      AppStrings.sendInvitationsButton(
+                                        preview?.newInvitations ?? 0,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Text(
+                                  '✉︎ ${AppStrings.sendInvitationsButton(preview?.newInvitations ?? 0)}',
+                                ),
                         ),
                       ),
                     ),

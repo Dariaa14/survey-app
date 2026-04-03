@@ -30,24 +30,32 @@ router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res)
         const survey = await Survey.findByPk(id);
         if (!survey) return res.status(404).json({ error: 'Survey not found' });
 
+        // Get all contacts in the list
         const contacts = await EmailContact.findAll({
-            where: { list_id }
+            where: { list_id },
+            attributes: ['id', 'email', 'name']
         });
 
+        // Get all emails already invited for this survey
         const existingInvites = await Invitation.findAll({
             where: { survey_id: id },
-            attributes: ['contact_id']
+            include: [{
+                model: EmailContact,
+                as: 'contact',
+                attributes: ['email']
+            }]
         });
 
-        const existingSet = new Set(existingInvites.map(i => i.contact_id));
+        const existingEmailSet = new Set(
+            existingInvites.map(inv => inv.contact.email)
+        );
 
         const toInsert = [];
-        const emailPayload = []; 
-
+        const emailPayload = [];
         let skipped = 0;
 
         for (const c of contacts) {
-            if (existingSet.has(c.id)) {
+            if (existingEmailSet.has(c.email)) {
                 skipped++;
                 continue;
             }
@@ -69,6 +77,7 @@ router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res)
             });
         }
 
+        // Insert new invitations
         if (toInsert.length > 0) {
             await Invitation.bulkCreate(toInsert, {
                 ignoreDuplicates: true
@@ -77,12 +86,13 @@ router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res)
 
         console.log('Emails to send:', emailPayload.length);
 
-        const limit = pLimit(5); 
+        // Parallel sending
+        const limit = pLimit(5);
 
         await Promise.all(
             emailPayload.map(payload =>
                 limit(async () => {
-                    const surveyLink = `http://localhost:3000/survey/${survey.id}?token=${payload.token}`;
+                    const surveyLink = `http://localhost:3000/survey/${survey.id}?t=${payload.token}`;
 
                     await sendEmail({
                         to: payload.email,
@@ -92,6 +102,12 @@ router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res)
                             <p>You are invited to take the survey:</p>
                             <p><strong>${survey.title}</strong></p>
                             <a href="${surveyLink}">Take Survey</a>
+
+                            <!-- Tracking pixel -->
+                            <img src="http://localhost:3000/t/open/${payload.token}.png"
+                                width="1" height="1"
+                                style="display:block;"
+                                alt="" />
                         `
                     });
                 })
@@ -155,21 +171,25 @@ router.get('/:id/invitations/preview', verifyToken, requireAdmin, async (req, re
 
         const contacts = await EmailContact.findAll({
             where: { list_id },
-            attributes: ['id']
+            attributes: ['id', 'email']
         });
 
-        const existingInvites = await Invitation.findAll({
+         const existingInvites = await Invitation.findAll({
             where: { survey_id: id },
-            attributes: ['contact_id']
+            include: [{
+                model: EmailContact,
+                as: 'contact',
+                attributes: ['email']
+            }]
         });
 
-        const existingSet = new Set(existingInvites.map(i => i.contact_id));
+        const existingSet = new Set(existingInvites.map(i => i.contact.email));
 
         let newCount = 0;
         let skipped = 0;
 
         contacts.forEach(c => {
-            if (existingSet.has(c.id)) {
+            if (existingSet.has(c.email)) {
                 skipped++;
             } else {
                 newCount++;
@@ -177,7 +197,6 @@ router.get('/:id/invitations/preview', verifyToken, requireAdmin, async (req, re
         });
 
         res.json({
-            total: contacts.length,
             new: newCount,
             skipped
         });

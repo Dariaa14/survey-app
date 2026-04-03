@@ -102,23 +102,32 @@ class InvitationsBloc extends Bloc<InvitationsEvent, InvitationsState> {
       return;
     }
 
-    await _surveyUseCase.sendInvitations(
-      token: token,
-      surveyId: event.survey.id,
-      listId: selectedEmailList.id,
-    );
+    emit(state.copyWith(isSendingInvitations: true));
 
-    final invitations = await _surveyUseCase.getInvitations(
-      token: token,
-      surveyId: event.survey.id,
-    );
+    try {
+      await _surveyUseCase.sendInvitations(
+        token: token,
+        surveyId: event.survey.id,
+        listId: selectedEmailList.id,
+      );
 
-    emit(
-      state
-          .copyWith(
-            invitations: invitations,
-          )
-          .copyWithNull(nullInvitationPreview: true),
-    );
+      final invitations = await _surveyUseCase.getInvitations(
+        token: token,
+        surveyId: event.survey.id,
+      );
+
+      emit(
+        state
+            .copyWith(
+              invitations: invitations,
+            )
+            .copyWithNull(
+              nullInvitationPreview: true,
+              nullIsSendingInvitations: true,
+            ),
+      );
+    } finally {
+      emit(state.copyWith(isSendingInvitations: false));
+    }
   }
 }

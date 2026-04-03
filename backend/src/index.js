@@ -26,6 +26,12 @@ app.use('/api/email-lists', emailListRoutes);
 const invitationRoutes = require('./routes/invitationRoutes');
 app.use('/api/surveys', invitationRoutes);
 
+const webhookRoutes = require('./routes/webhookRoutes');
+app.use('/api/webhooks', webhookRoutes);
+
+const trackingRoutes = require('./routes/trackingRoutes');
+app.use('/api/t', trackingRoutes);
+
 // DB
 const { sequelize } = require('./db');
 const models = require('./models');

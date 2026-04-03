@@ -11,6 +11,9 @@ class InvitationsState extends Equatable {
   /// Preview for the currently selected list.
   final InvitationPreviewEntity? invitationPreview;
 
+  /// Whether invitations are currently being sent.
+  final bool isSendingInvitations;
+
   /// The email list selected for sending invitations, if any.
   final EmailListEntity? selectedEmailList;
 
@@ -18,6 +21,7 @@ class InvitationsState extends Equatable {
   const InvitationsState({
     this.invitations = const <InvitationEntity>[],
     this.invitationPreview,
+    this.isSendingInvitations = false,
     this.selectedEmailList,
   });
 
@@ -25,11 +29,13 @@ class InvitationsState extends Equatable {
   InvitationsState copyWith({
     List<InvitationEntity>? invitations,
     InvitationPreviewEntity? invitationPreview,
+    bool? isSendingInvitations,
     EmailListEntity? selectedEmailList,
   }) {
     return InvitationsState(
       invitations: invitations ?? this.invitations,
       invitationPreview: invitationPreview ?? this.invitationPreview,
+      isSendingInvitations: isSendingInvitations ?? this.isSendingInvitations,
       selectedEmailList: selectedEmailList ?? this.selectedEmailList,
     );
   }
@@ -38,11 +44,15 @@ class InvitationsState extends Equatable {
   InvitationsState copyWithNull({
     bool nullSurvey = false,
     bool nullInvitationPreview = false,
+    bool nullIsSendingInvitations = false,
     bool nullSelectedEmailList = false,
   }) {
     return InvitationsState(
       invitations: invitations,
       invitationPreview: nullInvitationPreview ? null : invitationPreview,
+      isSendingInvitations: nullIsSendingInvitations
+          ? false
+          : isSendingInvitations,
       selectedEmailList: nullSelectedEmailList ? null : selectedEmailList,
     );
   }
@@ -51,6 +61,7 @@ class InvitationsState extends Equatable {
   List<Object?> get props => [
     invitations,
     invitationPreview,
+    isSendingInvitations,
     selectedEmailList,
   ];
 }
