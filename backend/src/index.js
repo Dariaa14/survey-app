@@ -27,10 +27,10 @@ const invitationRoutes = require('./routes/invitationRoutes');
 app.use('/api/surveys', invitationRoutes);
 
 const webhookRoutes = require('./routes/webhookRoutes');
-app.use('/api/webhooks', webhookRoutes);
+app.use('/webhooks', webhookRoutes);
 
 const trackingRoutes = require('./routes/trackingRoutes');
-app.use('/api/t', trackingRoutes);
+app.use('/t', trackingRoutes);
 
 // DB
 const { sequelize } = require('./db');

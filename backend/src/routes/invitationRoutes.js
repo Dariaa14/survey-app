@@ -104,7 +104,7 @@ router.post('/:id/invitations/send', verifyToken, requireAdmin, async (req, res)
                             <a href="${surveyLink}">Take Survey</a>
 
                             <!-- Tracking pixel -->
-                            <img src="http://localhost:3000/t/open/${payload.token}.png"
+                            <img src="${process.env.NGROK_URL}/t/open/${payload.token}.png"
                                 width="1" height="1"
                                 style="display:block;"
                                 alt="" />

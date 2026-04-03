@@ -6,41 +6,32 @@ const {Op} = require('sequelize');
 
 router.post('/ses', async (req, res) => {
     try {
-        const message = JSON.parse(req.body.Message);
+        const event = req.body; 
+        console.log('SES webhook received:', event);
 
-        if (message.Type === 'SubscriptionConfirmation') {
-            console.log('Confirming SNS subscription...');
-            await fetch(message.SubscribeURL);
-        }
+        if (event.notificationType === 'Bounce') {
+            const bouncedEmails = event.bounce.bouncedRecipients.map(r => r.emailAddress);
 
-        if (message.notificationType === 'Bounce') {
-            const bouncedEmails = message.bounce.bouncedRecipients.map(r => r.emailAddress);
-
-            const invitations = await Invitation.findAll({
-                include: [
-                    {
+            for (const email of bouncedEmails) {
+                const invite = await Invitation.findOne({
+                    include: [{
                         model: EmailContact,
                         as: 'contact',
-                        where: {
-                            email: {
-                                [Op.in]: bouncedEmails
-                            }
-                        }
-                    }
-                ]
-            });
-
-            await Promise.all(invitations.map(async (invitation) => {
-                await invitation.update({ bounced_at: new Date() });
-            }));
-
+                        where: { email }
+                    }]
+                });
+                if (invite) {
+                    invite.bounced_at = new Date();
+                    invite.status = 'bounced';
+                    await invite.save();
+                }
+            }
         }
 
-        res.sendStatus(200);
-
+        res.status(200).send('OK');
     } catch (err) {
         console.error(err);
-        res.sendStatus(500);
+        res.status(500).send('Error');
     }
 });
 
