@@ -18,8 +18,11 @@ class LoadSurveyInvitations extends InvitationsEvent {
   /// Survey whose invitations should be loaded.
   final SurveyEntity survey;
 
+  /// Optional email query filter.
+  final String? query;
+
   /// Creates a [LoadSurveyInvitations] event.
-  LoadSurveyInvitations(this.survey);
+  LoadSurveyInvitations(this.survey, {this.query});
 }
 
 /// Event for loading a preview of invitations for the selected list.

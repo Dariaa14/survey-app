@@ -1,16 +1,26 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:survey_app_flutter/domain/entities/invitation_entity.dart';
+import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/invitations/bloc/invitations_bloc.dart';
+import 'package:survey_app_flutter/presentation/invitations/bloc/invitations_event.dart';
 import 'package:survey_app_flutter/presentation/invitations/bloc/invitations_state.dart';
 import 'package:survey_app_flutter/shared/custom_textfield.dart';
 import 'package:survey_app_flutter/utils/app_blocs.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// A widget for the sent invitations section of the invitations page.
-class SentInvitationsSection extends StatelessWidget {
+class SentInvitationsSection extends StatefulWidget {
   /// Constructs a [SentInvitationsSection].
-  const SentInvitationsSection({super.key});
+  const SentInvitationsSection({required this.survey, super.key});
+
+  /// Survey for which invitations are displayed.
+  final SurveyEntity survey;
+
+  @override
+  State<SentInvitationsSection> createState() => _SentInvitationsSectionState();
 
   static const List<String> _headers = [
     AppStrings.invitationsHeaderEmail,
@@ -19,13 +29,36 @@ class SentInvitationsSection extends StatelessWidget {
     AppStrings.invitationsHeaderStatus,
     AppStrings.invitationsHeaderDate,
   ];
+}
+
+class _SentInvitationsSectionState extends State<SentInvitationsSection> {
+  Timer? _searchDebounce;
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
+      AppBlocs.invitationsBloc.add(
+        LoadSurveyInvitations(
+          widget.survey,
+          query: query.trim().isEmpty ? null : query.trim(),
+        ),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<InvitationsBloc, InvitationsState>(
       bloc: AppBlocs.invitationsBloc,
       buildWhen: (previous, current) =>
-          previous.invitations != current.invitations,
+          previous.invitations != current.invitations ||
+          previous.totalInvitationsCount != current.totalInvitationsCount,
       builder: (context, state) {
         final theme = Theme.of(context);
         final colorScheme = theme.colorScheme;
@@ -37,7 +70,9 @@ class SentInvitationsSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    AppStrings.sentInvitationsTitle(state.invitations.length),
+                    AppStrings.sentInvitationsTitle(
+                      state.totalInvitationsCount,
+                    ),
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w700,
@@ -45,10 +80,11 @@ class SentInvitationsSection extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const SizedBox(
+                SizedBox(
                   width: 320,
                   child: CustomTextfield(
                     hintText: AppStrings.searchByEmailPlaceholder,
+                    onChanged: _onSearchChanged,
                   ),
                 ),
               ],
@@ -66,7 +102,7 @@ class SentInvitationsSection extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  for (final header in _headers)
+                  for (final header in SentInvitationsSection._headers)
                     Expanded(
                       flex: 3,
                       child: Text(

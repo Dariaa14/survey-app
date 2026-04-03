@@ -47,18 +47,36 @@ class InvitationsBloc extends Bloc<InvitationsEvent, InvitationsState> {
     LoadSurveyInvitations event,
     Emitter<InvitationsState> emit,
   ) async {
+    final isFilteredRequest =
+        event.query != null && event.query!.trim().isNotEmpty;
+
     final token = await _userUseCase.getAuthToken();
     if (token == null || token.isEmpty) {
-      emit(state.copyWith(invitations: const <InvitationEntity>[]));
+      emit(
+        state.copyWith(
+          invitations: const <InvitationEntity>[],
+          totalInvitationsCount: isFilteredRequest
+              ? state.totalInvitationsCount
+              : 0,
+        ),
+      );
       return;
     }
 
     final invitations = await _surveyUseCase.getInvitations(
       token: token,
       surveyId: event.survey.id,
+      query: event.query,
     );
 
-    emit(state.copyWith(invitations: invitations));
+    emit(
+      state.copyWith(
+        invitations: invitations,
+        totalInvitationsCount: isFilteredRequest
+            ? state.totalInvitationsCount
+            : invitations.length,
+      ),
+    );
   }
 
   /// Loads a preview for the currently selected email list.
@@ -120,6 +138,7 @@ class InvitationsBloc extends Bloc<InvitationsEvent, InvitationsState> {
         state
             .copyWith(
               invitations: invitations,
+              totalInvitationsCount: invitations.length,
             )
             .copyWithNull(
               nullInvitationPreview: true,

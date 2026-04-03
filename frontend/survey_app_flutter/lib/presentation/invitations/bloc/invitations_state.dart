@@ -8,6 +8,9 @@ class InvitationsState extends Equatable {
   /// Invitations loaded for the current survey.
   final List<InvitationEntity> invitations;
 
+  /// Total invitations count for the survey (unfiltered).
+  final int totalInvitationsCount;
+
   /// Preview for the currently selected list.
   final InvitationPreviewEntity? invitationPreview;
 
@@ -20,6 +23,7 @@ class InvitationsState extends Equatable {
   /// Creates an [InvitationsState] with optional survey and selected email list.
   const InvitationsState({
     this.invitations = const <InvitationEntity>[],
+    this.totalInvitationsCount = 0,
     this.invitationPreview,
     this.isSendingInvitations = false,
     this.selectedEmailList,
@@ -28,12 +32,15 @@ class InvitationsState extends Equatable {
   /// Creates a copy of the current state with optional new values.
   InvitationsState copyWith({
     List<InvitationEntity>? invitations,
+    int? totalInvitationsCount,
     InvitationPreviewEntity? invitationPreview,
     bool? isSendingInvitations,
     EmailListEntity? selectedEmailList,
   }) {
     return InvitationsState(
       invitations: invitations ?? this.invitations,
+      totalInvitationsCount:
+          totalInvitationsCount ?? this.totalInvitationsCount,
       invitationPreview: invitationPreview ?? this.invitationPreview,
       isSendingInvitations: isSendingInvitations ?? this.isSendingInvitations,
       selectedEmailList: selectedEmailList ?? this.selectedEmailList,
@@ -49,6 +56,7 @@ class InvitationsState extends Equatable {
   }) {
     return InvitationsState(
       invitations: invitations,
+      totalInvitationsCount: totalInvitationsCount,
       invitationPreview: nullInvitationPreview ? null : invitationPreview,
       isSendingInvitations: nullIsSendingInvitations
           ? false
@@ -60,6 +68,7 @@ class InvitationsState extends Equatable {
   @override
   List<Object?> get props => [
     invitations,
+    totalInvitationsCount,
     invitationPreview,
     isSendingInvitations,
     selectedEmailList,

@@ -64,7 +64,7 @@ class _SurveyInvitationsPageState extends State<SurveyInvitationsPage> {
                 const SizedBox(height: 24),
                 SendInvitationsSection(survey: widget.survey),
                 const SizedBox(height: 24),
-                const SentInvitationsSection(),
+                SentInvitationsSection(survey: widget.survey),
               ],
             ),
           ),
