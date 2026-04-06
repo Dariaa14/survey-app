@@ -322,6 +322,14 @@ class AppStrings {
   static const String alreadyAnsweredSurveyMessage =
       'Ai trimis deja răspunsul pentru acest sondaj.';
 
+  /// The title shown after a survey response is submitted successfully.
+  static const String registeredAnswerTitle =
+      '✅\nRăspunsurile tale au fost înregistrate';
+
+  /// Message shown after a survey response is submitted successfully.
+  static const String registeredAnswerMessage =
+      'Mulțumim pentru participare! Poți închide această fereastră.';
+
   /// Required warning text for unanswered multiple-choice questions.
   static String publicRequiredSelectWarning(int order) =>
       'Întrebarea $order este obligatorie — selectează cel puțin o opțiune.';

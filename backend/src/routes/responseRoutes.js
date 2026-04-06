@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { sequelize } = require('../db')
 
-const { sequelize, Response, AnswerChoice, AnswerText } = require('../models');
-const { validateToken } = require('../middleware/validateToken');
+const { Response, AnswerChoice, AnswerText } = require('../models');
+const { validateToken } = require('../utils/tokenValidation');
 
 /// CREATE
 router.post(
@@ -12,8 +13,7 @@ router.post(
     const transaction = await sequelize.transaction();
 
     try {
-      const { slug } = req.params;
-      const { answers } = req.body;
+      const { answers = [] } = req.body;
 
       const invitation = req.invitation;
 
@@ -35,21 +35,36 @@ router.post(
       const textRows = [];
 
       for (const a of answers) {
-        if (a.option_ids && a.option_ids.length > 0) {
-          for (const optionId of a.option_ids) {
-            choiceRows.push({
-              response_id: response.id,
-              question_id: a.question_id,
-              option_id: optionId,
-            });
-          }
+        const questionId = a.question_id || a.questionId;
+        if (!questionId) {
+          continue;
         }
 
-        if (a.text_value) {
+        const optionIds = Array.isArray(a.option_ids)
+          ? a.option_ids
+          : a.option_id
+            ? [a.option_id]
+            : [];
+
+        const textValue = (a.text_value || a.textValue || '').trim();
+
+        const validOptionIds = optionIds.filter((id) =>
+          typeof id === 'string' && id.trim().length > 0,
+        );
+
+        for (const optionId of validOptionIds) {
+          choiceRows.push({
+            response_id: response.id,
+            question_id: questionId,
+            option_id: optionId,
+          });
+        }
+
+        if (textValue.length > 0) {
           textRows.push({
             response_id: response.id,
-            question_id: a.question_id,
-            text_value: a.text_value,
+            question_id: questionId,
+            text_value: textValue,
           });
         }
       }

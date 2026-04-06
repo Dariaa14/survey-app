@@ -3,10 +3,11 @@ import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Widget for displaying a multiple choice question in the survey builder.
-class MultiChoiceQuestion extends StatefulWidget {
+class MultiChoiceQuestion extends StatelessWidget {
   /// Constructs a [MultiChoiceQuestion].
   const MultiChoiceQuestion({
     required this.question,
+    this.selectedIndexes = const <int>{},
     this.onSelectionChanged,
     super.key,
   });
@@ -14,41 +15,35 @@ class MultiChoiceQuestion extends StatefulWidget {
   /// The question entity containing the data for this question.
   final QuestionEntity question;
 
+  /// Currently selected option indexes.
+  final Set<int> selectedIndexes;
+
   /// Callback when the selected options change.
   final ValueChanged<Set<int>>? onSelectionChanged;
 
-  @override
-  State<MultiChoiceQuestion> createState() => _MultiChoiceQuestionState();
-}
-
-class _MultiChoiceQuestionState extends State<MultiChoiceQuestion> {
-  final Set<int> _selectedIndexes = <int>{};
-
   void _onOptionToggled(int index, bool selected) {
-    final int maxSelections = widget.question.maxSelections ?? 1;
+    final int maxSelections = question.maxSelections ?? 1;
+    final updatedSelection = Set<int>.from(selectedIndexes);
 
-    setState(() {
-      if (selected) {
-        if (_selectedIndexes.length >= maxSelections) {
-          return;
-        }
-
-        _selectedIndexes.add(index);
-      } else {
-        _selectedIndexes.remove(index);
+    if (selected) {
+      if (updatedSelection.length >= maxSelections) {
+        return;
       }
+      updatedSelection.add(index);
+    } else {
+      updatedSelection.remove(index);
+    }
 
-      widget.onSelectionChanged?.call(Set<int>.from(_selectedIndexes));
-    });
+    onSelectionChanged?.call(updatedSelection);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final options = widget.question.options ?? const [];
-    final maxSelections = widget.question.maxSelections ?? 1;
-    final selectedCount = _selectedIndexes.length;
+    final options = question.options ?? const [];
+    final maxSelections = question.maxSelections ?? 1;
+    final selectedCount = selectedIndexes.length;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -63,15 +58,15 @@ class _MultiChoiceQuestionState extends State<MultiChoiceQuestion> {
           Text.rich(
             TextSpan(
               text: AppStrings.publicQuestionTitle(
-                widget.question.order,
-                widget.question.title,
+                question.order,
+                question.title,
               ),
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
               children: [
-                if (widget.question.required)
+                if (question.required)
                   TextSpan(
                     text: ' *',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -95,7 +90,7 @@ class _MultiChoiceQuestionState extends State<MultiChoiceQuestion> {
           Column(
             children: List.generate(options.length, (index) {
               final option = options[index];
-              final isSelected = _selectedIndexes.contains(index);
+              final isSelected = selectedIndexes.contains(index);
               final isDisabled = !isSelected && selectedCount >= maxSelections;
 
               return Padding(

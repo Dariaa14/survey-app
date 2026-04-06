@@ -26,19 +26,14 @@ class UnansweredQuestionWarning extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.error_outline,
-            color: colorScheme.error,
-            size: 20,
-          ),
+          const Text('❌'),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onErrorContainer,
+                color: colorScheme.error,
                 fontWeight: FontWeight.w600,
               ),
             ),

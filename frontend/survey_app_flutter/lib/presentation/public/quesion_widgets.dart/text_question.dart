@@ -8,12 +8,16 @@ class TextQuestion extends StatefulWidget {
   /// Constructs a [TextQuestion] widget.
   const TextQuestion({
     required this.question,
+    this.initialText = '',
     this.onTextChanged,
     super.key,
   });
 
   /// The question entity containing the data for this question.
   final QuestionEntity question;
+
+  /// Current text value provided by parent state.
+  final String initialText;
 
   /// Callback when the text input changes.
   final ValueChanged<String>? onTextChanged;
@@ -37,7 +41,19 @@ class _TextQuestionState extends State<TextQuestion> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController();
+    _controller = TextEditingController(text: widget.initialText);
+  }
+
+  @override
+  void didUpdateWidget(covariant TextQuestion oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialText != widget.initialText &&
+        _controller.text != widget.initialText) {
+      _controller.value = TextEditingValue(
+        text: widget.initialText,
+        selection: TextSelection.collapsed(offset: widget.initialText.length),
+      );
+    }
   }
 
   @override

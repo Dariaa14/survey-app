@@ -29,22 +29,22 @@ class AnswerEntityImpl implements AnswerEntity {
   /// Factory method to create an [AnswerEntityImpl] from a JSON map.
   factory AnswerEntityImpl.fromJson(Map<String, dynamic> json) {
     return AnswerEntityImpl(
-      questionId: json['questionId'] as String,
-      responseId: json['responseId'] as String,
+      questionId: json['question_id'] as String,
+      responseId: json['response_id'] as String,
       id: json['id'] as String,
-      textValue: json['textValue'] as String?,
-      optionId: json['optionId'] as String?,
+      textValue: json['text_value'] as String?,
+      optionId: json['option_id'] as String?,
     );
   }
 
   /// Converts this [AnswerEntityImpl] instance to a JSON map.
   Map<String, dynamic> toJson() {
     return {
-      'questionId': questionId,
-      'responseId': responseId,
-      'id': id,
-      'textValue': textValue,
-      'optionId': optionId,
+      'question_id': questionId,
+      if (responseId.isNotEmpty) 'response_id': responseId,
+      if (id.isNotEmpty) 'id': id,
+      if ((textValue ?? '').trim().isNotEmpty) 'text_value': textValue!.trim(),
+      if ((optionId ?? '').isNotEmpty) 'option_id': optionId,
     };
   }
 }
