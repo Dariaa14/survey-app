@@ -265,6 +265,116 @@ class AppStrings {
   static const String invalidSurveyMessage =
       'Linkul de invitație nu este valid sau a expirat.';
 
+  // Results page:
+  /// Formats results page title with survey title.
+  static String resultsPageTitle(String surveyTitle) =>
+      'Rezultate - $surveyTitle';
+
+  /// Subtitle shown on results page.
+  static const String resultsPageSubtitle = 'Date actualizate în timp real';
+
+  /// Action label for exporting survey results as CSV.
+  static const String resultsExportCsvButton = '📥 Export CSV';
+
+  /// Funnel section title on results page.
+  static const String resultsFunnelTitle = 'FUNNEL INVITAȚI → SUBMIT';
+
+  /// Formats bounce and completion-rate info in results summary.
+  static String resultsBounceAndCompletion(
+    int bounced,
+    double completionRate,
+  ) =>
+      'Bounce: $bounced · Completion rate (survey open → submit): ${completionRate.toStringAsFixed(1)}%';
+
+  /// Label for Questions results tab.
+  static const String resultsQuestionsTab = 'Intrebari';
+
+  /// Label for Comments results tab.
+  static const String resultsCommentsTab = 'Comentarii';
+
+  /// Placeholder content for comments tab.
+  static const String resultsCommentsMockContent = 'Conținut Comentarii (mock)';
+
+  /// Hint text for comments search input.
+  static const String resultsCommentsSearchHint = 'Caută în comentarii...';
+
+  /// Placeholder text for comments question dropdown.
+  static const String resultsCommentsQuestionDropdownPlaceholder =
+      'Alege întrebare text liber';
+
+  /// Formats comments section summary line with pagination.
+  static String resultsCommentsSummary(
+    int responses,
+    int currentPage,
+    int totalPages,
+  ) => '$responses RĂSPUNSURI · pagina $currentPage din $totalPages';
+
+  /// Formats comments card metadata line with email and date.
+  static String resultsCommentMeta(String email, String dateLabel) =>
+      '$email · $dateLabel';
+
+  /// Previous-page button label in comments pagination.
+  static const String resultsCommentsPrevButton = 'Prev';
+
+  /// Next-page button label in comments pagination.
+  static const String resultsCommentsNextButton = 'Next';
+
+  /// Empty state for comments when there are no text questions.
+  static const String resultsCommentsNoTextQuestions =
+      'Nu există întrebări de tip text liber.';
+
+  /// Empty state for comments when no results match filters.
+  static const String resultsCommentsNoMatches =
+      'Nu există răspunsuri care să corespundă filtrului.';
+
+  /// Empty-state text for results questions section.
+  static const String resultsNoQuestions =
+      'Nu există întrebări pentru acest sondaj.';
+
+  /// Horizontal stats label for invited count.
+  static const String resultsInvitedLabel = 'Invitati';
+
+  /// Horizontal stats label for sent count.
+  static const String resultsSentLabel = 'Trimisi';
+
+  /// Horizontal stats label for opened-email count.
+  static const String resultsEmailOpenLabel = 'Email Open';
+
+  /// Horizontal stats label for opened-survey count.
+  static const String resultsSurveyOpenLabel = 'Survey Open';
+
+  /// Horizontal stats label for submitted responses.
+  static const String resultsSubmittedLabel = 'Submituri';
+
+  /// Formats a percentage value for results UI.
+  static String resultsPercent(double value) => '${value.toStringAsFixed(1)}%';
+
+  /// Formats multiple-choice question metadata line.
+  static String resultsMultiChoiceMeta(
+    int maxSelections,
+    int respondents,
+    int invited,
+  ) =>
+      'multi-choice · max $maxSelections · $respondents răspunsuri din $invited';
+
+  /// Warning message shown for multi-choice percentage interpretation.
+  static String resultsMultiChoicePercentageWarning(int respondents) =>
+      '⚠ La multi-choice suma procentelor poate depăși 100%. Procentele sunt calculate din numărul de respondenți la această întrebare ($respondents).';
+
+  /// Formats option count text for results rows.
+  static String resultsOptionCount(int count) => '($count)';
+
+  /// Formats free-text question metadata line.
+  static String resultsTextMeta(int respondents, int invited) =>
+      'text liber · $respondents răspunsuri din $invited';
+
+  /// Action label for viewing all text answers.
+  static const String resultsViewAllTextAnswersButton = 'Vezi toate →';
+
+  /// Placeholder text for text-question answers preview.
+  static const String resultsTextAnswersPreviewMock =
+      'Preview pentru întrebările text va fi afișat aici.';
+
   /// The label for edit button in question preview.
   static const String questionPreviewEditButton = "Edit";
 

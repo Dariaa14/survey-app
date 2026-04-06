@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
+import 'package:survey_app_flutter/presentation/results/sections/results_comments_section.dart';
+import 'package:survey_app_flutter/presentation/results/sections/results_questions_section.dart';
+import 'package:survey_app_flutter/presentation/results/widgets/results_horizontal_info.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
-import 'package:survey_app_flutter/shared/custom_color_variant.dart';
+import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Page that displays the results of a survey.
-class ResultsPage extends StatelessWidget {
+class ResultsPage extends StatefulWidget {
   /// Constructs a [ResultsPage].
   const ResultsPage({
     required this.survey,
@@ -13,6 +16,70 @@ class ResultsPage extends StatelessWidget {
 
   /// Survey whose results are displayed.
   final SurveyEntity survey;
+
+  @override
+  State<ResultsPage> createState() => _ResultsPageState();
+}
+
+class _ResultsPageState extends State<ResultsPage> {
+  int _selectedTabIndex = 0;
+
+  double _measureTabWidth(BuildContext context, String label) {
+    final theme = Theme.of(context);
+    final style = theme.textTheme.titleSmall?.copyWith(
+      fontWeight: FontWeight.w700,
+    );
+
+    final painter = TextPainter(
+      text: TextSpan(text: label, style: style),
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    return painter.width + 8;
+  }
+
+  Widget _buildTab(
+    BuildContext context, {
+    required String label,
+    required int index,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isSelected = _selectedTabIndex == index;
+
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedTabIndex = index;
+        });
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            label,
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: isSelected
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSelectedTabContent(BuildContext context) {
+    if (_selectedTabIndex == 0) {
+      return ResultsQuestionsSection(survey: widget.survey);
+    }
+
+    return ResultsCommentsSection(survey: widget.survey);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +101,7 @@ class ResultsPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Rezultate - ${survey.title}',
+                          AppStrings.resultsPageTitle(widget.survey.title),
                           style: theme.textTheme.headlineSmall?.copyWith(
                             color: colorScheme.onSurface,
                             fontWeight: FontWeight.w700,
@@ -42,7 +109,7 @@ class ResultsPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Date actualizate în timp real',
+                          AppStrings.resultsPageSubtitle,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -55,19 +122,108 @@ class ResultsPage extends StatelessWidget {
                     width: 170,
                     child: CustomButton(
                       onPressed: () {},
-                      text: 'Export CSV',
+                      text: AppStrings.resultsExportCsvButton,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
               Text(
-                'FUNNEL INVITAȚI → SUBMIT',
+                AppStrings.resultsFunnelTitle,
                 style: theme.textTheme.titleSmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              const SizedBox(height: 24),
+              const ResultsHorizontalInfo(),
+              const SizedBox(height: 24),
+              Text(
+                AppStrings.resultsBounceAndCompletion(3, 92.1),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Builder(
+                builder: (context) {
+                  const gap = 20.0;
+                  final intrebariWidth = _measureTabWidth(
+                    context,
+                    AppStrings.resultsQuestionsTab,
+                  );
+                  final comentariiWidth = _measureTabWidth(
+                    context,
+                    AppStrings.resultsCommentsTab,
+                  );
+
+                  final indicatorLeft = _selectedTabIndex == 0
+                      ? 0.0
+                      : intrebariWidth + gap;
+                  final indicatorWidth = _selectedTabIndex == 0
+                      ? intrebariWidth
+                      : comentariiWidth;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: intrebariWidth,
+                            child: _buildTab(
+                              context,
+                              label: AppStrings.resultsQuestionsTab,
+                              index: 0,
+                            ),
+                          ),
+                          const SizedBox(width: gap),
+                          SizedBox(
+                            width: comentariiWidth,
+                            child: _buildTab(
+                              context,
+                              label: AppStrings.resultsCommentsTab,
+                              index: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 2,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            AnimatedPositioned(
+                              duration: const Duration(milliseconds: 180),
+                              curve: Curves.easeOut,
+                              left: indicatorLeft,
+                              width: indicatorWidth,
+                              child: Container(
+                                height: 2,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildSelectedTabContent(context),
             ],
           ),
         ),
