@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:survey_app_flutter/domain/entities/question_entity.dart';
+import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/public/bloc/public_bloc.dart';
 import 'package:survey_app_flutter/presentation/public/bloc/public_event.dart';
 import 'package:survey_app_flutter/presentation/public/bloc/public_state.dart';
+import 'package:survey_app_flutter/presentation/public/quesion_widgets.dart/multi_choice_question.dart';
+import 'package:survey_app_flutter/presentation/public/quesion_widgets.dart/text_question.dart';
+import 'package:survey_app_flutter/presentation/public/quesion_widgets.dart/unanswered_question_warning.dart';
+import 'package:survey_app_flutter/presentation/public/survey_states_pages/already_answered_survey_page.dart';
+import 'package:survey_app_flutter/presentation/public/survey_states_pages/closed_survey_page.dart';
+import 'package:survey_app_flutter/presentation/public/survey_states_pages/invalid_survey_page.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
+import 'package:survey_app_flutter/shared/custom_color_variant.dart';
 import 'package:survey_app_flutter/utils/app_blocs.dart';
+import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Page for displaying the survey formular to users.
 class SurveyFormularPage extends StatefulWidget {
@@ -26,6 +36,9 @@ class SurveyFormularPage extends StatefulWidget {
 }
 
 class _SurveyFormularPageState extends State<SurveyFormularPage> {
+  final Map<String, Object?> _answers = <String, Object?>{};
+  final List<String> _warningMessages = <String>[];
+
   @override
   void initState() {
     super.initState();
@@ -33,6 +46,51 @@ class _SurveyFormularPageState extends State<SurveyFormularPage> {
     AppBlocs.publicBloc.add(
       PublicSurveyRequested(slug: widget.slug, token: widget.token),
     );
+  }
+
+  void _handleMultipleChoiceChanged(String questionId, Set<int> selected) {
+    _answers[questionId] = selected;
+  }
+
+  void _handleTextChanged(String questionId, String value) {
+    _answers[questionId] = value;
+  }
+
+  void _handleSubmit(SurveyEntity survey) {
+    final warnings = <String>[];
+
+    for (final question in survey.questions) {
+      if (!question.required) {
+        continue;
+      }
+
+      final answer = _answers[question.id];
+
+      if (question.type == QuestionType.multipleChoice) {
+        final selected = answer is Set<int> ? answer : const <int>{};
+        if (selected.isEmpty) {
+          warnings.add(
+            AppStrings.publicRequiredSelectWarning(question.order),
+          );
+        }
+        continue;
+      }
+
+      if (question.type == QuestionType.text) {
+        final text = answer is String ? answer.trim() : '';
+        if (text.isEmpty) {
+          warnings.add(
+            AppStrings.publicRequiredTextWarning(question.order),
+          );
+        }
+      }
+    }
+
+    setState(() {
+      _warningMessages
+        ..clear()
+        ..addAll(warnings);
+    });
   }
 
   @override
@@ -50,138 +108,119 @@ class _SurveyFormularPageState extends State<SurveyFormularPage> {
         }
 
         if (state.errorMessage != null) {
-          return Scaffold(
-            body: Center(
-              child: Text(
-                state.errorMessage!,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.error,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          );
+          return const InvalidSurveyPage();
         }
 
         final survey = state.survey;
         if (survey == null) {
-          return Scaffold(
-            body: Center(
-              child: Text(
-                'Survey not found.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.error,
-                ),
-              ),
-            ),
-          );
+          return const InvalidSurveyPage();
+        }
+
+        if (state.mockAlreadyAnswered) {
+          return const AlreadyAnsweredSurveyPage();
+        }
+
+        if (survey.status == SurveyStatus.closed) {
+          return const ClosedSurveyPage();
         }
 
         return Scaffold(
           body: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Text(
-                    survey.title,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-
-                  Text(
-                    survey.description ?? '',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-
-                  Column(
-                    children: List.generate(
-                      survey.questions.length,
-                      (index) {
-                        final question = survey.questions[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: colorScheme.outlineVariant,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  question.title,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                if (question.options != null &&
-                                    question.options!.isNotEmpty)
-                                  Column(
-                                    children: List.generate(
-                                      question.options!.length,
-                                      (optionIndex) => Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 8,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Radio<int>(
-                                              value: optionIndex,
-                                              groupValue: null,
-                                              onChanged: (value) {},
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                question
-                                                    .options![optionIndex]
-                                                    .label,
-                                                style: theme
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      color:
-                                                          colorScheme.onSurface,
-                                                    ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                else
-                                  Text(
-                                    'Mock answer option 1',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: colorScheme.onSurface,
-                                    ),
-                                  ),
-                              ],
-                            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8, right: 14),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 760),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          survey.title,
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            color: colorScheme.onSurface,
                           ),
-                        );
-                      },
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+
+                        Text(
+                          survey.description ?? '',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 32),
+
+                        Column(
+                          children: List.generate(
+                            survey.questions.length,
+                            (index) {
+                              final question = survey.questions[index];
+
+                              if (question.type ==
+                                  QuestionType.multipleChoice) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                  child: MultiChoiceQuestion(
+                                    question: question,
+                                    onSelectionChanged: (selected) {
+                                      _handleMultipleChoiceChanged(
+                                        question.id,
+                                        selected,
+                                      );
+                                    },
+                                  ),
+                                );
+                              }
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                child: TextQuestion(
+                                  question: question,
+                                  onTextChanged: (value) {
+                                    _handleTextChanged(question.id, value);
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        if (_warningMessages.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Column(
+                            children: _warningMessages
+                                .map(
+                                  (message) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: UnansweredQuestionWarning(
+                                      message: message,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                        const SizedBox(height: 32),
+
+                        SizedBox(
+                          width: double.infinity,
+                          child: CustomButton(
+                            onPressed: () => _handleSubmit(survey),
+                            text: AppStrings.publicSubmitAnswersButton,
+                            variant: CustomColorVariant.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 32),
-
-                  CustomButton(
-                    onPressed: () {},
-                    text: 'Trimite raspunsurile ->',
-                  ),
-                  const SizedBox(height: 32),
-                ],
+                ),
               ),
             ),
           ),

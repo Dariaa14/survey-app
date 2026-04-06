@@ -8,6 +8,7 @@ class PublicState extends Equatable {
     this.isLoading = false,
     this.survey,
     this.errorMessage,
+    this.mockAlreadyAnswered = false,
   });
 
   /// Whether the survey is currently being loaded.
@@ -19,16 +20,21 @@ class PublicState extends Equatable {
   /// Error message when loading fails.
   final String? errorMessage;
 
+  /// Temporary mock flag for the already-answered page state.
+  final bool mockAlreadyAnswered;
+
   /// Returns a new [PublicState] with updated values.
   PublicState copyWith({
     bool? isLoading,
     SurveyEntity? survey,
     String? errorMessage,
+    bool? mockAlreadyAnswered,
   }) {
     return PublicState(
       isLoading: isLoading ?? this.isLoading,
       survey: survey ?? this.survey,
       errorMessage: errorMessage,
+      mockAlreadyAnswered: mockAlreadyAnswered ?? this.mockAlreadyAnswered,
     );
   }
 
@@ -45,5 +51,10 @@ class PublicState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [isLoading, survey, errorMessage];
+  List<Object?> get props => [
+    isLoading,
+    survey,
+    errorMessage,
+    mockAlreadyAnswered,
+  ];
 }

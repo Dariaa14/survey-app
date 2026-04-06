@@ -258,6 +258,13 @@ class AppStrings {
   /// The text for the "Save" button in the question builder.
   static const String saveButton = "Salvează";
 
+  /// The title shown when a survey link is invalid.
+  static const String invalidSurveyTitle = '🔗\nLink invalid';
+
+  /// Message shown when a survey invitation link is invalid or expired.
+  static const String invalidSurveyMessage =
+      'Linkul de invitație nu este valid sau a expirat.';
+
   /// The label for edit button in question preview.
   static const String questionPreviewEditButton = "Edit";
 
@@ -268,6 +275,60 @@ class AppStrings {
   /// Formats the max characters text in question preview.
   static String questionPreviewMaxCharacters(int value) =>
       "max $value caractere";
+
+  /// Formats the public question title line with order and title.
+  static String publicQuestionTitle(int order, String title) =>
+      '$order. $title';
+
+  /// Helper text for single-selection multiple choice questions.
+  static String publicSelectSingleOption(int count) =>
+      'Selecteaza $count optiune';
+
+  /// Helper text for multi-selection multiple choice questions.
+  static String publicSelectMaxOptions(int maxSelections) =>
+      'Selecteaza maxim $maxSelections optiuni';
+
+  /// Counter text showing used selections for a multiple choice question.
+  static String publicSelectionsUsed(int selected, int maxSelections) =>
+      '$selected/$maxSelections selectii utilizate';
+
+  /// Placeholder for public free-text question input.
+  static const String publicTextQuestionHint = 'Scrie raspunsul tau...';
+
+  /// Counter text showing used characters for a text question.
+  static String publicTextQuestionCharacters(int written, int maxCharacters) =>
+      '$written/$maxCharacters';
+
+  /// Message shown when a public survey cannot be found.
+  static const String publicSurveyNotFound = 'Survey not found.';
+
+  /// Placeholder text for unsupported public question types.
+  static const String publicUnsupportedQuestionMock = 'Intrebare text (mock)';
+
+  /// Submit button label on public survey page.
+  static const String publicSubmitAnswersButton = 'Trimite raspunsurile →';
+
+  /// The title shown when a survey is closed.
+  static const String closedSurveyTitle = '🔒\nSondaj închis';
+
+  /// Message shown when a survey no longer accepts responses.
+  static const String closedSurveyMessage =
+      'Acest sondaj nu mai acceptă răspunsuri.';
+
+  /// The title shown when a user has already answered the survey.
+  static const String alreadyAnsweredSurveyTitle = '☑\nDeja completat';
+
+  /// Message shown when the survey has already been answered.
+  static const String alreadyAnsweredSurveyMessage =
+      'Ai trimis deja răspunsul pentru acest sondaj.';
+
+  /// Required warning text for unanswered multiple-choice questions.
+  static String publicRequiredSelectWarning(int order) =>
+      'Întrebarea $order este obligatorie — selectează cel puțin o opțiune.';
+
+  /// Required warning text for unanswered text questions.
+  static String publicRequiredTextWarning(int order) =>
+      'Întrebarea $order este obligatorie — scrie cel puțin un caracter.';
 
   /// Formats the options text in question preview.
   static String questionPreviewOptions(List<String> labels) {
