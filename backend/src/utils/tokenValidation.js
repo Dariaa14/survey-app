@@ -17,6 +17,12 @@ async function _validateToken(slug, rawToken) {
         },
     });
 
+     if (!invitation.survey_opened_at) {
+            await invitation.update({
+                survey_opened_at: new Date()
+            });
+        }
+
     console.log(`Found invitation: ${invitation ? 'Yes' : 'No'}`);
 
     if (!invitation) return { valid: false, reason: 'INVALID' };

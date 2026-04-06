@@ -80,7 +80,7 @@ class SurveyRepositoryImpl implements SurveyRepository {
     required String slug,
     required String token,
   }) async {
-    final uri = Uri.parse('$baseUrl/slug/$slug?t=$token');
+    final uri = Uri.parse('$baseUrl/s/$slug?t=$token');
 
     final response = await http.get(
       uri,

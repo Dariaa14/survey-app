@@ -108,7 +108,7 @@ router.get('/user/:ownerId', verifyAuthToken, requireAdmin, async (req, res) => 
 });
 
 // GET by slug
-router.get('/slug/:slug', validateToken, async (req, res) => {
+router.get('/s/:slug', validateToken, async (req, res) => {
     try {
         const { slug } = req.params;
 
