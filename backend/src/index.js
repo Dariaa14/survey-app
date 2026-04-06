@@ -30,6 +30,9 @@ app.use('/webhooks', webhookRoutes);
 const trackingRoutes = require('./routes/trackingRoutes');
 app.use('/t', trackingRoutes);
 
+const responseRoutes = require('./routes/responseRoutes');
+app.use('/api/public/surveys', responseRoutes);
+
 // DB
 const { sequelize } = require('./db');
 const models = require('./models');

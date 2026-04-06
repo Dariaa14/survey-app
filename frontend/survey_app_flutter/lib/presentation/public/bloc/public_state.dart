@@ -9,6 +9,9 @@ class PublicState extends Equatable {
     this.survey,
     this.errorMessage,
     this.mockAlreadyAnswered = false,
+    this.isSubmitting = false,
+    this.submissionError,
+    this.isSubmitted = false,
   });
 
   /// Whether the survey is currently being loaded.
@@ -23,18 +26,33 @@ class PublicState extends Equatable {
   /// Temporary mock flag for the already-answered page state.
   final bool mockAlreadyAnswered;
 
+  /// Whether the response is currently being submitted.
+  final bool isSubmitting;
+
+  /// Error message when submission fails.
+  final String? submissionError;
+
+  /// Whether the response has been successfully submitted.
+  final bool isSubmitted;
+
   /// Returns a new [PublicState] with updated values.
   PublicState copyWith({
     bool? isLoading,
     SurveyEntity? survey,
     String? errorMessage,
     bool? mockAlreadyAnswered,
+    bool? isSubmitting,
+    String? submissionError,
+    bool? isSubmitted,
   }) {
     return PublicState(
       isLoading: isLoading ?? this.isLoading,
       survey: survey ?? this.survey,
       errorMessage: errorMessage,
       mockAlreadyAnswered: mockAlreadyAnswered ?? this.mockAlreadyAnswered,
+      isSubmitting: isSubmitting ?? this.isSubmitting,
+      submissionError: submissionError,
+      isSubmitted: isSubmitted ?? this.isSubmitted,
     );
   }
 
@@ -42,11 +60,16 @@ class PublicState extends Equatable {
   PublicState copyWithNull({
     bool nullSurvey = false,
     bool nullErrorMessage = false,
+    bool nullSubmissionError = false,
   }) {
     return PublicState(
       isLoading: isLoading,
       survey: nullSurvey ? null : survey,
       errorMessage: nullErrorMessage ? null : errorMessage,
+      mockAlreadyAnswered: mockAlreadyAnswered,
+      isSubmitting: isSubmitting,
+      submissionError: nullSubmissionError ? null : submissionError,
+      isSubmitted: isSubmitted,
     );
   }
 
@@ -56,5 +79,8 @@ class PublicState extends Equatable {
     survey,
     errorMessage,
     mockAlreadyAnswered,
+    isSubmitting,
+    submissionError,
+    isSubmitted,
   ];
 }

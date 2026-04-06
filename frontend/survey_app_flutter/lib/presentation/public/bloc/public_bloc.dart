@@ -1,16 +1,20 @@
 import 'package:bloc/bloc.dart';
+import 'package:survey_app_flutter/domain/use_cases/response_use_case.dart';
 import 'package:survey_app_flutter/domain/use_cases/survey_use_case.dart';
 import 'package:survey_app_flutter/presentation/public/bloc/public_event.dart';
 import 'package:survey_app_flutter/presentation/public/bloc/public_state.dart';
 
 /// Bloc for managing the state of the public survey page.
 class PublicBloc extends Bloc<PublicEvent, PublicState> {
-  /// Constructs a [PublicBloc] with the required survey use case.
-  PublicBloc(this._surveyUseCase) : super(const PublicState()) {
+  /// Constructs a [PublicBloc] with the required use cases.
+  PublicBloc(this._surveyUseCase, this._responseUseCase)
+    : super(const PublicState()) {
     on<PublicSurveyRequested>(_onPublicSurveyRequested);
+    on<PublicResponseSubmitted>(_onPublicResponseSubmitted);
   }
 
   final SurveyUseCase _surveyUseCase;
+  final ResponseUseCase _responseUseCase;
 
   Future<void> _onPublicSurveyRequested(
     PublicSurveyRequested event,
@@ -57,6 +61,34 @@ class PublicBloc extends Bloc<PublicEvent, PublicState> {
               errorMessage: 'Could not load survey. Please check the link.',
             )
             .copyWithNull(nullSurvey: true),
+      );
+    }
+  }
+
+  Future<void> _onPublicResponseSubmitted(
+    PublicResponseSubmitted event,
+    Emitter<PublicState> emit,
+  ) async {
+    emit(
+      state
+          .copyWith(isSubmitting: true)
+          .copyWithNull(nullSubmissionError: true),
+    );
+
+    try {
+      await _responseUseCase.submitSurveyResponse(
+        slug: event.slug,
+        token: event.token,
+        answers: event.answers,
+      );
+
+      emit(state.copyWith(isSubmitting: false, isSubmitted: true));
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isSubmitting: false,
+          submissionError: e.toString(),
+        ),
       );
     }
   }

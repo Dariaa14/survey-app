@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:survey_app_flutter/data/entities_impl/answer_entity_impl.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/public/bloc/public_bloc.dart';
@@ -91,6 +92,57 @@ class _SurveyFormularPageState extends State<SurveyFormularPage> {
         ..clear()
         ..addAll(warnings);
     });
+
+    // If validation passed, submit the response
+    if (warnings.isEmpty) {
+      // Convert answers map to List<AnswerEntity>
+      final answerEntities = <AnswerEntityImpl>[];
+
+      _answers.forEach((questionId, answerValue) {
+        if (answerValue is Set<int>) {
+          // Multiple choice: create one AnswerEntity per option selected
+          final question = survey.questions.firstWhere(
+            (q) => q.id == questionId,
+          );
+          final options = question.options;
+
+          if (options != null) {
+            for (final optionIndex in answerValue) {
+              if (optionIndex < options.length) {
+                answerEntities.add(
+                  AnswerEntityImpl(
+                    questionId: questionId,
+                    responseId: '', // Placeholder - server will assign
+                    id: '', // Placeholder - server will assign
+                    optionId: options[optionIndex].id,
+                    textValue: null,
+                  ),
+                );
+              }
+            }
+          }
+        } else if (answerValue is String && answerValue.trim().isNotEmpty) {
+          // Text answer
+          answerEntities.add(
+            AnswerEntityImpl(
+              questionId: questionId,
+              responseId: '', // Placeholder - server will assign
+              id: '', // Placeholder - server will assign
+              optionId: null,
+              textValue: answerValue.trim(),
+            ),
+          );
+        }
+      });
+
+      AppBlocs.publicBloc.add(
+        PublicResponseSubmitted(
+          slug: widget.slug,
+          token: widget.token,
+          answers: answerEntities,
+        ),
+      );
+    }
   }
 
   @override

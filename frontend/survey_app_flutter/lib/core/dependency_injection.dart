@@ -1,11 +1,14 @@
 import 'package:get_it/get_it.dart';
 import 'package:survey_app_flutter/data/repositories_impl/email_list_repository_impl.dart';
+import 'package:survey_app_flutter/data/repositories_impl/response_repository_impl.dart';
 import 'package:survey_app_flutter/data/repositories_impl/survey_repository_impl.dart';
 import 'package:survey_app_flutter/data/repositories_impl/user_repository_impl.dart';
 import 'package:survey_app_flutter/domain/repositories/email_list_repository.dart';
+import 'package:survey_app_flutter/domain/repositories/response_repository.dart';
 import 'package:survey_app_flutter/domain/repositories/survey_repository.dart';
 import 'package:survey_app_flutter/domain/repositories/user_repository.dart';
 import 'package:survey_app_flutter/domain/use_cases/email_list_use_case.dart';
+import 'package:survey_app_flutter/domain/use_cases/response_use_case.dart';
 import 'package:survey_app_flutter/domain/use_cases/survey_use_case.dart';
 import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_bloc.dart';
@@ -31,6 +34,7 @@ void _loadRepositories() {
   getIt.registerLazySingleton<SurveyRepository>(SurveyRepositoryImpl.new);
   getIt.registerLazySingleton<UserRepository>(UserRepositoryImpl.new);
   getIt.registerLazySingleton<EmailListRepository>(EmailListRepositoryImpl.new);
+  getIt.registerLazySingleton<ResponseRepository>(ResponseRepositoryImpl.new);
 }
 
 /// Method that registers use cases
@@ -43,6 +47,9 @@ void _loadUseCases() {
   );
   getIt.registerLazySingleton<EmailListUseCase>(
     () => EmailListUseCase(getIt.get<EmailListRepository>()),
+  );
+  getIt.registerLazySingleton<ResponseUseCase>(
+    () => ResponseUseCase(getIt.get<ResponseRepository>()),
   );
 }
 
@@ -79,6 +86,7 @@ void _loadBlocs() {
   getIt.registerLazySingleton<PublicBloc>(
     () => PublicBloc(
       getIt.get<SurveyUseCase>(),
+      getIt.get<ResponseUseCase>(),
     ),
   );
 }
