@@ -18,6 +18,12 @@ class AnswerEntityImpl implements AnswerEntity {
   final String? optionId;
 
   @override
+  final String? email;
+
+  @override
+  final String? submittedAt;
+
+  @override
   final int? page;
 
   /// Constructs an [AnswerEntityImpl] with the given parameters.
@@ -27,6 +33,8 @@ class AnswerEntityImpl implements AnswerEntity {
     required this.id,
     this.textValue,
     this.optionId,
+    this.email,
+    this.submittedAt,
     this.page,
   });
 
@@ -38,6 +46,8 @@ class AnswerEntityImpl implements AnswerEntity {
       id: json['id'] as String,
       textValue: json['text_value'] as String?,
       optionId: json['option_id'] as String?,
+      email: json['email'] as String?,
+      submittedAt: json['submitted_at'] as String?,
       page: json['page'] as int?,
     );
   }
@@ -50,6 +60,8 @@ class AnswerEntityImpl implements AnswerEntity {
       if (id.isNotEmpty) 'id': id,
       if ((textValue ?? '').trim().isNotEmpty) 'text_value': textValue!.trim(),
       if ((optionId ?? '').isNotEmpty) 'option_id': optionId,
+      if ((email ?? '').trim().isNotEmpty) 'email': email!.trim(),
+      if ((submittedAt ?? '').trim().isNotEmpty) 'submitted_at': submittedAt,
       if (page != null) 'page': page,
     };
   }

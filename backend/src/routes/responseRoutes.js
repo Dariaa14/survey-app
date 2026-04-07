@@ -187,9 +187,12 @@ router.get('/surveys/:id/results/comments', async (req, res) => {
         at.text_value,
         at.question_id,
         at.response_id,
-        r.submitted_at
+        r.submitted_at,
+        ec.email
       FROM answers_text at
       JOIN responses r ON r.id = at.response_id
+      JOIN invitations i ON i.id = r.invitation_id
+      JOIN email_contacts ec ON ec.id = i.contact_id
       WHERE r.survey_id = :surveyId
         ${question_id ? 'AND at.question_id = :questionId' : ''}
         AND at.text_value ILIKE :search
@@ -221,33 +224,167 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const results = await sequelize.query(
+    const { sequelize } = require('../db');
+    const { QueryTypes } = require('sequelize');
+    const { Parser } = require('json2csv');
+
+    // ✅ Helper to clean column names
+    const clean = (str) =>
+      str
+        .replace(/[\n\r]+/g, ' ')
+        .replace(/,/g, '')
+        .trim();
+
+    // ✅ 1. Get ALL responses (only submitted)
+    const responses = await sequelize.query(
       `
       SELECT
         r.id AS response_id,
         r.submitted_at,
-        q.title AS question,
-        o.label AS selected_option,
-        at.text_value
+        ec.email
       FROM responses r
-      LEFT JOIN answers_choice ac ON ac.response_id = r.id
-      LEFT JOIN options o ON o.id = ac.option_id
-      LEFT JOIN questions q ON q.id = ac.question_id
-      LEFT JOIN answers_text at
-        ON at.response_id = r.id AND at.question_id = q.id
+      JOIN invitations i ON i.id = r.invitation_id
+      JOIN email_contacts ec ON ec.id = i.contact_id
       WHERE r.survey_id = :surveyId
-      ORDER BY r.submitted_at
+        AND r.submitted_at IS NOT NULL
       `,
       {
         replacements: { surveyId: id },
-        type: sequelize.QueryTypes.SELECT,
+        type: QueryTypes.SELECT,
       }
     );
 
-    const parser = new Parser();
-    const csv = parser.parse(results);
+    // ✅ 2. Get ALL options (defines columns)
+    const allOptions = await sequelize.query(
+      `
+      SELECT
+        o.id AS option_id,
+        o.label AS option_label,
+        q.title AS question_title
+      FROM options o
+      JOIN questions q ON q.id = o.question_id
+      WHERE q.survey_id = :surveyId
+      `,
+      {
+        replacements: { surveyId: id },
+        type: QueryTypes.SELECT,
+      }
+    );
 
-    res.header('Content-Type', 'text/csv');
+    // ✅ 3. Get ALL text questions (defines columns)
+    const allTextQuestions = await sequelize.query(
+      `
+      SELECT id, title
+      FROM questions
+      WHERE survey_id = :surveyId
+        AND type = 'text'
+      `,
+      {
+        replacements: { surveyId: id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    // ✅ 4. Get selected choices (actual answers)
+    const choices = await sequelize.query(
+      `
+      SELECT
+        response_id,
+        option_id
+      FROM answers_choice
+      `,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    // ✅ 5. Get text answers
+    const texts = await sequelize.query(
+      `
+      SELECT
+        response_id,
+        question_id,
+        text_value
+      FROM answers_text
+      `,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    // ✅ 6. Build column maps
+
+    const optionColumns = new Map(); // option_id -> column name
+    for (const opt of allOptions) {
+      const col = `${clean(opt.question_title)} - ${clean(opt.option_label)}`;
+      optionColumns.set(opt.option_id, col);
+    }
+
+    const textColumns = new Map(); // question_id -> column name
+    for (const q of allTextQuestions) {
+      const col = clean(q.title);
+      textColumns.set(q.id, col);
+    }
+
+    // ✅ 7. Build response rows
+    const responsesMap = new Map();
+
+    for (const r of responses) {
+      const row = {
+        email: r.email,
+        submitted_at: r.submitted_at,
+      };
+
+      // 🔥 initialize ALL option columns to 0
+      for (const col of optionColumns.values()) {
+        row[col] = 0;
+      }
+
+      // 🔥 initialize ALL text columns to empty
+      for (const col of textColumns.values()) {
+        row[col] = '';
+      }
+
+      responsesMap.set(r.response_id, row);
+    }
+
+    // ✅ 8. Fill selected options
+    for (const c of choices) {
+      if (!responsesMap.has(c.response_id)) continue;
+
+      const col = optionColumns.get(c.option_id);
+      if (!col) continue;
+
+      responsesMap.get(c.response_id)[col] = 1;
+    }
+
+    // ✅ 9. Fill text answers
+    for (const t of texts) {
+      if (!responsesMap.has(t.response_id)) continue;
+
+      const col = textColumns.get(t.question_id);
+      if (!col) continue;
+
+      responsesMap.get(t.response_id)[col] = t.text_value;
+    }
+
+    // ✅ 10. Final rows
+    const finalRows = Array.from(responsesMap.values());
+
+    // ✅ 11. Generate CSV
+    const parser = new Parser({
+      fields: [
+        'email',
+        'submitted_at',
+        ...optionColumns.values(),
+        ...textColumns.values(),
+      ],
+    });
+
+    const csv = parser.parse(finalRows);
+
+    // ✅ 12. Send response
+    res.header('Content-Type', 'text/csv; charset=utf-8');
     res.attachment('survey_results.csv');
     res.send(csv);
 

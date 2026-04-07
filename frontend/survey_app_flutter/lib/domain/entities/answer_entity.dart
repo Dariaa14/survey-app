@@ -17,6 +17,12 @@ abstract class AnswerEntity {
   /// questions, or null for multiple choice questions.
   String? get textValue;
 
+  /// Email of the respondent for text comments, when available.
+  String? get email;
+
+  /// Submission timestamp for text comments, when available.
+  String? get submittedAt;
+
   /// Page number for paginated comments. Null if not part of paginated results.
   int? get page;
 }

@@ -65,13 +65,12 @@ class MultiChoiceQuestionAnswer extends StatelessWidget {
   }
 
   int _getRespondentsForQuestion() {
-    // Get the total submitted responses
+    // Get the total submitted responses.
     return summary?.submitted ?? 0;
   }
 
-  int _getInvitedForQuestion() {
-    // Get the total invited
-    return summary?.invited ?? 0;
+  int _getAnswersForQuestion(List<_OptionMetric> optionMetrics) {
+    return optionMetrics.fold(0, (total, metric) => total + metric.count);
   }
 
   @override
@@ -79,8 +78,8 @@ class MultiChoiceQuestionAnswer extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final optionMetrics = _buildOptionMetrics();
-    final respondentsForQuestion = _getRespondentsForQuestion();
-    final invitedForQuestion = _getInvitedForQuestion();
+    final submittedResponses = _getRespondentsForQuestion();
+    final answersForQuestion = _getAnswersForQuestion(optionMetrics);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -113,8 +112,8 @@ class MultiChoiceQuestionAnswer extends StatelessWidget {
                     Text(
                       AppStrings.resultsMultiChoiceMeta(
                         question.maxSelections ?? 1,
-                        respondentsForQuestion,
-                        invitedForQuestion,
+                        answersForQuestion,
+                        submittedResponses,
                       ),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
@@ -158,7 +157,7 @@ class MultiChoiceQuestionAnswer extends StatelessWidget {
             ),
             child: Text(
               AppStrings.resultsMultiChoicePercentageWarning(
-                respondentsForQuestion,
+                submittedResponses,
               ),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,

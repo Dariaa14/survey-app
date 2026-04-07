@@ -112,6 +112,7 @@ class ResultsState extends Equatable {
     bool nullSummaryError = false,
     bool nullQuestionStatsError = false,
     bool nullCommentsError = false,
+    bool nullSelectedQuestionId = false,
   }) {
     return ResultsState(
       selectedTabIndex: selectedTabIndex,
@@ -119,7 +120,7 @@ class ResultsState extends Equatable {
       exportError: nullExportError ? null : exportError,
       searchTerm: searchTerm,
       currentPage: currentPage,
-      selectedQuestionId: selectedQuestionId,
+      selectedQuestionId: nullSelectedQuestionId ? null : selectedQuestionId,
       summary: summary,
       summaryLoading: summaryLoading,
       summaryError: nullSummaryError ? null : summaryError,

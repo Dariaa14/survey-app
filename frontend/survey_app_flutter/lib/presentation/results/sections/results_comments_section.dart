@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:survey_app_flutter/domain/entities/answer_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/results/bloc/results_bloc.dart';
@@ -51,6 +52,35 @@ class ResultsCommentsSection extends StatelessWidget {
     return [currentPage - 1, currentPage, currentPage + 1];
   }
 
+  String _formatCommentDate(String? rawDate) {
+    if (rawDate == null || rawDate.trim().isEmpty) {
+      return '';
+    }
+
+    final parsedDate = DateTime.tryParse(rawDate);
+    if (parsedDate == null) {
+      return rawDate;
+    }
+
+    const monthLabels = <int, String>{
+      1: 'ian',
+      2: 'feb',
+      3: 'mar',
+      4: 'apr',
+      5: 'mai',
+      6: 'iun',
+      7: 'iul',
+      8: 'aug',
+      9: 'sep',
+      10: 'oct',
+      11: 'nov',
+      12: 'dec',
+    };
+
+    final month = monthLabels[parsedDate.month] ?? '';
+    return '${parsedDate.day} $month ${parsedDate.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -78,9 +108,9 @@ class ResultsCommentsSection extends StatelessWidget {
         // Calculate page items
         final start = (safeCurrentPage - 1) * _itemsPerPage;
         final end = (start + _itemsPerPage).clamp(0, comments.length);
-        final pageComments = start < comments.length
+        final List<AnswerEntity> pageComments = start < comments.length
             ? comments.sublist(start, end)
-            : const [];
+            : const <AnswerEntity>[];
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -126,6 +156,7 @@ class ResultsCommentsSection extends StatelessWidget {
                         ),
                         items: [
                           const DropdownMenuItem<String?>(
+                            value: null,
                             child: Text(
                               AppStrings
                                   .resultsCommentsQuestionDropdownPlaceholder,
@@ -145,15 +176,22 @@ class ResultsCommentsSection extends StatelessWidget {
                           ),
                         ],
                         onChanged: (value) {
+                          final normalizedQuestionId =
+                              value == null || value.trim().isEmpty
+                              ? null
+                              : value;
+
                           AppBlocs.resultsBloc.add(
-                            CommentsQuestionFilterChangedEvent(value),
+                            CommentsQuestionFilterChangedEvent(
+                              normalizedQuestionId,
+                            ),
                           );
                           AppBlocs.resultsBloc.add(
                             FetchCommentsEvent(
                               survey.id,
                               searchTerm: state.searchTerm,
                               page: 1,
-                              questionId: value,
+                              questionId: normalizedQuestionId,
                             ),
                           );
                         },
@@ -187,7 +225,9 @@ class ResultsCommentsSection extends StatelessWidget {
               Column(
                 children: List.generate(pageComments.length, (index) {
                   final answer = pageComments[index];
-                  final body = (answer.textValue ?? '') as String;
+                  final body = answer.textValue ?? '';
+                  final email = (answer.email ?? '').trim();
+                  final submittedAt = _formatCommentDate(answer.submittedAt);
 
                   return Padding(
                     padding: EdgeInsets.only(
@@ -200,11 +240,28 @@ class ResultsCommentsSection extends StatelessWidget {
                         color: colorScheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Text(
-                        body,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            body,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          if (email.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              AppStrings.resultsCommentMeta(
+                                email,
+                                submittedAt,
+                              ),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   );

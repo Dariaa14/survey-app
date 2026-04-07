@@ -3,6 +3,7 @@ import 'package:survey_app_flutter/domain/use_cases/response_use_case.dart';
 import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
 import 'package:survey_app_flutter/presentation/results/bloc/results_event.dart';
 import 'package:survey_app_flutter/presentation/results/bloc/results_state.dart';
+import 'package:survey_app_flutter/utils/file_download_service.dart';
 
 /// Bloc for managing the state of the results screen.
 class ResultsBloc extends Bloc<ResultsEvent, ResultsState> {
@@ -37,9 +38,22 @@ class ResultsBloc extends Bloc<ResultsEvent, ResultsState> {
 
     try {
       final token = await _userUseCase.getAuthToken();
-      await _responseUseCase.exportSurveyResultsCsv(
+      final csvContent = await _responseUseCase.exportSurveyResultsCsv(
         surveyId: event.surveyId,
         token: token,
+      );
+
+      // Generate filename with timestamp
+      final timestamp = DateTime.now()
+          .toIso8601String()
+          .replaceAll(':', '-')
+          .split('.')[0];
+      final fileName = 'survey_results_${event.surveyId}_$timestamp.csv';
+
+      // Trigger browser download
+      await FileDownloadService.downloadCsv(
+        csvContent: csvContent,
+        fileName: fileName,
       );
 
       emit(state.copyWith(isExporting: false));
@@ -72,7 +86,13 @@ class ResultsBloc extends Bloc<ResultsEvent, ResultsState> {
     CommentsQuestionFilterChangedEvent event,
     Emitter<ResultsState> emit,
   ) async {
-    // Reset to page 1 when filter changes
+    if (event.questionId == null) {
+      return emit(
+        state
+            .copyWith(currentPage: 1)
+            .copyWithNull(nullSelectedQuestionId: true),
+      );
+    }
     emit(state.copyWith(selectedQuestionId: event.questionId, currentPage: 1));
   }
 

@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/results/bloc/results_bloc.dart';
+import 'package:survey_app_flutter/presentation/results/bloc/results_event.dart';
 import 'package:survey_app_flutter/presentation/results/bloc/results_state.dart';
 import 'package:survey_app_flutter/presentation/results/sections/questions_widget/multi_choice_question_answer.dart';
 import 'package:survey_app_flutter/presentation/results/sections/questions_widget/text_question_answer.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
+import 'package:survey_app_flutter/utils/app_blocs.dart';
 
 /// Section widget for displaying survey questions in the results page.
 class ResultsQuestionsSection extends StatelessWidget {
@@ -39,18 +41,41 @@ class ResultsQuestionsSection extends StatelessWidget {
       builder: (context, state) {
         final stats = state.questionStats;
         final summary = state.summary;
+        final comments = state.comments;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: List.generate(questions.length, (index) {
             final question = questions[index];
+            final questionComments = comments
+                .where((answer) => answer.questionId == question.id)
+                .toList();
+
             final widget = question.type == QuestionType.multipleChoice
                 ? MultiChoiceQuestionAnswer(
                     question: question,
                     stats: stats,
                     summary: summary,
                   )
-                : TextQuestionAnswer(question: question);
+                : TextQuestionAnswer(
+                    question: question,
+                    comments: questionComments,
+                    submittedCount: summary?.submitted ?? 0,
+                    onViewAll: () {
+                      AppBlocs.resultsBloc.add(TabChangedEvent(1));
+                      AppBlocs.resultsBloc.add(
+                        CommentsQuestionFilterChangedEvent(question.id),
+                      );
+                      AppBlocs.resultsBloc.add(
+                        FetchCommentsEvent(
+                          survey.id,
+                          searchTerm: state.searchTerm,
+                          page: 1,
+                          questionId: question.id,
+                        ),
+                      );
+                    },
+                  );
 
             return Padding(
               padding: EdgeInsets.only(

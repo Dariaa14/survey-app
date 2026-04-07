@@ -32,7 +32,6 @@ class ResultsHorizontalInfo extends StatelessWidget {
     final emailOpened = summary?.emailOpened ?? 0;
     final surveyOpened = summary?.surveyOpened ?? 0;
     final submitted = summary?.submitted ?? 0;
-    final bounced = summary?.bounced ?? 0;
 
     final sentPercentage = invited > 0 ? (sent / invited) * 100 : 0.0;
     final emailOpenPercentage = sent > 0 ? (emailOpened / invited) * 100 : 0.0;
@@ -42,7 +41,6 @@ class ResultsHorizontalInfo extends StatelessWidget {
     final submittedPercentage = surveyOpened > 0
         ? (submitted / invited) * 100
         : 0.0;
-    final bouncedPercentage = invited > 0 ? (bounced / invited) * 100 : 0.0;
 
     return [
       _MetricInfo(label: AppStrings.resultsInvitedLabel, value: invited),
@@ -65,11 +63,6 @@ class ResultsHorizontalInfo extends StatelessWidget {
         label: AppStrings.resultsSubmittedLabel,
         value: submitted,
         percentage: submittedPercentage,
-      ),
-      _MetricInfo(
-        label: 'Bounce',
-        value: bounced,
-        percentage: bouncedPercentage,
       ),
     ];
   }
