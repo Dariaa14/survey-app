@@ -31,7 +31,7 @@ const trackingRoutes = require('./routes/trackingRoutes');
 app.use('/t', trackingRoutes);
 
 const responseRoutes = require('./routes/responseRoutes');
-app.use('/api/public/surveys', responseRoutes);
+app.use('/api', responseRoutes);
 
 // DB
 const { sequelize } = require('./db');

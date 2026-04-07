@@ -16,4 +16,7 @@ abstract class AnswerEntity {
   /// The text value of the answer for text
   /// questions, or null for multiple choice questions.
   String? get textValue;
+
+  /// Page number for paginated comments. Null if not part of paginated results.
+  int? get page;
 }

@@ -1,39 +1,84 @@
 import 'package:flutter/material.dart';
+import 'package:survey_app_flutter/domain/entities/results_summary_entity.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Widget that displays horizontal information in the results page.
 class ResultsHorizontalInfo extends StatelessWidget {
   /// Constructs a [ResultsHorizontalInfo].
-  const ResultsHorizontalInfo({super.key});
+  const ResultsHorizontalInfo({
+    required this.summary,
+    super.key,
+  });
 
-  static const List<_MetricInfo> _mockMetrics = [
-    _MetricInfo(label: AppStrings.resultsInvitedLabel, value: 1200),
-    _MetricInfo(
-      label: AppStrings.resultsSentLabel,
-      value: 980,
-      percentage: 81.7,
-    ),
-    _MetricInfo(
-      label: AppStrings.resultsEmailOpenLabel,
-      value: 640,
-      percentage: 65.3,
-    ),
-    _MetricInfo(
-      label: AppStrings.resultsSurveyOpenLabel,
-      value: 430,
-      percentage: 67.2,
-    ),
-    _MetricInfo(
-      label: AppStrings.resultsSubmittedLabel,
-      value: 210,
-      percentage: 48.8,
-    ),
-  ];
+  /// Summary data containing invitation/response counts.
+  /// If null, mock data is displayed as a placeholder.
+  final ResultsSummaryEntity? summary;
+
+  _BounceCompletionStats _buildBounceCompletionStats() {
+    final bounced = summary?.bounced ?? 0;
+    final completionRate = summary != null && summary!.surveyOpened > 0
+        ? (summary!.submitted / summary!.surveyOpened) * 100
+        : 0.0;
+
+    return _BounceCompletionStats(
+      bounced: bounced,
+      completionRate: completionRate,
+    );
+  }
+
+  List<_MetricInfo> _buildMetrics() {
+    final invited = summary?.invited ?? 0;
+    final sent = summary?.sent ?? 0;
+    final emailOpened = summary?.emailOpened ?? 0;
+    final surveyOpened = summary?.surveyOpened ?? 0;
+    final submitted = summary?.submitted ?? 0;
+    final bounced = summary?.bounced ?? 0;
+
+    final sentPercentage = invited > 0 ? (sent / invited) * 100 : 0.0;
+    final emailOpenPercentage = sent > 0 ? (emailOpened / invited) * 100 : 0.0;
+    final surveyOpenPercentage = emailOpened > 0
+        ? (surveyOpened / invited) * 100
+        : 0.0;
+    final submittedPercentage = surveyOpened > 0
+        ? (submitted / invited) * 100
+        : 0.0;
+    final bouncedPercentage = invited > 0 ? (bounced / invited) * 100 : 0.0;
+
+    return [
+      _MetricInfo(label: AppStrings.resultsInvitedLabel, value: invited),
+      _MetricInfo(
+        label: AppStrings.resultsSentLabel,
+        value: sent,
+        percentage: sentPercentage,
+      ),
+      _MetricInfo(
+        label: AppStrings.resultsEmailOpenLabel,
+        value: emailOpened,
+        percentage: emailOpenPercentage,
+      ),
+      _MetricInfo(
+        label: AppStrings.resultsSurveyOpenLabel,
+        value: surveyOpened,
+        percentage: surveyOpenPercentage,
+      ),
+      _MetricInfo(
+        label: AppStrings.resultsSubmittedLabel,
+        value: submitted,
+        percentage: submittedPercentage,
+      ),
+      _MetricInfo(
+        label: 'Bounce',
+        value: bounced,
+        percentage: bouncedPercentage,
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final metrics = _buildMetrics();
 
     final segmentColors = <Color>[
       colorScheme.tertiaryContainer,
@@ -60,7 +105,7 @@ class ResultsHorizontalInfo extends StatelessWidget {
         const SizedBox(height: 14),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: _mockMetrics
+          children: metrics
               .map(
                 (metric) => Expanded(
                   child: Column(
@@ -99,6 +144,17 @@ class ResultsHorizontalInfo extends StatelessWidget {
               )
               .toList(),
         ),
+        const SizedBox(height: 24),
+        Text(
+          AppStrings.resultsBounceAndCompletion(
+            _buildBounceCompletionStats().bounced,
+            _buildBounceCompletionStats().completionRate,
+          ),
+          style: theme.textTheme.titleSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
@@ -114,4 +170,14 @@ class _MetricInfo {
   final String label;
   final int value;
   final double? percentage;
+}
+
+class _BounceCompletionStats {
+  const _BounceCompletionStats({
+    required this.bounced,
+    required this.completionRate,
+  });
+
+  final int bounced;
+  final double completionRate;
 }

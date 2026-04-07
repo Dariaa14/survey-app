@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
+import 'package:survey_app_flutter/domain/entities/question_stat_entity.dart';
+import 'package:survey_app_flutter/domain/entities/results_summary_entity.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Widget for displaying answers to multiple-choice questions in the survey results.
@@ -7,39 +9,78 @@ class MultiChoiceQuestionAnswer extends StatelessWidget {
   /// Constructs a [MultiChoiceQuestionAnswer] widget.
   const MultiChoiceQuestionAnswer({
     required this.question,
+    required this.stats,
+    required this.summary,
     super.key,
   });
 
   /// Multiple-choice question shown in results.
   final QuestionEntity question;
 
-  static const int _mockRespondentsForQuestion = 148;
-  static const int _mockInvitedForQuestion = 152;
+  /// All question statistics from the API.
+  final List<QuestionStatEntity> stats;
 
-  List<_OptionMetric> _buildMockOptionMetrics() {
+  /// Summary data with total respondents.
+  final ResultsSummaryEntity? summary;
+
+  List<_OptionMetric> _buildOptionMetrics() {
     final options = question.options ?? const [];
     if (options.isEmpty) {
       return const [];
     }
 
-    const mockPercents = <double>[57.4, 44.6, 36.5, 29.1, 17.6, 9.4];
+    // Filter stats to get only the ones for this question
+    final questionStats = stats
+        .where((stat) => stat.questionId == question.id)
+        .toList();
 
-    return List.generate(options.length, (index) {
-      final percent = mockPercents[index % mockPercents.length];
-      final count = ((_mockRespondentsForQuestion * percent) / 100).round();
+    if (questionStats.isEmpty) {
+      // Fallback: create empty metrics for all options
+      return options
+          .map(
+            (option) => _OptionMetric(
+              label: option.label,
+              percent: 0.0,
+              count: 0,
+            ),
+          )
+          .toList();
+    }
+
+    final statsByOptionId = <String, QuestionStatEntity>{
+      for (final stat in questionStats)
+        if (stat.optionId != null) stat.optionId!: stat,
+    };
+
+    // Match each option with its stats.
+    return options.map((option) {
+      final optionStat = statsByOptionId[option.id];
+
       return _OptionMetric(
-        label: options[index].label,
-        percent: percent,
-        count: count,
+        label: option.label,
+        percent: optionStat?.percentage ?? 0.0,
+        count: optionStat?.count ?? 0,
       );
-    });
+    }).toList();
+  }
+
+  int _getRespondentsForQuestion() {
+    // Get the total submitted responses
+    return summary?.submitted ?? 0;
+  }
+
+  int _getInvitedForQuestion() {
+    // Get the total invited
+    return summary?.invited ?? 0;
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final optionMetrics = _buildMockOptionMetrics();
+    final optionMetrics = _buildOptionMetrics();
+    final respondentsForQuestion = _getRespondentsForQuestion();
+    final invitedForQuestion = _getInvitedForQuestion();
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -72,8 +113,8 @@ class MultiChoiceQuestionAnswer extends StatelessWidget {
                     Text(
                       AppStrings.resultsMultiChoiceMeta(
                         question.maxSelections ?? 1,
-                        _mockRespondentsForQuestion,
-                        _mockInvitedForQuestion,
+                        respondentsForQuestion,
+                        invitedForQuestion,
                       ),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
@@ -117,7 +158,7 @@ class MultiChoiceQuestionAnswer extends StatelessWidget {
             ),
             child: Text(
               AppStrings.resultsMultiChoicePercentageWarning(
-                _mockRespondentsForQuestion,
+                respondentsForQuestion,
               ),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,

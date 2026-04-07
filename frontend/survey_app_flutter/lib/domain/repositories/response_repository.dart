@@ -1,4 +1,6 @@
 import 'package:survey_app_flutter/domain/entities/answer_entity.dart';
+import 'package:survey_app_flutter/domain/entities/question_stat_entity.dart';
+import 'package:survey_app_flutter/domain/entities/results_summary_entity.dart';
 
 /// Repository interface for managing survey responses.
 abstract class ResponseRepository {
@@ -14,5 +16,32 @@ abstract class ResponseRepository {
     required String slug,
     required String token,
     required List<AnswerEntity> answers,
+  });
+
+  /// Fetches high-level invitation/response summary counts for a survey.
+  Future<ResultsSummaryEntity> getSurveyResultsSummary({
+    required String surveyId,
+    String? token,
+  });
+
+  /// Fetches option-level statistics for all questions in a survey.
+  Future<List<QuestionStatEntity>> getSurveyQuestionStats({
+    required String surveyId,
+    String? token,
+  });
+
+  /// Fetches text comments for a survey with optional search and filtering.
+  Future<List<AnswerEntity>> getSurveyComments({
+    required String surveyId,
+    String query,
+    int page,
+    String? questionId,
+    String? token,
+  });
+
+  /// Exports all survey results as CSV content.
+  Future<String> exportSurveyResultsCsv({
+    required String surveyId,
+    String? token,
   });
 }

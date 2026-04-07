@@ -5,9 +5,11 @@ const { sequelize } = require('../db')
 const { Response, AnswerChoice, AnswerText } = require('../models');
 const { validateToken } = require('../utils/tokenValidation');
 
+const { Parser } = require('json2csv');
+
 /// CREATE
 router.post(
-  '/:slug/responses',
+  '/public/surveys/:slug/responses',
   validateToken,
   async (req, res) => {
     const transaction = await sequelize.transaction();
@@ -97,5 +99,162 @@ router.post(
     }
   }
 );
+
+/// Summary
+router.get('/surveys/:id/results/summary', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const results = await sequelize.query(
+      `
+      SELECT
+        COUNT(*) AS invited,
+        COUNT(sent_at) AS sent,
+        COUNT(email_opened_at) AS email_opened,
+        COUNT(survey_opened_at) AS survey_opened,
+        COUNT(submitted_at) AS submitted,
+        COUNT(bounced_at) AS bounced
+      FROM invitations
+      WHERE survey_id = :surveyId
+      `,
+      {
+        replacements: { surveyId: id },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    res.json(results[0]);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch summary' });
+  }
+});
+
+/// Statistics of question
+router.get('/surveys/:id/results/questions', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const results = await sequelize.query(
+      `
+      SELECT
+        q.id AS question_id,
+        q.title AS question_text,
+        o.id AS option_id,
+        o.label AS option_text,
+        COUNT(ac.id) AS count,
+        ROUND(
+          COUNT(ac.id) * 100.0 /
+          NULLIF(SUM(COUNT(ac.id)) OVER (PARTITION BY q.id), 0),
+          2
+        ) AS percentage
+      FROM questions q
+      LEFT JOIN options o ON o.question_id = q.id
+      LEFT JOIN answers_choice ac
+        ON ac.option_id = o.id
+      WHERE q.survey_id = :surveyId
+      GROUP BY q.id, o.id
+      ORDER BY q."order", o."order"
+      `,
+      {
+        replacements: { surveyId: id },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    res.json(results);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch question stats' });
+  }
+});
+
+/// Comments 
+router.get('/surveys/:id/results/comments', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { q = '', page = 1, question_id } = req.query;
+
+    const limit = 10;
+    const offset = (page - 1) * limit;
+
+    const results = await sequelize.query(
+      `
+      SELECT
+        at.id,
+        at.text_value,
+        at.question_id,
+        at.response_id,
+        r.submitted_at
+      FROM answers_text at
+      JOIN responses r ON r.id = at.response_id
+      WHERE r.survey_id = :surveyId
+        ${question_id ? 'AND at.question_id = :questionId' : ''}
+        AND at.text_value ILIKE :search
+      ORDER BY r.submitted_at DESC
+      LIMIT :limit OFFSET :offset
+      `,
+      {
+        replacements: {
+          surveyId: id,
+          questionId: question_id,
+          search: `%${q}%`,
+          limit,
+          offset,
+        },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    res.json(results);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch comments' });
+  }
+});
+
+/// Export CSV
+router.get('/surveys/:id/results/export.csv', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const results = await sequelize.query(
+      `
+      SELECT
+        r.id AS response_id,
+        r.submitted_at,
+        q.title AS question,
+        o.label AS selected_option,
+        at.text_value
+      FROM responses r
+      LEFT JOIN answers_choice ac ON ac.response_id = r.id
+      LEFT JOIN options o ON o.id = ac.option_id
+      LEFT JOIN questions q ON q.id = ac.question_id
+      LEFT JOIN answers_text at
+        ON at.response_id = r.id AND at.question_id = q.id
+      WHERE r.survey_id = :surveyId
+      ORDER BY r.submitted_at
+      `,
+      {
+        replacements: { surveyId: id },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const parser = new Parser();
+    const csv = parser.parse(results);
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment('survey_results.csv');
+    res.send(csv);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to export CSV' });
+  }
+});
 
 module.exports = router;

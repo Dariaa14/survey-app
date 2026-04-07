@@ -4,7 +4,9 @@ import 'package:survey_app_flutter/presentation/admin/bloc/admin_bloc.dart';
 import 'package:survey_app_flutter/presentation/authentication/bloc/authentication_bloc.dart';
 import 'package:survey_app_flutter/presentation/email_list/email_list_builder/bloc/email_list_builder_bloc.dart';
 import 'package:survey_app_flutter/presentation/invitations/bloc/invitations_bloc.dart';
+import 'package:survey_app_flutter/presentation/public/bloc/public_bloc.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_bloc.dart';
+import 'package:survey_app_flutter/presentation/results/bloc/results_bloc.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_bloc.dart';
 import 'package:survey_app_flutter/utils/app_blocs.dart';
 
@@ -38,6 +40,8 @@ class BlocProviders extends StatelessWidget {
         BlocProvider<InvitationsBloc>.value(
           value: AppBlocs.invitationsBloc,
         ),
+        BlocProvider<PublicBloc>.value(value: AppBlocs.publicBloc),
+        BlocProvider<ResultsBloc>.value(value: AppBlocs.resultsBloc),
       ],
       child: child,
     );

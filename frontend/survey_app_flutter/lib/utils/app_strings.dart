@@ -276,6 +276,9 @@ class AppStrings {
   /// Action label for exporting survey results as CSV.
   static const String resultsExportCsvButton = '📥 Export CSV';
 
+  /// Status text while exporting CSV.
+  static const String resultsExporting = 'Exporting...';
+
   /// Funnel section title on results page.
   static const String resultsFunnelTitle = 'FUNNEL INVITAȚI → SUBMIT';
 

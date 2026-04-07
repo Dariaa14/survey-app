@@ -17,6 +17,7 @@ import 'package:survey_app_flutter/presentation/email_list/email_list_builder/bl
 import 'package:survey_app_flutter/presentation/invitations/bloc/invitations_bloc.dart';
 import 'package:survey_app_flutter/presentation/public/bloc/public_bloc.dart';
 import 'package:survey_app_flutter/presentation/question_builder/bloc/question_builder_bloc.dart';
+import 'package:survey_app_flutter/presentation/results/bloc/results_bloc.dart';
 import 'package:survey_app_flutter/presentation/survey_builder/bloc/survey_builder_bloc.dart';
 
 /// Instance of getIt
@@ -87,6 +88,12 @@ void _loadBlocs() {
     () => PublicBloc(
       getIt.get<SurveyUseCase>(),
       getIt.get<ResponseUseCase>(),
+    ),
+  );
+  getIt.registerLazySingleton<ResultsBloc>(
+    () => ResultsBloc(
+      getIt.get<ResponseUseCase>(),
+      getIt.get<UserUseCase>(),
     ),
   );
 }

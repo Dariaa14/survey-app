@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
+import 'package:survey_app_flutter/presentation/bloc_listeners/bloc_providers.dart';
+import 'package:survey_app_flutter/presentation/results/bloc/results_bloc.dart';
+import 'package:survey_app_flutter/presentation/results/bloc/results_event.dart';
+import 'package:survey_app_flutter/presentation/results/bloc/results_state.dart';
 import 'package:survey_app_flutter/presentation/results/sections/results_comments_section.dart';
 import 'package:survey_app_flutter/presentation/results/sections/results_questions_section.dart';
 import 'package:survey_app_flutter/presentation/results/widgets/results_horizontal_info.dart';
 import 'package:survey_app_flutter/shared/custom_button.dart';
+import 'package:survey_app_flutter/utils/app_blocs.dart';
 import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Page that displays the results of a survey.
@@ -22,7 +28,19 @@ class ResultsPage extends StatefulWidget {
 }
 
 class _ResultsPageState extends State<ResultsPage> {
-  int _selectedTabIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeData();
+    });
+  }
+
+  void _initializeData() {
+    AppBlocs.resultsBloc.add(FetchSummaryEvent(widget.survey.id));
+    AppBlocs.resultsBloc.add(FetchQuestionStatsEvent(widget.survey.id));
+    AppBlocs.resultsBloc.add(FetchCommentsEvent(widget.survey.id));
+  }
 
   double _measureTabWidth(BuildContext context, String label) {
     final theme = Theme.of(context);
@@ -43,17 +61,14 @@ class _ResultsPageState extends State<ResultsPage> {
     BuildContext context, {
     required String label,
     required int index,
+    required bool isSelected,
+    required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isSelected = _selectedTabIndex == index;
 
     return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedTabIndex = index;
-        });
-      },
+      onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -73,8 +88,8 @@ class _ResultsPageState extends State<ResultsPage> {
     );
   }
 
-  Widget _buildSelectedTabContent(BuildContext context) {
-    if (_selectedTabIndex == 0) {
+  Widget _buildSelectedTabContent(BuildContext context, int tabIndex) {
+    if (tabIndex == 0) {
       return ResultsQuestionsSection(survey: widget.survey);
     }
 
@@ -86,147 +101,172 @@ class _ResultsPageState extends State<ResultsPage> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
+    return BlocProviders(
+      child: BlocBuilder<ResultsBloc, ResultsState>(
+        builder: (context, state) {
+          final selectedTabIndex = state.selectedTabIndex;
+
+          return Scaffold(
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          AppStrings.resultsPageTitle(widget.survey.title),
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            color: colorScheme.onSurface,
-                            fontWeight: FontWeight.w700,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                AppStrings.resultsPageTitle(
+                                  widget.survey.title,
+                                ),
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  color: colorScheme.onSurface,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                AppStrings.resultsPageSubtitle,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          AppStrings.resultsPageSubtitle,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                        const SizedBox(width: 16),
+                        SizedBox(
+                          width: 170,
+                          child: CustomButton(
+                            onPressed: state.isExporting
+                                ? null
+                                : () {
+                                    AppBlocs.resultsBloc.add(
+                                      ExportCsvRequestedEvent(
+                                        widget.survey.id,
+                                      ),
+                                    );
+                                  },
+                            text: state.isExporting
+                                ? AppStrings.resultsExporting
+                                : AppStrings.resultsExportCsvButton,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  SizedBox(
-                    width: 170,
-                    child: CustomButton(
-                      onPressed: () {},
-                      text: AppStrings.resultsExportCsvButton,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Text(
-                AppStrings.resultsFunnelTitle,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 24),
-              const ResultsHorizontalInfo(),
-              const SizedBox(height: 24),
-              Text(
-                AppStrings.resultsBounceAndCompletion(3, 92.1),
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Builder(
-                builder: (context) {
-                  const gap = 20.0;
-                  final intrebariWidth = _measureTabWidth(
-                    context,
-                    AppStrings.resultsQuestionsTab,
-                  );
-                  final comentariiWidth = _measureTabWidth(
-                    context,
-                    AppStrings.resultsCommentsTab,
-                  );
-
-                  final indicatorLeft = _selectedTabIndex == 0
-                      ? 0.0
-                      : intrebariWidth + gap;
-                  final indicatorWidth = _selectedTabIndex == 0
-                      ? intrebariWidth
-                      : comentariiWidth;
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: intrebariWidth,
-                            child: _buildTab(
-                              context,
-                              label: AppStrings.resultsQuestionsTab,
-                              index: 0,
-                            ),
-                          ),
-                          const SizedBox(width: gap),
-                          SizedBox(
-                            width: comentariiWidth,
-                            child: _buildTab(
-                              context,
-                              label: AppStrings.resultsCommentsTab,
-                              index: 1,
-                            ),
-                          ),
-                        ],
+                    const SizedBox(height: 24),
+                    Text(
+                      AppStrings.resultsFunnelTitle,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
                       ),
-                      SizedBox(
-                        height: 2,
-                        child: Stack(
+                    ),
+                    const SizedBox(height: 24),
+                    ResultsHorizontalInfo(summary: state.summary),
+
+                    const SizedBox(height: 20),
+                    Builder(
+                      builder: (context) {
+                        const gap = 20.0;
+                        final intrebariWidth = _measureTabWidth(
+                          context,
+                          AppStrings.resultsQuestionsTab,
+                        );
+                        final comentariiWidth = _measureTabWidth(
+                          context,
+                          AppStrings.resultsCommentsTab,
+                        );
+
+                        final indicatorLeft = selectedTabIndex == 0
+                            ? 0.0
+                            : intrebariWidth + gap;
+                        final indicatorWidth = selectedTabIndex == 0
+                            ? intrebariWidth
+                            : comentariiWidth;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Positioned.fill(
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: intrebariWidth,
+                                  child: _buildTab(
+                                    context,
+                                    label: AppStrings.resultsQuestionsTab,
+                                    index: 0,
+                                    isSelected: selectedTabIndex == 0,
+                                    onTap: () {
+                                      AppBlocs.resultsBloc.add(
+                                        TabChangedEvent(0),
+                                      );
+                                    },
                                   ),
                                 ),
-                              ),
+                                const SizedBox(width: gap),
+                                SizedBox(
+                                  width: comentariiWidth,
+                                  child: _buildTab(
+                                    context,
+                                    label: AppStrings.resultsCommentsTab,
+                                    index: 1,
+                                    isSelected: selectedTabIndex == 1,
+                                    onTap: () {
+                                      AppBlocs.resultsBloc.add(
+                                        TabChangedEvent(1),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                            AnimatedPositioned(
-                              duration: const Duration(milliseconds: 180),
-                              curve: Curves.easeOut,
-                              left: indicatorLeft,
-                              width: indicatorWidth,
-                              child: Container(
-                                height: 2,
-                                color: colorScheme.primary,
+                            SizedBox(
+                              height: 2,
+                              child: Stack(
+                                children: [
+                                  Positioned.fill(
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: colorScheme.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  AnimatedPositioned(
+                                    duration: const Duration(milliseconds: 180),
+                                    curve: Curves.easeOut,
+                                    left: indicatorLeft,
+                                    width: indicatorWidth,
+                                    child: Container(
+                                      height: 2,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSelectedTabContent(context, selectedTabIndex),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              _buildSelectedTabContent(context),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

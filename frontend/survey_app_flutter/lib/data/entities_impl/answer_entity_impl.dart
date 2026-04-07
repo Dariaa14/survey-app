@@ -17,6 +17,9 @@ class AnswerEntityImpl implements AnswerEntity {
   @override
   final String? optionId;
 
+  @override
+  final int? page;
+
   /// Constructs an [AnswerEntityImpl] with the given parameters.
   const AnswerEntityImpl({
     required this.questionId,
@@ -24,6 +27,7 @@ class AnswerEntityImpl implements AnswerEntity {
     required this.id,
     this.textValue,
     this.optionId,
+    this.page,
   });
 
   /// Factory method to create an [AnswerEntityImpl] from a JSON map.
@@ -34,6 +38,7 @@ class AnswerEntityImpl implements AnswerEntity {
       id: json['id'] as String,
       textValue: json['text_value'] as String?,
       optionId: json['option_id'] as String?,
+      page: json['page'] as int?,
     );
   }
 
@@ -45,6 +50,7 @@ class AnswerEntityImpl implements AnswerEntity {
       if (id.isNotEmpty) 'id': id,
       if ((textValue ?? '').trim().isNotEmpty) 'text_value': textValue!.trim(),
       if ((optionId ?? '').isNotEmpty) 'option_id': optionId,
+      if (page != null) 'page': page,
     };
   }
 }
