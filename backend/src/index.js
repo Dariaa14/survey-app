@@ -60,6 +60,9 @@ const startServer = async () => {
 
 startServer();
 
+const bcrypt = require('bcrypt');
+bcrypt.hash('admin', 10).then(hash => console.log('Admin password hash:', hash));
+
 // Global error handlers
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION:', err);

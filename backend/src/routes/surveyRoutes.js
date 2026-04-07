@@ -211,7 +211,6 @@ router.post('/:id/questions', verifyAuthToken, requireAdmin, async (req, res) =>
             type,
             title,
             required,
-            order,
             max_length,
             max_selections,
             options
@@ -224,12 +223,21 @@ router.post('/:id/questions', verifyAuthToken, requireAdmin, async (req, res) =>
             return res.status(400).json({ error: 'Can only add questions to draft surveys' });
         }
 
+        const highestOrder = await Question.max('order', {
+            where: { survey_id: id }
+        });
+
+        const normalizedHighestOrder = Number(highestOrder);
+        const nextOrder = (Number.isFinite(normalizedHighestOrder)
+            ? normalizedHighestOrder
+            : 0) + 1;
+
         const question = await Question.create({
             survey_id: id,
             type,
             title,
             required: required ?? false,
-            order: order ?? 0,
+            order: nextOrder,
             max_length,
             max_selections
         });

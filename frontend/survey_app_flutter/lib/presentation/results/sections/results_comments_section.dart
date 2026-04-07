@@ -26,9 +26,20 @@ class ResultsCommentsSection extends StatelessWidget {
   static const int _itemsPerPage = 10;
 
   List<QuestionEntity> get _textQuestions {
-    return survey.questions
-        .where((question) => question.type == QuestionType.text)
-        .toList();
+    final seenIds = <String>{};
+
+    return survey.questions.where((question) {
+      if (question.type != QuestionType.text) {
+        return false;
+      }
+
+      final questionId = question.id.trim();
+      if (questionId.isEmpty) {
+        return false;
+      }
+
+      return seenIds.add(questionId);
+    }).toList();
   }
 
   int _totalPages(int count) {
@@ -99,13 +110,20 @@ class ResultsCommentsSection extends StatelessWidget {
     return BlocBuilder<ResultsBloc, ResultsState>(
       builder: (context, state) {
         final currentPage = state.currentPage;
-        final selectedQuestionId = state.selectedQuestionId;
+        final availableQuestionIds = textQuestions
+            .map((question) => question.id.trim())
+            .toSet();
+        final selectedQuestionId =
+            availableQuestionIds.contains(
+              state.selectedQuestionId?.trim(),
+            )
+            ? state.selectedQuestionId?.trim()
+            : null;
         final comments = state.comments;
         final totalPages = _totalPages(comments.length);
         final safeCurrentPage = currentPage.clamp(1, totalPages);
         final visiblePages = _visiblePages(safeCurrentPage, totalPages);
 
-        // Calculate page items
         final start = (safeCurrentPage - 1) * _itemsPerPage;
         final end = (start + _itemsPerPage).clamp(0, comments.length);
         final List<AnswerEntity> pageComments = start < comments.length
@@ -164,7 +182,7 @@ class ResultsCommentsSection extends StatelessWidget {
                           ),
                           ...textQuestions.map(
                             (question) => DropdownMenuItem<String?>(
-                              value: question.id,
+                              value: question.id.trim(),
                               child: Text(
                                 AppStrings.publicQuestionTitle(
                                   question.order,
@@ -179,13 +197,17 @@ class ResultsCommentsSection extends StatelessWidget {
                           final normalizedQuestionId =
                               value == null || value.trim().isEmpty
                               ? null
-                              : value;
+                              : value.trim();
 
-                          AppBlocs.resultsBloc.add(
-                            CommentsQuestionFilterChangedEvent(
-                              normalizedQuestionId,
-                            ),
-                          );
+                          if (normalizedQuestionId !=
+                              state.selectedQuestionId) {
+                            AppBlocs.resultsBloc.add(
+                              CommentsQuestionFilterChangedEvent(
+                                normalizedQuestionId,
+                              ),
+                            );
+                          }
+
                           AppBlocs.resultsBloc.add(
                             FetchCommentsEvent(
                               survey.id,

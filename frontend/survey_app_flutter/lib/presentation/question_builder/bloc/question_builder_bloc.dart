@@ -47,6 +47,8 @@ class QuestionBuilderBloc
         maxLength: question.maxLength,
         maxSelections: question.maxSelections,
         options: question.options,
+        questionId: question.id,
+        surveyId: question.surveyId,
       ),
     );
   }
@@ -170,15 +172,22 @@ class QuestionBuilderBloc
     QuestionBuilderReset event,
     Emitter<QuestionBuilderState> emit,
   ) {
-    emit(QuestionBuilderState(type: state.type));
+    emit(
+      QuestionBuilderState(
+        type: state.type,
+        orderNumber: state.orderNumber,
+        questionId: null,
+        surveyId: null,
+      ),
+    );
   }
 
   /// Builds a [QuestionEntity] based on the current state of the question
   /// builder.
   QuestionEntity buildQuestionEntity() {
     return QuestionEntityImpl(
-      id: '',
-      surveyId: '',
+      id: state.questionId ?? '',
+      surveyId: state.surveyId ?? '',
       type: state.type,
       title: state.title,
       required: state.required,

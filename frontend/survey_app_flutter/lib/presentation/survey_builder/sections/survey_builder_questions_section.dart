@@ -99,6 +99,23 @@ class _SurveyBuilderQuestionsSectionState
     return true;
   }
 
+  String _questionKey(QuestionEntity question) {
+    final normalizedTitle = question.title.trim().toLowerCase();
+    return '$normalizedTitle-${question.type.name}';
+  }
+
+  int _nextQuestionOrder() {
+    if (_visibleQuestions.isEmpty) {
+      return 1;
+    }
+
+    final highestOrder = _visibleQuestions
+        .map((question) => question.order)
+        .reduce((currentMax, order) => order > currentMax ? order : currentMax);
+
+    return highestOrder + 1;
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -166,7 +183,7 @@ class _SurveyBuilderQuestionsSectionState
             itemBuilder: (context, index) {
               final q = _visibleQuestions[index];
               return Padding(
-                key: ObjectKey(q),
+                key: ValueKey(_questionKey(q)),
                 padding: const EdgeInsets.only(bottom: 12),
                 child: QuestionPreview(
                   question: q,
@@ -187,7 +204,7 @@ class _SurveyBuilderQuestionsSectionState
             children: _visibleQuestions
                 .map(
                   (q) => Padding(
-                    key: ObjectKey(q),
+                    key: ValueKey(_questionKey(q)),
                     padding: const EdgeInsets.only(bottom: 12),
                     child: QuestionPreview(
                       question: q,
@@ -230,7 +247,7 @@ class _SurveyBuilderQuestionsSectionState
     final newQuestion = await showDialog<QuestionEntity?>(
       context: context,
       builder: (context) => QuestionBuilderPage(
-        orderNumber: widget.questions.length + 1,
+        orderNumber: _nextQuestionOrder(),
         initialIsMultiChoiceSelected: questionTypeIsMultiChoice,
         question: question,
       ),

@@ -27,6 +27,12 @@ class QuestionBuilderState extends Equatable {
   /// Order number of the question being edited, used for display purposes.
   final int orderNumber;
 
+  /// Identifier of the question being edited, if this is an existing one.
+  final String? questionId;
+
+  /// Identifier of the survey that owns the question being edited.
+  final String? surveyId;
+
   /// Creates a [QuestionBuilderState] with the given parameters.
   const QuestionBuilderState({
     this.type = QuestionType.text,
@@ -35,6 +41,8 @@ class QuestionBuilderState extends Equatable {
     this.maxLength,
     this.maxSelections,
     this.orderNumber = 0,
+    this.questionId,
+    this.surveyId,
     this.options = const [],
   });
 
@@ -47,6 +55,8 @@ class QuestionBuilderState extends Equatable {
     int? maxSelections,
     List<OptionEntity>? options,
     int? orderNumber,
+    String? questionId,
+    String? surveyId,
   }) {
     return QuestionBuilderState(
       type: type ?? this.type,
@@ -56,6 +66,8 @@ class QuestionBuilderState extends Equatable {
       maxSelections: maxSelections ?? this.maxSelections,
       options: options ?? this.options,
       orderNumber: orderNumber ?? this.orderNumber,
+      questionId: questionId ?? this.questionId,
+      surveyId: surveyId ?? this.surveyId,
     );
   }
 
@@ -72,6 +84,8 @@ class QuestionBuilderState extends Equatable {
       maxSelections: nullMaxSelections ? null : maxSelections,
       options: options,
       orderNumber: orderNumber,
+      questionId: questionId,
+      surveyId: surveyId,
     );
   }
 
@@ -84,5 +98,7 @@ class QuestionBuilderState extends Equatable {
     maxSelections,
     options,
     orderNumber,
+    questionId,
+    surveyId,
   ];
 }
