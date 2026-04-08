@@ -45,6 +45,17 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<AdminSurveyCloseRequested>(_onSurveyCloseRequested);
     on<AdminLiveUpdatesStarted>(_onLiveUpdatesStarted);
     on<AdminLiveUpdatesStopped>(_onLiveUpdatesStopped);
+    on<AdminStateReset>(_onStateReset);
+  }
+
+  Future<void> _onStateReset(
+    AdminStateReset event,
+    Emitter<AdminState> emit,
+  ) async {
+    _isLiveUpdatesEnabled = false;
+    _liveRefreshDebounce?.cancel();
+    await _clearLiveSurveySubscriptions();
+    emit(const AdminState());
   }
 
   void _onMainTabChanged(

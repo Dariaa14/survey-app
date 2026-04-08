@@ -49,6 +49,7 @@ class AuthenticationBloc
                 .copyWith(
                   status: AuthenticationStatus.unauthenticated,
                   token: '',
+                  isAdmin: false,
                   logoutMessage: AppStrings.authSessionExpired,
                 )
                 .copyWithNull(nullErrorMessage: true),
@@ -74,7 +75,11 @@ class AuthenticationBloc
 
       emit(
         state
-            .copyWith(status: AuthenticationStatus.unauthenticated, token: '')
+            .copyWith(
+              status: AuthenticationStatus.unauthenticated,
+              token: '',
+              isAdmin: false,
+            )
             .copyWithNull(nullErrorMessage: true, nullLogoutMessage: true),
       );
     } catch (e) {
@@ -82,6 +87,7 @@ class AuthenticationBloc
         state.copyWith(
           status: AuthenticationStatus.unauthenticated,
           token: '',
+          isAdmin: false,
           errorMessage: e.toString(),
         ),
       );

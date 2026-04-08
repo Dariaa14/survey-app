@@ -122,3 +122,9 @@ class AdminLiveUpdatesStopped extends AdminEvent {
   /// Creates [AdminLiveUpdatesStopped].
   const AdminLiveUpdatesStopped();
 }
+
+/// Triggered to clear admin cached state (account, surveys, contacts).
+class AdminStateReset extends AdminEvent {
+  /// Creates [AdminStateReset].
+  const AdminStateReset();
+}
