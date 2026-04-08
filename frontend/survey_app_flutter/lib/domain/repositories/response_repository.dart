@@ -44,4 +44,10 @@ abstract class ResponseRepository {
     required String surveyId,
     String? token,
   });
+
+  /// Starts or returns a live stream for survey result changes.
+  Stream<void> watchSurveyResults({required String surveyId});
+
+  /// Stops any active live results stream resources.
+  Future<void> stopWatchingSurveyResults();
 }

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:survey_app_flutter/data/entities_impl/answer_entity_impl.dart';
 import 'package:survey_app_flutter/data/entities_impl/question_stat_entity_impl.dart';
 import 'package:survey_app_flutter/data/entities_impl/results_summary_entity_impl.dart';
+import 'package:survey_app_flutter/data/repositories_impl/results_live_updates_client.dart';
 import 'package:survey_app_flutter/domain/entities/answer_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_stat_entity.dart';
 import 'package:survey_app_flutter/domain/entities/results_summary_entity.dart';
@@ -13,6 +14,9 @@ import 'package:survey_app_flutter/domain/repositories/response_repository.dart'
 class ResponseRepositoryImpl implements ResponseRepository {
   /// Base URL for the API.
   final String baseUrl = 'http://localhost:3000/api';
+
+  ResultsLiveUpdatesClient? _liveUpdatesClient;
+  String? _activeSurveyId;
 
   Map<String, String> _buildHeaders({String? token, bool csv = false}) {
     return <String, String>{
@@ -155,5 +159,27 @@ class ResponseRepositoryImpl implements ResponseRepository {
     }
 
     throw Exception('Failed to export survey results CSV: ${response.body}');
+  }
+
+  @override
+  Stream<void> watchSurveyResults({required String surveyId}) {
+    if (_activeSurveyId != surveyId || _liveUpdatesClient == null) {
+      _liveUpdatesClient?.dispose();
+      _activeSurveyId = surveyId;
+      _liveUpdatesClient = createResultsLiveUpdatesClient(
+        baseUrl: baseUrl,
+        surveyId: surveyId,
+      );
+      _liveUpdatesClient?.connect();
+    }
+
+    return _liveUpdatesClient?.updates ?? const Stream<void>.empty();
+  }
+
+  @override
+  Future<void> stopWatchingSurveyResults() async {
+    _liveUpdatesClient?.dispose();
+    _liveUpdatesClient = null;
+    _activeSurveyId = null;
   }
 }

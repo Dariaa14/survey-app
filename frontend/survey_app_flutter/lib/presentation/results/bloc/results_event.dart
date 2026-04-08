@@ -86,3 +86,24 @@ class FetchCommentsEvent extends ResultsEvent {
   /// Optional question ID filter.
   final String? questionId;
 }
+
+/// Event to start listening for live response changes.
+class ResultsLiveUpdatesStartedEvent extends ResultsEvent {
+  /// Constructs a [ResultsLiveUpdatesStartedEvent].
+  ResultsLiveUpdatesStartedEvent(this.surveyId);
+
+  /// ID of the survey whose updates should be observed.
+  final String surveyId;
+}
+
+/// Event to stop listening for live response changes.
+class ResultsLiveUpdatesStoppedEvent extends ResultsEvent {}
+
+/// Event triggered when survey responses changed.
+class ResultsResponsesChangedEvent extends ResultsEvent {
+  /// Constructs a [ResultsResponsesChangedEvent].
+  ResultsResponsesChangedEvent(this.surveyId);
+
+  /// ID of the survey whose results changed.
+  final String surveyId;
+}

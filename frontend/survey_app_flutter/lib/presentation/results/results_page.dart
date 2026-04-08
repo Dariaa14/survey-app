@@ -31,9 +31,16 @@ class _ResultsPageState extends State<ResultsPage> {
   @override
   void initState() {
     super.initState();
+    AppBlocs.resultsBloc.add(ResultsLiveUpdatesStartedEvent(widget.survey.id));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeData();
     });
+  }
+
+  @override
+  void dispose() {
+    AppBlocs.resultsBloc.add(ResultsLiveUpdatesStoppedEvent());
+    super.dispose();
   }
 
   void _initializeData() {

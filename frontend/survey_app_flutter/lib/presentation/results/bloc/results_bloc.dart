@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:survey_app_flutter/domain/use_cases/response_use_case.dart';
 import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
@@ -18,10 +20,15 @@ class ResultsBloc extends Bloc<ResultsEvent, ResultsState> {
     on<FetchSummaryEvent>(_onFetchSummary);
     on<FetchQuestionStatsEvent>(_onFetchQuestionStats);
     on<FetchCommentsEvent>(_onFetchComments);
+    on<ResultsLiveUpdatesStartedEvent>(_onLiveUpdatesStarted);
+    on<ResultsLiveUpdatesStoppedEvent>(_onLiveUpdatesStopped);
+    on<ResultsResponsesChangedEvent>(_onResponsesChanged);
   }
 
   final ResponseUseCase _responseUseCase;
   final UserUseCase _userUseCase;
+  StreamSubscription<void>? _liveUpdatesSubscription;
+  String? _liveUpdatesSurveyId;
 
   Future<void> _onTabChanged(
     TabChangedEvent event,
@@ -179,5 +186,59 @@ class ResultsBloc extends Bloc<ResultsEvent, ResultsState> {
         ),
       );
     }
+  }
+
+  Future<void> _onLiveUpdatesStarted(
+    ResultsLiveUpdatesStartedEvent event,
+    Emitter<ResultsState> emit,
+  ) async {
+    if (_liveUpdatesSurveyId == event.surveyId &&
+        _liveUpdatesSubscription != null) {
+      return;
+    }
+
+    await _liveUpdatesSubscription?.cancel();
+    await _responseUseCase.stopWatchingSurveyResults();
+
+    _liveUpdatesSurveyId = event.surveyId;
+    _liveUpdatesSubscription = _responseUseCase
+        .watchSurveyResults(surveyId: event.surveyId)
+        .listen((_) {
+          add(ResultsResponsesChangedEvent(event.surveyId));
+        });
+  }
+
+  Future<void> _onLiveUpdatesStopped(
+    ResultsLiveUpdatesStoppedEvent event,
+    Emitter<ResultsState> emit,
+  ) async {
+    await _liveUpdatesSubscription?.cancel();
+    _liveUpdatesSubscription = null;
+    _liveUpdatesSurveyId = null;
+    await _responseUseCase.stopWatchingSurveyResults();
+  }
+
+  Future<void> _onResponsesChanged(
+    ResultsResponsesChangedEvent event,
+    Emitter<ResultsState> emit,
+  ) async {
+    add(FetchSummaryEvent(event.surveyId));
+    add(FetchQuestionStatsEvent(event.surveyId));
+    add(
+      FetchCommentsEvent(
+        event.surveyId,
+        searchTerm: state.searchTerm,
+        page: state.currentPage,
+        questionId: state.selectedQuestionId,
+      ),
+    );
+  }
+
+  @override
+  Future<void> close() async {
+    await _liveUpdatesSubscription?.cancel();
+    _liveUpdatesSubscription = null;
+    await _responseUseCase.stopWatchingSurveyResults();
+    return super.close();
   }
 }

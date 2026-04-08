@@ -80,4 +80,14 @@ class ResponseUseCase {
       token: token,
     );
   }
+
+  /// Starts or returns a live stream for survey result changes.
+  Stream<void> watchSurveyResults({required String surveyId}) {
+    return _responseRepository.watchSurveyResults(surveyId: surveyId);
+  }
+
+  /// Stops any active live results stream resources.
+  Future<void> stopWatchingSurveyResults() {
+    return _responseRepository.stopWatchingSurveyResults();
+  }
 }

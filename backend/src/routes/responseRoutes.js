@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { sequelize } = require('../db')
+const responseEvents = require('../events/responseEvents');
 
 const { Response, AnswerChoice, AnswerText } = require('../models');
 const { validateToken } = require('../utils/tokenValidation');
+
+const { streamResults, createResponse} = require('../controllers/resultsController');
 
 const { Parser } = require('json2csv');
 
@@ -87,6 +90,12 @@ router.post(
       );
 
       await transaction.commit();
+
+      responseEvents.emit('response_created', {
+        type: 'response_created',
+        surveyId: invitation.survey_id,
+        responseId: response.id,
+      });
 
       res.status(201).json({
         message: 'Response submitted successfully',
@@ -393,5 +402,11 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
     res.status(500).json({ error: 'Failed to export CSV' });
   }
 });
+
+/// LISTEN to changes
+router.get('/surveys/:id/results/stream', streamResults);
+
+/// TRIGGER changes
+router.post('/surveys/:id/results', createResponse);
 
 module.exports = router;
