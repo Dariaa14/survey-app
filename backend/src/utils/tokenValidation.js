@@ -6,8 +6,6 @@ async function _validateToken(slug, rawToken) {
 
     const hash = hashToken(rawToken);
 
-    console.log(`Validating token for survey slug: ${slug}, raw token: ${rawToken}, hash: ${hash}`);
-
     const invitation = await Invitation.findOne({
         where: { token_hash: hash },
         include: {
@@ -23,8 +21,6 @@ async function _validateToken(slug, rawToken) {
             });
         }
 
-    console.log(`Found invitation: ${invitation ? 'Yes' : 'No'}`);
-
     if (!invitation) return { valid: false, reason: 'INVALID' };
     if (invitation.survey.status === 'closed') return { valid: false, reason: 'CLOSED' };
     if (invitation.submitted_at) return { valid: false, reason: 'ALREADY_SUBMITTED' };
@@ -38,8 +34,6 @@ async function validateToken(req, res, next) {
         const token = req.query.t; 
 
         const result = await _validateToken(slug, token);
-
-        console.log('Token validation result:', result);
 
         if (!result.valid) {
             return res.status(400).json({ error: result.reason });

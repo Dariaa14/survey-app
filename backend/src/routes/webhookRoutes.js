@@ -37,7 +37,6 @@ router.post('/ses', express.text({type: '*/*'}), async (req, res) => {
             if (event.eventType === 'Bounce') {
                 const bouncedEmails = event.bounce.bouncedRecipients.map(r => r.emailAddress);
 
-                console.log('Bounced emails:', bouncedEmails);
                 for (const email of bouncedEmails) {
                     const invite = await Invitation.findOne({
                         include: [{

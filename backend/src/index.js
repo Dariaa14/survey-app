@@ -41,28 +41,15 @@ const models = require('./models');
 const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
-    try {
-        await sequelize.authenticate();
-        console.log('Database connected');
-
-        await sequelize.sync({ alter: true });
-        console.log('All models synced');
-
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
-        });
-
-        setInterval(() => console.log('Server still running...'), 30000);
-
-    } catch (err) {
-        console.error('Failed to start server:', err);
-    }
+  try {
+    await sequelize.authenticate();
+    app.listen(PORT, () => {});
+  } catch (err) {
+    console.error('Failed to start server:', err);
+  }
 };
 
 startServer();
-
-const bcrypt = require('bcrypt');
-bcrypt.hash('admin', 10).then(hash => console.log('Admin password hash:', hash));
 
 // Global error handlers
 process.on('uncaughtException', (err) => {

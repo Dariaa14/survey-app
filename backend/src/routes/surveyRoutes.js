@@ -43,7 +43,6 @@ router.post('/', verifyAuthToken, requireAdmin, async (req, res) => {
 
         res.status(201).json(survey);
     } catch (err) {
-        console.log(err);
         console.error(err);
         res.status(500).json({ error: 'Failed to create survey' });
     }
@@ -97,11 +96,8 @@ router.get('/user/:ownerId', verifyAuthToken, requireAdmin, async (req, res) => 
             ]
         });
 
-        console.log(`Fetched ${surveys.length} surveys for user ${ownerId} with status filter: ${status || 'none'}`);
-
         res.json(surveys);
     } catch (err) {
-        console.log(err);
         console.error('Error fetching surveys:', err.stack);
         res.status(500).json({ error: 'Failed to fetch surveys for user', err });
     }
@@ -326,7 +322,6 @@ router.put('/:id/questions/:qid', verifyAuthToken, requireAdmin, async (req, res
         res.json(updatedQuestion);
 
     } catch (err) {
-        console.log(err);
         await t.rollback();
         console.error(err);
         res.status(500).json({ error: 'Failed to update question: ', message: err.message });
