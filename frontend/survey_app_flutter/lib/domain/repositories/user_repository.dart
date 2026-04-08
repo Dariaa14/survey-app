@@ -9,7 +9,7 @@ abstract class UserRepository {
   Future<UserEntity> getUserById(String userId);
 
   /// Creates a new user in the data source.
-  Future<UserEntity> createUser(UserEntity user);
+  Future<UserEntity> createUser(String email, String password);
 
   /// Authenticates a user with their email and password.
   Future<bool> login(String email, String password);

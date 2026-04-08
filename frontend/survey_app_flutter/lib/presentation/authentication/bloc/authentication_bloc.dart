@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
 import 'package:survey_app_flutter/presentation/authentication/bloc/authentication_event.dart';
 import 'package:survey_app_flutter/presentation/authentication/bloc/authentication_state.dart';
+import 'package:survey_app_flutter/utils/app_strings.dart';
 
 /// Bloc for managing authentication state and events.
 class AuthenticationBloc
@@ -21,8 +22,10 @@ class AuthenticationBloc
     on<AuthenticationEmailChanged>(_onEmailChanged);
     on<AuthenticationPasswordChanged>(_onPasswordChanged);
     on<AuthenticationLoginSubmitted>(_onLoginSubmitted);
+    on<AuthenticationRegistrationSubmitted>(_onRegistrationSubmitted);
     on<AuthenticationLogoutRequested>(_onLogoutRequested);
     on<AuthenticationErrorCleared>(_onErrorCleared);
+    on<AuthenticationRegistrationCleared>(_onRegistrationCleared);
   }
 
   Future<void> _onStarted(
@@ -46,8 +49,7 @@ class AuthenticationBloc
                 .copyWith(
                   status: AuthenticationStatus.unauthenticated,
                   token: '',
-                  logoutMessage:
-                      'Your session expired. Please authenticate again.',
+                  logoutMessage: AppStrings.authSessionExpired,
                 )
                 .copyWithNull(nullErrorMessage: true),
           );
@@ -90,14 +92,19 @@ class AuthenticationBloc
     AuthenticationEmailChanged event,
     Emitter<AuthenticationState> emit,
   ) {
-    emit(state.copyWith(email: event.email));
+    emit(state.copyWith(email: event.email, registrationCompleted: false));
   }
 
   void _onPasswordChanged(
     AuthenticationPasswordChanged event,
     Emitter<AuthenticationState> emit,
   ) {
-    emit(state.copyWith(password: event.password));
+    emit(
+      state.copyWith(
+        password: event.password,
+        registrationCompleted: false,
+      ),
+    );
   }
 
   Future<void> _onLoginSubmitted(
@@ -108,7 +115,7 @@ class AuthenticationBloc
       emit(
         state.copyWith(
           status: AuthenticationStatus.unauthenticated,
-          errorMessage: 'Email and password are required.',
+          errorMessage: AppStrings.authEmailPasswordRequired,
         ),
       );
       return;
@@ -131,7 +138,7 @@ class AuthenticationBloc
           state.copyWith(
             status: AuthenticationStatus.unauthenticated,
             token: '',
-            errorMessage: 'Invalid email or password.',
+            errorMessage: AppStrings.authInvalidCredentials,
           ),
         );
         return;
@@ -141,7 +148,7 @@ class AuthenticationBloc
         state.copyWith(
           status: AuthenticationStatus.unauthenticated,
           token: '',
-          errorMessage: 'Login step failed: $e',
+          errorMessage: AppStrings.authLoginStepFailed(e.toString()),
         ),
       );
       return;
@@ -198,10 +205,56 @@ class AuthenticationBloc
             token: '',
             password: '',
             isAdmin: false,
-            logoutMessage: event.reason ?? 'You have been logged out.',
+            logoutMessage: event.reason ?? AppStrings.authLoggedOut,
           )
           .copyWithNull(nullErrorMessage: true),
     );
+  }
+
+  Future<void> _onRegistrationSubmitted(
+    AuthenticationRegistrationSubmitted event,
+    Emitter<AuthenticationState> emit,
+  ) async {
+    if (state.email.trim().isEmpty || state.password.isEmpty) {
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.unauthenticated,
+          errorMessage: AppStrings.authEmailPasswordRequired,
+          registrationCompleted: false,
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state
+          .copyWith(
+            status: AuthenticationStatus.loading,
+            registrationCompleted: false,
+          )
+          .copyWithNull(nullErrorMessage: true, nullLogoutMessage: true),
+    );
+
+    try {
+      await _userUseCase.createUser(state.email.trim(), state.password);
+      emit(
+        state
+            .copyWith(
+              status: AuthenticationStatus.unauthenticated,
+              password: '',
+              registrationCompleted: true,
+            )
+            .copyWithNull(nullErrorMessage: true),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.unauthenticated,
+          registrationCompleted: false,
+          errorMessage: AppStrings.authRegistrationFailed(e.toString()),
+        ),
+      );
+    }
   }
 
   void _onErrorCleared(
@@ -209,6 +262,13 @@ class AuthenticationBloc
     Emitter<AuthenticationState> emit,
   ) {
     emit(state.copyWithNull(nullErrorMessage: true));
+  }
+
+  void _onRegistrationCleared(
+    AuthenticationRegistrationCleared event,
+    Emitter<AuthenticationState> emit,
+  ) {
+    emit(state.copyWith(registrationCompleted: false));
   }
 
   DateTime? _extractTokenExpiry(String token) {
@@ -257,7 +317,7 @@ class AuthenticationBloc
     if (remaining <= Duration.zero) {
       add(
         const AuthenticationLogoutRequested(
-          reason: 'Your session expired. Please authenticate again.',
+          reason: AppStrings.authSessionExpired,
         ),
       );
       return;
@@ -266,7 +326,7 @@ class AuthenticationBloc
     _tokenExpiryTimer = Timer(remaining, () {
       add(
         const AuthenticationLogoutRequested(
-          reason: 'Your session expired. Please authenticate again.',
+          reason: AppStrings.authSessionExpired,
         ),
       );
     });

@@ -82,13 +82,17 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<UserEntity> createUser(UserEntity user) async {
+  Future<UserEntity> createUser(String email, String password) async {
     try {
       final response = await http
           .post(
             Uri.parse(baseUsersUrl),
             headers: {'Content-Type': 'application/json'},
-            body: jsonEncode((user as UserEntityImpl).toJson()),
+            body: jsonEncode({
+              'email': email,
+              'password': password,
+              'type': 'admin',
+            }),
           )
           .timeout(const Duration(seconds: 15));
 

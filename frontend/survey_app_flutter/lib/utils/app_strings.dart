@@ -19,6 +19,47 @@ class AppStrings {
   /// The text for the sign up button.
   static const String noAccountButton = "Nu ai cont? Înregistrează-te";
 
+  /// The title of the registration page.
+  static const String registrationTitle = "Creați un cont nou";
+
+  /// Snackbar message shown after successful registration.
+  static const String registrationSuccessMessage =
+      "Înregistrarea a fost finalizată cu succes.";
+
+  /// Button text to return from registration to authentication page.
+  static const String registrationBackButton = "Înapoi la autentificare";
+
+  /// Button text for registration action.
+  static const String registrationButton = "Înregistrare";
+
+  /// Button text shown while registration request is in progress.
+  static const String registrationLoadingButton = "Încărcare...";
+
+  /// Generic fallback shown for authentication errors.
+  static const String authFallbackError = "Autentificarea a eșuat.";
+
+  /// Validation message when email or password are missing.
+  static const String authEmailPasswordRequired =
+      "Email și parolă sunt obligatorii.";
+
+  /// Message shown when provided login credentials are invalid.
+  static const String authInvalidCredentials = "Email sau parolă invalidă.";
+
+  /// Message shown when the user is logged out manually.
+  static const String authLoggedOut = "Te-ai deconectat.";
+
+  /// Message shown when JWT/session has expired.
+  static const String authSessionExpired =
+      "Sesiunea a expirat. Te rugăm să te autentifici din nou.";
+
+  /// Formats login-step failures with backend or runtime details.
+  static String authLoginStepFailed(String details) =>
+      "Pasul de autentificare a eșuat: $details";
+
+  /// Formats registration failures with backend or runtime details.
+  static String authRegistrationFailed(String details) =>
+      "Înregistrarea a eșuat: $details";
+
   // Admin surveys list page:
   /// The title of the admin surveys list page.
   static const String adminSurveysTitle = "Sondaje";

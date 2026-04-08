@@ -38,6 +38,9 @@ class AuthenticationState extends Equatable {
   /// Indicates whether the currently authenticated user has admin privileges.
   final bool isAdmin;
 
+  /// Indicates if registration just completed successfully.
+  final bool registrationCompleted;
+
   /// Constructs an [AuthenticationState] with the given [status] and optional [errorMessage].
   const AuthenticationState({
     this.status = AuthenticationStatus.initial,
@@ -47,6 +50,7 @@ class AuthenticationState extends Equatable {
     this.password = '',
     this.token = '',
     this.isAdmin = false,
+    this.registrationCompleted = false,
   });
 
   /// Creates a copy of the current state with updated fields.
@@ -58,6 +62,7 @@ class AuthenticationState extends Equatable {
     String? errorMessage,
     String? logoutMessage,
     bool? isAdmin,
+    bool? registrationCompleted,
   }) {
     return AuthenticationState(
       status: status ?? this.status,
@@ -67,6 +72,8 @@ class AuthenticationState extends Equatable {
       errorMessage: errorMessage ?? this.errorMessage,
       logoutMessage: logoutMessage ?? this.logoutMessage,
       isAdmin: isAdmin ?? this.isAdmin,
+      registrationCompleted:
+          registrationCompleted ?? this.registrationCompleted,
     );
   }
 
@@ -82,6 +89,7 @@ class AuthenticationState extends Equatable {
     errorMessage: nullErrorMessage ? null : errorMessage,
     logoutMessage: nullLogoutMessage ? null : logoutMessage,
     isAdmin: isAdmin,
+    registrationCompleted: registrationCompleted,
   );
 
   @override
@@ -93,5 +101,6 @@ class AuthenticationState extends Equatable {
     errorMessage,
     logoutMessage,
     isAdmin,
+    registrationCompleted,
   ];
 }

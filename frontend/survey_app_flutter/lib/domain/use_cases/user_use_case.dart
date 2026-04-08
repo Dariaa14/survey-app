@@ -19,8 +19,8 @@ class UserUseCase {
   }
 
   /// Creates a new user.
-  Future<UserEntity> createUser(UserEntity user) async {
-    return _userRepository.createUser(user);
+  Future<UserEntity> createUser(String email, String password) async {
+    return _userRepository.createUser(email, password);
   }
 
   /// Authenticates a user with their email and password.

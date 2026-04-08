@@ -3,6 +3,7 @@ import 'package:survey_app_flutter/domain/entities/email_list_entity.dart';
 import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/presentation/admin/admin_main_page.dart';
 import 'package:survey_app_flutter/presentation/authentication/authentication_page.dart';
+import 'package:survey_app_flutter/presentation/authentication/registration_page.dart';
 import 'package:survey_app_flutter/presentation/email_list/email_list_page.dart';
 import 'package:survey_app_flutter/presentation/invitations/survey_invitations_page.dart';
 import 'package:survey_app_flutter/presentation/public/survey_formular_page.dart';
@@ -16,6 +17,9 @@ abstract final class AppRoutes {
 
   /// The admin surveys list page path.
   static const String adminSurveys = '/admin/surveys';
+
+  /// The registration page path.
+  static const String registration = '/registration';
 
   /// The survey builder create page path.
   static const String adminSurveyCreate = '/admin/surveys/new';
@@ -74,6 +78,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.authentication,
       builder: (context, state) => const AuthenticationPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.registration,
+      builder: (context, state) => const RegistrationPage(),
     ),
     GoRoute(
       path: AppRoutes.adminSurveys,

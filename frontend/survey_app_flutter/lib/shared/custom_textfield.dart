@@ -9,6 +9,7 @@ class CustomTextfield extends StatefulWidget {
     this.controller,
     this.onChanged,
     this.readOnly = false,
+    this.obscureText = false,
     this.textColor,
     this.minLines,
     this.maxLines = 1,
@@ -26,6 +27,9 @@ class CustomTextfield extends StatefulWidget {
 
   /// Whether the text field can only be read.
   final bool readOnly;
+
+  /// Whether to hide the entered text (useful for passwords).
+  final bool obscureText;
 
   /// Optional text color for the input content.
   final Color? textColor;
@@ -70,6 +74,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
       controller: widget.controller,
       onChanged: widget.readOnly ? null : widget.onChanged,
       readOnly: widget.readOnly,
+      obscureText: widget.obscureText,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       scrollController: _scrollController,

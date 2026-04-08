@@ -36,6 +36,12 @@ class AuthenticationLoginSubmitted extends AuthenticationEvent {
   const AuthenticationLoginSubmitted();
 }
 
+/// Triggered when user submits registration credentials.
+class AuthenticationRegistrationSubmitted extends AuthenticationEvent {
+  /// Creates [AuthenticationRegistrationSubmitted].
+  const AuthenticationRegistrationSubmitted();
+}
+
 /// Triggered when user logs out.
 class AuthenticationLogoutRequested extends AuthenticationEvent {
   /// Creates [AuthenticationLogoutRequested].
@@ -49,4 +55,10 @@ class AuthenticationLogoutRequested extends AuthenticationEvent {
 class AuthenticationErrorCleared extends AuthenticationEvent {
   /// Creates [AuthenticationErrorCleared].
   const AuthenticationErrorCleared();
+}
+
+/// Triggered to clear registration success state.
+class AuthenticationRegistrationCleared extends AuthenticationEvent {
+  /// Creates [AuthenticationRegistrationCleared].
+  const AuthenticationRegistrationCleared();
 }
