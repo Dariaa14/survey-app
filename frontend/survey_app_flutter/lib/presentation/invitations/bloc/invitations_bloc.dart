@@ -2,8 +2,10 @@ import 'package:bloc/bloc.dart';
 import 'package:survey_app_flutter/domain/entities/invitation_entity.dart';
 import 'package:survey_app_flutter/domain/use_cases/survey_use_case.dart';
 import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
+import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
 import 'package:survey_app_flutter/presentation/invitations/bloc/invitations_event.dart';
 import 'package:survey_app_flutter/presentation/invitations/bloc/invitations_state.dart';
+import 'package:survey_app_flutter/utils/app_blocs.dart';
 
 /// Bloc for managing the state of the invitations page.
 class InvitationsBloc extends Bloc<InvitationsEvent, InvitationsState> {
@@ -145,6 +147,8 @@ class InvitationsBloc extends Bloc<InvitationsEvent, InvitationsState> {
               nullIsSendingInvitations: true,
             ),
       );
+
+      AppBlocs.adminBloc.add(const AdminSurveysRefreshed());
     } finally {
       emit(state.copyWith(isSendingInvitations: false));
     }

@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
+import 'package:survey_app_flutter/domain/entities/survey_entity.dart';
 import 'package:survey_app_flutter/domain/use_cases/email_list_use_case.dart';
+import 'package:survey_app_flutter/domain/use_cases/response_use_case.dart';
 import 'package:survey_app_flutter/domain/use_cases/survey_use_case.dart';
 import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
@@ -8,15 +12,21 @@ import 'package:survey_app_flutter/presentation/admin/bloc/admin_state.dart';
 /// Bloc for managing admin-related state and events.
 class AdminBloc extends Bloc<AdminEvent, AdminState> {
   final EmailListUseCase _emailListUseCase;
+  final ResponseUseCase _responseUseCase;
   final SurveyUseCase _surveyUseCase;
   final UserUseCase _userUseCase;
+  final Map<String, StreamSubscription<void>> _liveSurveySubscriptions = {};
+  Timer? _liveRefreshDebounce;
+  bool _isLiveUpdatesEnabled = false;
 
   /// Constructs an [AdminBloc] with the initial state of [AdminState].
   AdminBloc({
     required EmailListUseCase emailListUseCase,
+    required ResponseUseCase responseUseCase,
     required SurveyUseCase surveyUseCase,
     required UserUseCase userUseCase,
   }) : _emailListUseCase = emailListUseCase,
+       _responseUseCase = responseUseCase,
        _surveyUseCase = surveyUseCase,
        _userUseCase = userUseCase,
        super(const AdminState()) {
@@ -33,6 +43,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<AdminSurveyFilterChanged>(_onSurveyFilterChanged);
     on<AdminSurveyPublishRequested>(_onSurveyPublishRequested);
     on<AdminSurveyCloseRequested>(_onSurveyCloseRequested);
+    on<AdminLiveUpdatesStarted>(_onLiveUpdatesStarted);
+    on<AdminLiveUpdatesStopped>(_onLiveUpdatesStopped);
   }
 
   void _onMainTabChanged(
@@ -118,6 +130,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
             )
             .copyWithNull(nullErrorMessage: true),
       );
+
+      await _syncLiveSurveySubscriptions(surveys);
     } catch (e) {
       emit(
         state.copyWith(
@@ -172,6 +186,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
             )
             .copyWithNull(nullErrorMessage: true),
       );
+
+      await _syncLiveSurveySubscriptions(surveys);
     } catch (e) {
       emit(
         state.copyWith(
@@ -512,5 +528,72 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         ),
       );
     }
+  }
+
+  Future<void> _onLiveUpdatesStarted(
+    AdminLiveUpdatesStarted event,
+    Emitter<AdminState> emit,
+  ) async {
+    _isLiveUpdatesEnabled = true;
+    await _syncLiveSurveySubscriptions(state.surveys);
+  }
+
+  Future<void> _onLiveUpdatesStopped(
+    AdminLiveUpdatesStopped event,
+    Emitter<AdminState> emit,
+  ) async {
+    _isLiveUpdatesEnabled = false;
+    await _clearLiveSurveySubscriptions();
+  }
+
+  Future<void> _syncLiveSurveySubscriptions(List<SurveyEntity> surveys) async {
+    final surveyIds = surveys.map((survey) => survey.id).toSet();
+
+    final removedIds = _liveSurveySubscriptions.keys
+        .where((id) => !surveyIds.contains(id))
+        .toList();
+
+    for (final id in removedIds) {
+      await _liveSurveySubscriptions[id]?.cancel();
+      _liveSurveySubscriptions.remove(id);
+      await _responseUseCase.stopWatchingSurveyResults(surveyId: id);
+    }
+
+    if (!_isLiveUpdatesEnabled) {
+      return;
+    }
+
+    for (final id in surveyIds) {
+      if (_liveSurveySubscriptions.containsKey(id)) {
+        continue;
+      }
+
+      _liveSurveySubscriptions[id] = _responseUseCase
+          .watchSurveyResults(surveyId: id)
+          .listen((_) {
+            _liveRefreshDebounce?.cancel();
+            _liveRefreshDebounce = Timer(const Duration(milliseconds: 350), () {
+              add(const AdminSurveysRefreshed());
+            });
+          });
+    }
+  }
+
+  Future<void> _clearLiveSurveySubscriptions() async {
+    _liveRefreshDebounce?.cancel();
+    _liveRefreshDebounce = null;
+
+    final ids = _liveSurveySubscriptions.keys.toList();
+    for (final id in ids) {
+      await _liveSurveySubscriptions[id]?.cancel();
+      _liveSurveySubscriptions.remove(id);
+      await _responseUseCase.stopWatchingSurveyResults(surveyId: id);
+    }
+  }
+
+  @override
+  Future<void> close() async {
+    await _clearLiveSurveySubscriptions();
+    return super.close();
   }
 }

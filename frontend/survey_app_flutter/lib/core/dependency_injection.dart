@@ -61,6 +61,7 @@ void _loadBlocs() {
   getIt.registerLazySingleton<AdminBloc>(
     () => AdminBloc(
       emailListUseCase: getIt.get<EmailListUseCase>(),
+      responseUseCase: getIt.get<ResponseUseCase>(),
       surveyUseCase: getIt.get<SurveyUseCase>(),
       userUseCase: getIt.get<UserUseCase>(),
     ),

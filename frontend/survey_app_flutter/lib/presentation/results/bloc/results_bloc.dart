@@ -198,7 +198,11 @@ class ResultsBloc extends Bloc<ResultsEvent, ResultsState> {
     }
 
     await _liveUpdatesSubscription?.cancel();
-    await _responseUseCase.stopWatchingSurveyResults();
+    if (_liveUpdatesSurveyId != null) {
+      await _responseUseCase.stopWatchingSurveyResults(
+        surveyId: _liveUpdatesSurveyId,
+      );
+    }
 
     _liveUpdatesSurveyId = event.surveyId;
     _liveUpdatesSubscription = _responseUseCase
@@ -214,8 +218,11 @@ class ResultsBloc extends Bloc<ResultsEvent, ResultsState> {
   ) async {
     await _liveUpdatesSubscription?.cancel();
     _liveUpdatesSubscription = null;
+    final surveyId = _liveUpdatesSurveyId;
     _liveUpdatesSurveyId = null;
-    await _responseUseCase.stopWatchingSurveyResults();
+    if (surveyId != null) {
+      await _responseUseCase.stopWatchingSurveyResults(surveyId: surveyId);
+    }
   }
 
   Future<void> _onResponsesChanged(
@@ -237,8 +244,12 @@ class ResultsBloc extends Bloc<ResultsEvent, ResultsState> {
   @override
   Future<void> close() async {
     await _liveUpdatesSubscription?.cancel();
+    final surveyId = _liveUpdatesSurveyId;
     _liveUpdatesSubscription = null;
-    await _responseUseCase.stopWatchingSurveyResults();
+    _liveUpdatesSurveyId = null;
+    if (surveyId != null) {
+      await _responseUseCase.stopWatchingSurveyResults(surveyId: surveyId);
+    }
     return super.close();
   }
 }

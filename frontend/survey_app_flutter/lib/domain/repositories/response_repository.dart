@@ -48,6 +48,9 @@ abstract class ResponseRepository {
   /// Starts or returns a live stream for survey result changes.
   Stream<void> watchSurveyResults({required String surveyId});
 
-  /// Stops any active live results stream resources.
-  Future<void> stopWatchingSurveyResults();
+  /// Stops live results stream resources.
+  ///
+  /// If [surveyId] is provided, only that survey stream is stopped.
+  /// If omitted, all survey streams are stopped.
+  Future<void> stopWatchingSurveyResults({String? surveyId});
 }

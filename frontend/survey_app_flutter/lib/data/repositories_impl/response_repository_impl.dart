@@ -15,8 +15,7 @@ class ResponseRepositoryImpl implements ResponseRepository {
   /// Base URL for the API.
   final String baseUrl = 'http://localhost:3000/api';
 
-  ResultsLiveUpdatesClient? _liveUpdatesClient;
-  String? _activeSurveyId;
+  final Map<String, ResultsLiveUpdatesClient> _liveUpdatesClients = {};
 
   Map<String, String> _buildHeaders({String? token, bool csv = false}) {
     return <String, String>{
@@ -163,23 +162,32 @@ class ResponseRepositoryImpl implements ResponseRepository {
 
   @override
   Stream<void> watchSurveyResults({required String surveyId}) {
-    if (_activeSurveyId != surveyId || _liveUpdatesClient == null) {
-      _liveUpdatesClient?.dispose();
-      _activeSurveyId = surveyId;
-      _liveUpdatesClient = createResultsLiveUpdatesClient(
-        baseUrl: baseUrl,
-        surveyId: surveyId,
-      );
-      _liveUpdatesClient?.connect();
+    final existingClient = _liveUpdatesClients[surveyId];
+    if (existingClient != null) {
+      return existingClient.updates;
     }
 
-    return _liveUpdatesClient?.updates ?? const Stream<void>.empty();
+    final client = createResultsLiveUpdatesClient(
+      baseUrl: baseUrl,
+      surveyId: surveyId,
+    );
+    client.connect();
+    _liveUpdatesClients[surveyId] = client;
+
+    return client.updates;
   }
 
   @override
-  Future<void> stopWatchingSurveyResults() async {
-    _liveUpdatesClient?.dispose();
-    _liveUpdatesClient = null;
-    _activeSurveyId = null;
+  Future<void> stopWatchingSurveyResults({String? surveyId}) async {
+    if (surveyId != null) {
+      final client = _liveUpdatesClients.remove(surveyId);
+      client?.dispose();
+      return;
+    }
+
+    for (final client in _liveUpdatesClients.values) {
+      client.dispose();
+    }
+    _liveUpdatesClients.clear();
   }
 }

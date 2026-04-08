@@ -24,6 +24,13 @@ class _AdminMainPageState extends State<AdminMainPage> {
   void initState() {
     super.initState();
     AppBlocs.adminBloc.add(const AdminAccountRequested());
+    AppBlocs.adminBloc.add(const AdminLiveUpdatesStarted());
+  }
+
+  @override
+  void dispose() {
+    AppBlocs.adminBloc.add(const AdminLiveUpdatesStopped());
+    super.dispose();
   }
 
   @override

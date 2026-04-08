@@ -86,8 +86,8 @@ class ResponseUseCase {
     return _responseRepository.watchSurveyResults(surveyId: surveyId);
   }
 
-  /// Stops any active live results stream resources.
-  Future<void> stopWatchingSurveyResults() {
-    return _responseRepository.stopWatchingSurveyResults();
+  /// Stops live results stream resources.
+  Future<void> stopWatchingSurveyResults({String? surveyId}) {
+    return _responseRepository.stopWatchingSurveyResults(surveyId: surveyId);
   }
 }

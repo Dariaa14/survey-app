@@ -4,6 +4,7 @@ const { Op } = require('sequelize');
 
 const pLimit = require('p-limit').default;
 const sendEmail = require('../services/emailService').sendEmail;
+const responseEvents = require('../events/responseEvents');
 
 const {
     Invitation,
@@ -113,6 +114,14 @@ router.post('/:id/invitations/send', verifyAuthToken, requireAdmin, async (req, 
                 })
             )
         );
+
+        if (toInsert.length > 0) {
+            responseEvents.emit('invitation_created', {
+                type: 'invitation_created',
+                surveyId: id,
+                inserted: toInsert.length,
+            });
+        }
 
         res.status(201).json({
             inserted: toInsert.length,

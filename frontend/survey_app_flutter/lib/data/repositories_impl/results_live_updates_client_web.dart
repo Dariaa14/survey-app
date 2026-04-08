@@ -30,7 +30,8 @@ class _WebResultsLiveUpdatesClient implements ResultsLiveUpdatesClient {
         }
 
         final payload = jsonDecode(rawData.toString()) as Map<String, dynamic>;
-        if (payload['type'] == 'response_created') {
+        if (payload['type'] == 'response_created' ||
+            payload['type'] == 'invitation_created') {
           _controller.add(null);
         }
       } catch (_) {

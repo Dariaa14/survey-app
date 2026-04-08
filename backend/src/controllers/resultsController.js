@@ -93,9 +93,11 @@ function streamResults(req, res) {
   };
 
   responseEvents.on('response_created', handler);
+  responseEvents.on('invitation_created', handler);
 
   req.on('close', () => {
     responseEvents.off('response_created', handler);
+  responseEvents.off('invitation_created', handler);
 
     const clients = surveyClients.get(surveyId);
     if (clients) {

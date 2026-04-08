@@ -110,3 +110,15 @@ class AdminSurveyCloseRequested extends AdminEvent {
   /// Creates [AdminSurveyCloseRequested].
   const AdminSurveyCloseRequested(this.surveyId);
 }
+
+/// Triggered to start live survey metric updates.
+class AdminLiveUpdatesStarted extends AdminEvent {
+  /// Creates [AdminLiveUpdatesStarted].
+  const AdminLiveUpdatesStarted();
+}
+
+/// Triggered to stop live survey metric updates.
+class AdminLiveUpdatesStopped extends AdminEvent {
+  /// Creates [AdminLiveUpdatesStopped].
+  const AdminLiveUpdatesStopped();
+}

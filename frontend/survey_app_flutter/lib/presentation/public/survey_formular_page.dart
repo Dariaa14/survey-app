@@ -137,6 +137,9 @@ class SurveyFormularPage extends StatelessWidget {
           return const InvalidSurveyPage();
         }
 
+        final questions = [...survey.questions]
+          ..sort((left, right) => left.order.compareTo(right.order));
+
         return Scaffold(
           body: Center(
             child: Padding(
@@ -169,9 +172,9 @@ class SurveyFormularPage extends StatelessWidget {
 
                         Column(
                           children: List.generate(
-                            survey.questions.length,
+                            questions.length,
                             (index) {
-                              final question = survey.questions[index];
+                              final question = questions[index];
 
                               if (question.type ==
                                   QuestionType.multipleChoice) {
