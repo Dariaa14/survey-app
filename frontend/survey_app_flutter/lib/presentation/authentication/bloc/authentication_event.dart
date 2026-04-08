@@ -39,7 +39,10 @@ class AuthenticationLoginSubmitted extends AuthenticationEvent {
 /// Triggered when user logs out.
 class AuthenticationLogoutRequested extends AuthenticationEvent {
   /// Creates [AuthenticationLogoutRequested].
-  const AuthenticationLogoutRequested();
+  const AuthenticationLogoutRequested({this.reason});
+
+  /// Optional message shown to users explaining why they were logged out.
+  final String? reason;
 }
 
 /// Triggered to clear the current error message from state.

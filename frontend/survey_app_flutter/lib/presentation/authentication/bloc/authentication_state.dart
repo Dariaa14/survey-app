@@ -32,6 +32,9 @@ class AuthenticationState extends Equatable {
   /// An optional error message if authentication fails.
   final String? errorMessage;
 
+  /// Optional message explaining why the user was logged out.
+  final String? logoutMessage;
+
   /// Indicates whether the currently authenticated user has admin privileges.
   final bool isAdmin;
 
@@ -39,6 +42,7 @@ class AuthenticationState extends Equatable {
   const AuthenticationState({
     this.status = AuthenticationStatus.initial,
     this.errorMessage,
+    this.logoutMessage,
     this.email = '',
     this.password = '',
     this.token = '',
@@ -52,6 +56,7 @@ class AuthenticationState extends Equatable {
     String? password,
     String? token,
     String? errorMessage,
+    String? logoutMessage,
     bool? isAdmin,
   }) {
     return AuthenticationState(
@@ -60,20 +65,24 @@ class AuthenticationState extends Equatable {
       password: password ?? this.password,
       token: token ?? this.token,
       errorMessage: errorMessage ?? this.errorMessage,
+      logoutMessage: logoutMessage ?? this.logoutMessage,
       isAdmin: isAdmin ?? this.isAdmin,
     );
   }
 
-  /// Creates a copy of the current state with the error message set to null.
-  AuthenticationState copyWithNull({bool nullErrorMessage = false}) =>
-      AuthenticationState(
-        status: status,
-        email: email,
-        password: password,
-        token: token,
-        errorMessage: nullErrorMessage ? null : errorMessage,
-        isAdmin: isAdmin,
-      );
+  /// Creates a copy of the current state with nullable message fields set to null.
+  AuthenticationState copyWithNull({
+    bool nullErrorMessage = false,
+    bool nullLogoutMessage = false,
+  }) => AuthenticationState(
+    status: status,
+    email: email,
+    password: password,
+    token: token,
+    errorMessage: nullErrorMessage ? null : errorMessage,
+    logoutMessage: nullLogoutMessage ? null : logoutMessage,
+    isAdmin: isAdmin,
+  );
 
   @override
   List<Object?> get props => [
@@ -82,6 +91,7 @@ class AuthenticationState extends Equatable {
     password,
     token,
     errorMessage,
+    logoutMessage,
     isAdmin,
   ];
 }

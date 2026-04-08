@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:survey_app_flutter/presentation/authentication/bloc/authentication_event.dart';
 import 'package:survey_app_flutter/presentation/admin/bloc/admin_event.dart';
 import 'package:survey_app_flutter/presentation/email_list/email_list_builder/bloc/email_list_builder_event.dart';
 import 'package:survey_app_flutter/presentation/email_list/email_list_builder/email_list_builder.dart';
@@ -119,6 +120,18 @@ class AdminTopBar extends StatelessWidget {
                 variant: CustomColorVariant.primary,
               );
 
+        final Widget logoutButton = CustomButton(
+          onPressed: () {
+            AppBlocs.authenticationBloc.add(
+              const AuthenticationLogoutRequested(
+                reason: '',
+              ),
+            );
+          },
+          text: AppStrings.logoutButton,
+          variant: CustomColorVariant.gray,
+        );
+
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -135,6 +148,8 @@ class AdminTopBar extends StatelessWidget {
                     tabs,
                     const SizedBox(height: 12),
                     createButton,
+                    const SizedBox(height: 12),
+                    SizedBox(width: double.infinity, child: logoutButton),
                   ],
                 )
               : Row(
@@ -143,6 +158,8 @@ class AdminTopBar extends StatelessWidget {
                     const SizedBox(width: 24),
                     tabs,
                     const Spacer(),
+                    logoutButton,
+                    const SizedBox(width: 12),
                     createButton,
                   ],
                 ),

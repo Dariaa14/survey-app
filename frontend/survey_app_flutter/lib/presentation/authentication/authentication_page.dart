@@ -30,6 +30,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
     super.initState();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    AppBlocs.authenticationBloc.add(const AuthenticationStarted());
   }
 
   @override
@@ -47,6 +48,9 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
       child: BlocListener<AuthenticationBloc, AuthenticationState>(
         bloc: AppBlocs.authenticationBloc,
         listener: (context, state) {
+          _emailController.clear();
+          _passwordController.clear();
+
           AppBlocs.authenticationBloc
             ..add(const AuthenticationEmailChanged(''))
             ..add(const AuthenticationPasswordChanged(''));

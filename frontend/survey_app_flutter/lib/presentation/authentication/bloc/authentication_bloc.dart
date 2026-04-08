@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:survey_app_flutter/domain/use_cases/user_use_case.dart';
 import 'package:survey_app_flutter/presentation/authentication/bloc/authentication_event.dart';
@@ -7,6 +10,7 @@ import 'package:survey_app_flutter/presentation/authentication/bloc/authenticati
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   final UserUseCase _userUseCase;
+  Timer? _tokenExpiryTimer;
 
   /// Constructs an [AuthenticationBloc] with the initial state
   /// of [AuthenticationState].
@@ -28,19 +32,40 @@ class AuthenticationBloc
     emit(
       state
           .copyWith(status: AuthenticationStatus.loading)
-          .copyWithNull(nullErrorMessage: true),
+          .copyWithNull(nullErrorMessage: true, nullLogoutMessage: true),
     );
 
     try {
       final token = await _userUseCase.getAuthToken();
       if (token != null && token.isNotEmpty) {
+        final expiry = _extractTokenExpiry(token);
+        if (_isExpired(expiry)) {
+          await _userUseCase.logout();
+          emit(
+            state
+                .copyWith(
+                  status: AuthenticationStatus.unauthenticated,
+                  token: '',
+                  logoutMessage:
+                      'Your session expired. Please authenticate again.',
+                )
+                .copyWithNull(nullErrorMessage: true),
+          );
+          return;
+        }
+
+        _scheduleTokenExpiryLogout(expiry);
+
+        final isAdmin = await _userUseCase.isCurrentUserAdmin();
+
         emit(
           state
               .copyWith(
                 status: AuthenticationStatus.authenticated,
                 token: token,
+                isAdmin: isAdmin,
               )
-              .copyWithNull(nullErrorMessage: true),
+              .copyWithNull(nullErrorMessage: true, nullLogoutMessage: true),
         );
         return;
       }
@@ -48,7 +73,7 @@ class AuthenticationBloc
       emit(
         state
             .copyWith(status: AuthenticationStatus.unauthenticated, token: '')
-            .copyWithNull(nullErrorMessage: true),
+            .copyWithNull(nullErrorMessage: true, nullLogoutMessage: true),
       );
     } catch (e) {
       emit(
@@ -92,7 +117,7 @@ class AuthenticationBloc
     emit(
       state
           .copyWith(status: AuthenticationStatus.loading)
-          .copyWithNull(nullErrorMessage: true),
+          .copyWithNull(nullErrorMessage: true, nullLogoutMessage: true),
     );
 
     try {
@@ -126,6 +151,8 @@ class AuthenticationBloc
       final token = await _userUseCase.getAuthToken() ?? '';
       final isAdmin = await _userUseCase.isCurrentUserAdmin();
 
+      _scheduleTokenExpiryLogout(_extractTokenExpiry(token));
+
       emit(
         state
             .copyWith(
@@ -133,7 +160,7 @@ class AuthenticationBloc
               isAdmin: isAdmin,
               token: token,
             )
-            .copyWithNull(nullErrorMessage: true),
+            .copyWithNull(nullErrorMessage: true, nullLogoutMessage: true),
       );
     } catch (e) {
       emit(
@@ -150,10 +177,12 @@ class AuthenticationBloc
     AuthenticationLogoutRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
+    _tokenExpiryTimer?.cancel();
+
     emit(
       state
           .copyWith(status: AuthenticationStatus.loading)
-          .copyWithNull(nullErrorMessage: true),
+          .copyWithNull(nullErrorMessage: true, nullLogoutMessage: true),
     );
 
     try {
@@ -169,6 +198,7 @@ class AuthenticationBloc
             token: '',
             password: '',
             isAdmin: false,
+            logoutMessage: event.reason ?? 'You have been logged out.',
           )
           .copyWithNull(nullErrorMessage: true),
     );
@@ -179,5 +209,72 @@ class AuthenticationBloc
     Emitter<AuthenticationState> emit,
   ) {
     emit(state.copyWithNull(nullErrorMessage: true));
+  }
+
+  DateTime? _extractTokenExpiry(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) {
+        return null;
+      }
+
+      final payload = parts[1];
+      final normalizedPayload = base64Url.normalize(payload);
+      final decodedPayload = utf8.decode(base64Url.decode(normalizedPayload));
+      final payloadMap = jsonDecode(decodedPayload) as Map<String, dynamic>;
+      final exp = payloadMap['exp'];
+
+      final expSeconds = exp is int ? exp : int.tryParse(exp.toString());
+      if (expSeconds == null) {
+        return null;
+      }
+
+      return DateTime.fromMillisecondsSinceEpoch(
+        expSeconds * 1000,
+        isUtc: true,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  bool _isExpired(DateTime? expiry) {
+    if (expiry == null) {
+      return false;
+    }
+
+    return DateTime.now().toUtc().isAfter(expiry);
+  }
+
+  void _scheduleTokenExpiryLogout(DateTime? expiry) {
+    _tokenExpiryTimer?.cancel();
+
+    if (expiry == null) {
+      return;
+    }
+
+    final remaining = expiry.difference(DateTime.now().toUtc());
+    if (remaining <= Duration.zero) {
+      add(
+        const AuthenticationLogoutRequested(
+          reason: 'Your session expired. Please authenticate again.',
+        ),
+      );
+      return;
+    }
+
+    _tokenExpiryTimer = Timer(remaining, () {
+      add(
+        const AuthenticationLogoutRequested(
+          reason: 'Your session expired. Please authenticate again.',
+        ),
+      );
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _tokenExpiryTimer?.cancel();
+    return super.close();
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:survey_app_flutter/domain/entities/answer_entity.dart';
 import 'package:survey_app_flutter/data/entities_impl/answer_entity_impl.dart';
+import 'package:survey_app_flutter/domain/entities/answer_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_entity.dart';
 import 'package:survey_app_flutter/presentation/public/bloc/public_bloc.dart';
 import 'package:survey_app_flutter/presentation/public/bloc/public_event.dart';

@@ -32,6 +32,9 @@ class AppStrings {
   /// The text for the create email list button.
   static const String createEmailListButton = "+    Listă nouă";
 
+  /// The text for the logout button in admin area.
+  static const String logoutButton = "Logout";
+
   /// The title for the "My Surveys" section.
   static const String mySurveysTitle = "Sondajele mele";
 
