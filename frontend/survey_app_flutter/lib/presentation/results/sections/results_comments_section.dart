@@ -23,8 +23,6 @@ class ResultsCommentsSection extends StatelessWidget {
   /// Survey for which comments are displayed.
   final SurveyEntity survey;
 
-  static const int _itemsPerPage = 10;
-
   List<QuestionEntity> get _textQuestions {
     final seenIds = <String>{};
 
@@ -44,7 +42,7 @@ class ResultsCommentsSection extends StatelessWidget {
 
   int _totalPages(int count) {
     if (count <= 0) return 1;
-    return ((count - 1) ~/ _itemsPerPage) + 1;
+    return count;
   }
 
   List<int> _visiblePages(int currentPage, int totalPages) {
@@ -120,15 +118,10 @@ class ResultsCommentsSection extends StatelessWidget {
             ? state.selectedQuestionId?.trim()
             : null;
         final comments = state.comments;
-        final totalPages = _totalPages(comments.length);
+        final totalPages = _totalPages(state.commentsTotalPages);
         final safeCurrentPage = currentPage.clamp(1, totalPages);
         final visiblePages = _visiblePages(safeCurrentPage, totalPages);
-
-        final start = (safeCurrentPage - 1) * _itemsPerPage;
-        final end = (start + _itemsPerPage).clamp(0, comments.length);
-        final List<AnswerEntity> pageComments = start < comments.length
-            ? comments.sublist(start, end)
-            : const <AnswerEntity>[];
+        final List<AnswerEntity> pageComments = comments;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -226,7 +219,7 @@ class ResultsCommentsSection extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               AppStrings.resultsCommentsSummary(
-                comments.length,
+                state.commentsTotalCount,
                 safeCurrentPage,
                 totalPages,
               ),
@@ -323,7 +316,7 @@ class ResultsCommentsSection extends StatelessWidget {
 
                   return SizedBox(
                     height: 44,
-                    width: 56,
+                    width: 76,
                     child: CustomButton(
                       onPressed: () {
                         AppBlocs.resultsBloc.add(

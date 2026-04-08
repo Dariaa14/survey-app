@@ -77,7 +77,6 @@ router.post('/:id/invitations/send', verifyAuthToken, requireAdmin, async (req, 
                         `
                     });
 
-                    // Only push toInsert if email sent successfully
                     toInsert.push({
                         survey_id: id,
                         contact_id: c.id,
@@ -92,7 +91,6 @@ router.post('/:id/invitations/send', verifyAuthToken, requireAdmin, async (req, 
             }))
         );
 
-        // Bulk insert only successfully sent invitations
         if (toInsert.length > 0) {
             await Invitation.bulkCreate(toInsert, { ignoreDuplicates: true });
             responseEvents.emit('invitation_created', {

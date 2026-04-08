@@ -5,6 +5,7 @@ import 'package:survey_app_flutter/data/entities_impl/question_stat_entity_impl.
 import 'package:survey_app_flutter/data/entities_impl/results_summary_entity_impl.dart';
 import 'package:survey_app_flutter/data/repositories_impl/results_live_updates_client.dart';
 import 'package:survey_app_flutter/domain/entities/answer_entity.dart';
+import 'package:survey_app_flutter/domain/entities/paginated_comments_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_stat_entity.dart';
 import 'package:survey_app_flutter/domain/entities/results_summary_entity.dart';
 import 'package:survey_app_flutter/domain/repositories/response_repository.dart';
@@ -107,7 +108,7 @@ class ResponseRepositoryImpl implements ResponseRepository {
   }
 
   @override
-  Future<List<AnswerEntity>> getSurveyComments({
+  Future<PaginatedCommentsEntity> getSurveyComments({
     required String surveyId,
     String query = '',
     int page = 1,
@@ -129,13 +130,44 @@ class ResponseRepositoryImpl implements ResponseRepository {
     final response = await http.get(uri, headers: _buildHeaders(token: token));
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body) as List<dynamic>;
+      final decoded = jsonDecode(response.body);
 
-      return data.map((item) {
-        final json = Map<String, dynamic>.from(item as Map);
-        json['page'] = page;
-        return AnswerEntityImpl.fromJson(json);
-      }).toList();
+      if (decoded is Map<String, dynamic>) {
+        final resultsJson = decoded['results'] as List<dynamic>? ?? const [];
+        final responsePage = (decoded['page'] as num?)?.toInt() ?? page;
+        final totalPages = (decoded['totalPages'] as num?)?.toInt() ?? 1;
+        final totalCount = (decoded['totalCount'] as num?)?.toInt() ?? 0;
+
+        final comments = resultsJson.map((item) {
+          final json = Map<String, dynamic>.from(item as Map);
+          json['page'] = responsePage;
+          return AnswerEntityImpl.fromJson(json);
+        }).toList();
+
+        return PaginatedCommentsEntity(
+          results: comments,
+          page: responsePage,
+          totalPages: totalPages,
+          totalCount: totalCount,
+        );
+      }
+
+      if (decoded is List<dynamic>) {
+        final comments = decoded.map((item) {
+          final json = Map<String, dynamic>.from(item as Map);
+          json['page'] = page;
+          return AnswerEntityImpl.fromJson(json);
+        }).toList();
+
+        return PaginatedCommentsEntity(
+          results: comments,
+          page: page,
+          totalPages: 1,
+          totalCount: comments.length,
+        );
+      }
+
+      throw Exception('Unexpected comments payload format');
     }
 
     throw Exception('Failed to fetch comments: ${response.body}');

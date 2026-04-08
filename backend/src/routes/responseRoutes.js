@@ -189,6 +189,7 @@ router.get('/surveys/:id/results/comments', async (req, res) => {
     const limit = 10;
     const offset = (page - 1) * limit;
 
+    // Main query for page data
     const results = await sequelize.query(
       `
       SELECT
@@ -211,7 +212,7 @@ router.get('/surveys/:id/results/comments', async (req, res) => {
       {
         replacements: {
           surveyId: id,
-          questionId: question_id,
+          questionId: question_id || null,
           search: `%${q}%`,
           limit,
           offset,
@@ -220,7 +221,36 @@ router.get('/surveys/:id/results/comments', async (req, res) => {
       }
     );
 
-    res.json(results);
+    // Count total matching rows
+    const countResult = await sequelize.query(
+      `
+      SELECT COUNT(*) AS total
+      FROM answers_text at
+      JOIN responses r ON r.id = at.response_id
+      JOIN invitations i ON i.id = r.invitation_id
+      WHERE r.survey_id = :surveyId
+        ${question_id ? 'AND at.question_id = :questionId' : ''}
+        AND at.text_value ILIKE :search
+      `,
+      {
+        replacements: {
+          surveyId: id,
+          questionId: question_id || null,
+          search: `%${q}%`,
+        },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const totalCount = parseInt(countResult[0].total, 10);
+    const totalPages = Math.ceil(totalCount / limit);
+
+    res.json({
+      results,
+      page: parseInt(page),
+      totalPages,
+      totalCount,
+    });
 
   } catch (err) {
     console.error(err);
@@ -237,14 +267,12 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
     const { QueryTypes } = require('sequelize');
     const { Parser } = require('json2csv');
 
-    // ✅ Helper to clean column names
     const clean = (str) =>
       str
         .replace(/[\n\r]+/g, ' ')
         .replace(/,/g, '')
         .trim();
 
-    // ✅ 1. Get ALL responses (only submitted)
     const responses = await sequelize.query(
       `
       SELECT
@@ -263,7 +291,6 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
       }
     );
 
-    // ✅ 2. Get ALL options (defines columns)
     const allOptions = await sequelize.query(
       `
       SELECT
@@ -280,7 +307,6 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
       }
     );
 
-    // ✅ 3. Get ALL text questions (defines columns)
     const allTextQuestions = await sequelize.query(
       `
       SELECT id, title
@@ -294,7 +320,6 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
       }
     );
 
-    // ✅ 4. Get selected choices (actual answers)
     const choices = await sequelize.query(
       `
       SELECT
@@ -307,7 +332,6 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
       }
     );
 
-    // ✅ 5. Get text answers
     const texts = await sequelize.query(
       `
       SELECT
@@ -321,21 +345,19 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
       }
     );
 
-    // ✅ 6. Build column maps
 
-    const optionColumns = new Map(); // option_id -> column name
+    const optionColumns = new Map(); 
     for (const opt of allOptions) {
       const col = `${clean(opt.question_title)} - ${clean(opt.option_label)}`;
       optionColumns.set(opt.option_id, col);
     }
 
-    const textColumns = new Map(); // question_id -> column name
+    const textColumns = new Map();
     for (const q of allTextQuestions) {
       const col = clean(q.title);
       textColumns.set(q.id, col);
     }
 
-    // ✅ 7. Build response rows
     const responsesMap = new Map();
 
     for (const r of responses) {
@@ -344,12 +366,10 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
         submitted_at: r.submitted_at,
       };
 
-      // 🔥 initialize ALL option columns to 0
       for (const col of optionColumns.values()) {
         row[col] = 0;
       }
 
-      // 🔥 initialize ALL text columns to empty
       for (const col of textColumns.values()) {
         row[col] = '';
       }
@@ -357,7 +377,6 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
       responsesMap.set(r.response_id, row);
     }
 
-    // ✅ 8. Fill selected options
     for (const c of choices) {
       if (!responsesMap.has(c.response_id)) continue;
 
@@ -367,7 +386,6 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
       responsesMap.get(c.response_id)[col] = 1;
     }
 
-    // ✅ 9. Fill text answers
     for (const t of texts) {
       if (!responsesMap.has(t.response_id)) continue;
 
@@ -377,10 +395,8 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
       responsesMap.get(t.response_id)[col] = t.text_value;
     }
 
-    // ✅ 10. Final rows
     const finalRows = Array.from(responsesMap.values());
 
-    // ✅ 11. Generate CSV
     const parser = new Parser({
       fields: [
         'email',
@@ -392,7 +408,6 @@ router.get('/surveys/:id/results/export.csv', async (req, res) => {
 
     const csv = parser.parse(finalRows);
 
-    // ✅ 12. Send response
     res.header('Content-Type', 'text/csv; charset=utf-8');
     res.attachment('survey_results.csv');
     res.send(csv);

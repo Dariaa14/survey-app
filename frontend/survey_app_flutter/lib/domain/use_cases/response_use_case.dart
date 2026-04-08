@@ -1,4 +1,5 @@
 import 'package:survey_app_flutter/domain/entities/answer_entity.dart';
+import 'package:survey_app_flutter/domain/entities/paginated_comments_entity.dart';
 import 'package:survey_app_flutter/domain/entities/question_stat_entity.dart';
 import 'package:survey_app_flutter/domain/entities/results_summary_entity.dart';
 import 'package:survey_app_flutter/domain/repositories/response_repository.dart';
@@ -54,7 +55,7 @@ class ResponseUseCase {
   }
 
   /// Fetches text comments for a survey with optional search and filtering.
-  Future<List<AnswerEntity>> getSurveyComments({
+  Future<PaginatedCommentsEntity> getSurveyComments({
     required String surveyId,
     String query = '',
     int page = 1,

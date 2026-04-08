@@ -177,7 +177,15 @@ class ResultsBloc extends Bloc<ResultsEvent, ResultsState> {
         token: token,
       );
 
-      emit(state.copyWith(comments: comments, commentsLoading: false));
+      emit(
+        state.copyWith(
+          comments: comments.results,
+          currentPage: comments.page,
+          commentsTotalPages: comments.totalPages,
+          commentsTotalCount: comments.totalCount,
+          commentsLoading: false,
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(

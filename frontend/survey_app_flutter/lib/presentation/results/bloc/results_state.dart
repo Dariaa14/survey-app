@@ -20,6 +20,8 @@ class ResultsState extends Equatable {
     this.questionStatsLoading = false,
     this.questionStatsError,
     this.comments = const [],
+    this.commentsTotalPages = 1,
+    this.commentsTotalCount = 0,
     this.commentsLoading = false,
     this.commentsError,
   });
@@ -63,6 +65,12 @@ class ResultsState extends Equatable {
   /// List of comments with optional filtering and pagination.
   final List<AnswerEntity> comments;
 
+  /// Total number of pages for comments query.
+  final int commentsTotalPages;
+
+  /// Total number of matching comments for current query.
+  final int commentsTotalCount;
+
   /// Whether comments are being fetched.
   final bool commentsLoading;
 
@@ -84,6 +92,8 @@ class ResultsState extends Equatable {
     bool? questionStatsLoading,
     String? questionStatsError,
     List<AnswerEntity>? comments,
+    int? commentsTotalPages,
+    int? commentsTotalCount,
     bool? commentsLoading,
     String? commentsError,
   }) {
@@ -101,6 +111,8 @@ class ResultsState extends Equatable {
       questionStatsLoading: questionStatsLoading ?? this.questionStatsLoading,
       questionStatsError: questionStatsError ?? this.questionStatsError,
       comments: comments ?? this.comments,
+      commentsTotalPages: commentsTotalPages ?? this.commentsTotalPages,
+      commentsTotalCount: commentsTotalCount ?? this.commentsTotalCount,
       commentsLoading: commentsLoading ?? this.commentsLoading,
       commentsError: commentsError ?? this.commentsError,
     );
@@ -128,6 +140,8 @@ class ResultsState extends Equatable {
       questionStatsLoading: questionStatsLoading,
       questionStatsError: nullQuestionStatsError ? null : questionStatsError,
       comments: comments,
+      commentsTotalPages: commentsTotalPages,
+      commentsTotalCount: commentsTotalCount,
       commentsLoading: commentsLoading,
       commentsError: nullCommentsError ? null : commentsError,
     );
@@ -148,6 +162,8 @@ class ResultsState extends Equatable {
     questionStatsLoading,
     questionStatsError,
     comments,
+    commentsTotalPages,
+    commentsTotalCount,
     commentsLoading,
     commentsError,
   ];
