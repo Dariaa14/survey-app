@@ -31,101 +31,81 @@ router.post('/:id/invitations/send', verifyAuthToken, requireAdmin, async (req, 
         const survey = await Survey.findByPk(id);
         if (!survey) return res.status(404).json({ error: 'Survey not found' });
 
-        // Get all contacts in the list
         const contacts = await EmailContact.findAll({
             where: { list_id },
             attributes: ['id', 'email', 'name']
         });
 
-        // Get all emails already invited for this survey
         const existingInvites = await Invitation.findAll({
             where: { survey_id: id },
-            include: [{
-                model: EmailContact,
-                as: 'contact',
-                attributes: ['email']
-            }]
+            include: [{ model: EmailContact, as: 'contact', attributes: ['email'] }]
         });
 
-        const existingEmailSet = new Set(
-            existingInvites.map(inv => inv.contact.email)
-        );
+        const existingEmailSet = new Set(existingInvites.map(inv => inv.contact.email));
 
-        const toInsert = [];
-        const emailPayload = [];
-        let skipped = 0;
-
-        for (const c of contacts) {
-            if (existingEmailSet.has(c.email)) {
-                skipped++;
-                continue;
-            }
-
-            const rawToken = generatePublicToken();
-            const tokenHash = hashToken(rawToken);
-
-            toInsert.push({
-                survey_id: id,
-                contact_id: c.id,
-                token_hash: tokenHash,
-                sent_at: new Date()
-            });
-
-            emailPayload.push({
-                email: c.email,
-                name: c.name,
-                token: rawToken
-            });
-        }
-
-        // Insert new invitations
-        if (toInsert.length > 0) {
-            await Invitation.bulkCreate(toInsert, {
-                ignoreDuplicates: true
-            });
-        }
-
-        console.log('Emails to send:', emailPayload.length);
-
-        // Parallel sending
         const limit = pLimit(5);
+        const toInsert = [];
+        let skipped = 0;
+        let failed = 0;
 
         await Promise.all(
-            emailPayload.map(payload =>
-                limit(async () => {
-                    const surveyLink = `http://localhost:5000/s/${survey.slug}?t=${payload.token}`;
+            contacts.map(c => limit(async () => {
+                if (existingEmailSet.has(c.email)) {
+                    skipped++;
+                    return;
+                }
 
+                const rawToken = generatePublicToken();
+                const tokenHash = hashToken(rawToken);
+                const surveyLink = `http://localhost:5000/s/${survey.slug}?t=${rawToken}`;
+
+                try {
                     await sendEmail({
-                        to: payload.email,
+                        to: c.email,
                         subject: `You're invited to: ${survey.title}`,
                         html: `
-                            <p>Hi ${payload.name || ''},</p>
+                            <p>Hi ${c.name || ''},</p>
                             <p>You are invited to take the survey:</p>
                             <p><strong>${survey.title}</strong></p>
                             <a href="${surveyLink}">Take Survey</a>
 
                             <!-- Tracking pixel -->
-                            <img src="${process.env.NGROK_URL}/t/open/${payload.token}.png"
+                            <img src="${process.env.NGROK_URL}/t/open/${rawToken}.png"
                                 width="1" height="1"
                                 style="display:block;"
                                 alt="" />
                         `
                     });
-                })
-            )
+
+                    // Only push toInsert if email sent successfully
+                    toInsert.push({
+                        survey_id: id,
+                        contact_id: c.id,
+                        token_hash: tokenHash,
+                        sent_at: new Date()
+                    });
+
+                } catch (err) {
+                    console.error(`Failed to send email to ${c.email}:`, err);
+                    failed++;
+                }
+            }))
         );
 
+        // Bulk insert only successfully sent invitations
         if (toInsert.length > 0) {
+            await Invitation.bulkCreate(toInsert, { ignoreDuplicates: true });
             responseEvents.emit('invitation_created', {
                 type: 'invitation_created',
                 surveyId: id,
-                inserted: toInsert.length,
+                inserted: toInsert.length
             });
         }
 
         res.status(201).json({
             inserted: toInsert.length,
-            skipped
+            skipped,
+            failed
         });
 
     } catch (err) {
