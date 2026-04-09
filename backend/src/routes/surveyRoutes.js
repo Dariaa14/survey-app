@@ -177,6 +177,10 @@ router.put('/:id', verifyAuthToken, requireAdmin, async (req, res) => {
         const survey = await Survey.findByPk(req.params.id);
         if (!survey) return res.status(404).json({ error: 'Survey not found' });
 
+        if (survey.status !== 'draft') {
+            return res.status(400).json({ error: 'Only draft surveys can be edited' });
+        }
+
         await survey.update({ title, description, slug, status, published_at, closed_at });
         res.json(survey);
     } catch (err) {
