@@ -13,10 +13,11 @@ class UserRepositoryImpl implements UserRepository {
   final _storage = const FlutterSecureStorage();
 
   /// Base URL for the users API.
-  final String baseUsersUrl = 'http://localhost:3000/api/users';
+  final String baseUsersUrl =
+      'https://survey-app-trusca-daria.onrender.com/api/users';
 
   /// Base URL for the authentication API.
-  final String baseUrl = 'http://localhost:3000';
+  final String baseUrl = 'https://survey-app-trusca-daria.onrender.com';
 
   Exception _requestFailed(
     String operation,

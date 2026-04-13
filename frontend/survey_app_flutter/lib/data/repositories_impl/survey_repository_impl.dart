@@ -15,7 +15,8 @@ import 'package:survey_app_flutter/domain/repositories/survey_repository.dart';
 /// a RESTful API.
 class SurveyRepositoryImpl implements SurveyRepository {
   /// Base URL for the survey API.
-  final String baseUrl = 'http://localhost:3000/api/surveys';
+  final String baseUrl =
+      'https://survey-app-trusca-daria.onrender.com/api/surveys';
 
   @override
   Future<List<SurveyEntity>> getAllSurveys() async {

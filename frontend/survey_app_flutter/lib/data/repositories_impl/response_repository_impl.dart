@@ -14,7 +14,7 @@ import 'package:survey_app_flutter/domain/repositories/response_repository.dart'
 /// a RESTful API to submit survey responses.
 class ResponseRepositoryImpl implements ResponseRepository {
   /// Base URL for the API.
-  final String baseUrl = 'http://localhost:3000/api';
+  final String baseUrl = 'https://survey-app-trusca-daria.onrender.com/api';
 
   final Map<String, ResultsLiveUpdatesClient> _liveUpdatesClients = {};
 

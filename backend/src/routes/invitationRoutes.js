@@ -70,7 +70,7 @@ router.post('/:id/invitations/send', verifyAuthToken, requireAdmin, async (req, 
                             <a href="${surveyLink}">Take Survey</a>
 
                             <!-- Tracking pixel -->
-                            <img src="${process.env.NGROK_URL}/t/open/${rawToken}.png"
+                            <img src="https://survey-app-trusca-daria.onrender.com/t/open/${rawToken}.png"
                                 width="1" height="1"
                                 style="display:block;"
                                 alt="" />

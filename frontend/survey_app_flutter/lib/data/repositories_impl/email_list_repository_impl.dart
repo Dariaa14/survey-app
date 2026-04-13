@@ -13,7 +13,8 @@ import 'package:survey_app_flutter/domain/repositories/email_list_repository.dar
 /// email list REST API endpoints.
 class EmailListRepositoryImpl implements EmailListRepository {
   /// Base URL for email list endpoints.
-  final String baseUrl = 'http://localhost:3000/api/email-lists';
+  final String baseUrl =
+      'https://survey-app-trusca-daria.onrender.com/api/email-lists';
 
   @override
   Future<List<EmailListEntity>> getEmailListsByUser({
