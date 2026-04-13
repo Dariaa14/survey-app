@@ -4,6 +4,9 @@ require('dotenv').config();
 
 const app = express();
 
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
