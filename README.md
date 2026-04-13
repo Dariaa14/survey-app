@@ -88,5 +88,5 @@ Add the following configuration to your `.vscode/launch.json` file:
 Run the Flutter web app using Chrome on a custom port:
 
 ```bash
-flutter run -d chrome --web-port 5000
+flutter run -d chrome --web-port 5000 -t lib/survey_app.dart
 ```
