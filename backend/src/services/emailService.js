@@ -1,52 +1,45 @@
-const nodemailer = require('nodemailer');
+const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
 
-const transporter = nodemailer.createTransport({
-    host: 'email-smtp.eu-north-1.amazonaws.com',
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,  
-    },
-    tls: {
-        rejectUnauthorized: false
-    }   
+
+const ses = new SESClient({
+  region: "eu-north-1",
+  credentials: {
+    accessKeyId: process.env.SMTP_USER,
+    secretAccessKey: process.env.SMTP_PASS,
+  },
 });
 
+
 async function sendEmail({ to, subject, text, html }) {
-    console.log("📤 [sendEmail] START");
-    console.log("➡️ To:", to);
-    console.log("➡️ Subject:", subject);
+  try {
+    console.log("📤 [SES API] sending to:", to);
 
-    try {
-        const result = await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to,
-            subject,
-            text,
-            html,
-            headers: {
-                'X-SES-CONFIGURATION-SET': 'survey-app-config-set'
-            }
-        });
+    const command = new SendEmailCommand({
+      Source: process.env.EMAIL_USER,
+      Destination: {
+        ToAddresses: [to],
+      },
+      Message: {
+        Subject: {
+          Data: subject,
+          Charset: "UTF-8",
+        },
+        Body: {
+          Text: text ? { Data: text, Charset: "UTF-8" } : undefined,
+          Html: html ? { Data: html, Charset: "UTF-8" } : undefined,
+        },
+      },
+    });
 
-        console.log("📥 [sendEmail] SUCCESS");
-        console.log("✉️ Message ID:", result?.messageId || result?.response);
+    const result = await ses.send(command);
 
-        return result;
+    console.log("📬 SES SUCCESS:", result.MessageId);
 
-    } catch (err) {
-        console.error("❌ [sendEmail] ERROR");
-        console.error("➡️ To:", to);
-        console.error("➡️ Subject:", subject);
-
-        // full error dump
-        console.error("📛 Error name:", err.name);
-        console.error("📛 Error message:", err.message);
-        console.error("📛 Full error:", err);
-
-        throw err;
-    }
+    return result;
+  } catch (err) {
+    console.error("❌ SES ERROR:", err);
+    throw err;
+  }
 }
 
 module.exports = {
