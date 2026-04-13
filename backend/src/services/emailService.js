@@ -12,8 +12,6 @@ const ses = new SESClient({
 
 async function sendEmail({ to, subject, text, html }) {
   try {
-    console.log("📤 [SES API] sending to:", to);
-
     const command = new SendEmailCommand({
       Source: process.env.EMAIL_USER,
       Destination: {
@@ -33,8 +31,6 @@ async function sendEmail({ to, subject, text, html }) {
     });
 
     const result = await ses.send(command);
-
-    console.log("📬 SES SUCCESS:", result.MessageId);
 
     return result;
   } catch (err) {
