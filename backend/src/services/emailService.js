@@ -29,6 +29,7 @@ async function sendEmail({ to, subject, text, html }) {
           Html: html ? { Data: html, Charset: "UTF-8" } : undefined,
         },
       },
+      ConfigurationSetName: "survey-app-config-set",
     });
 
     const result = await ses.send(command);
