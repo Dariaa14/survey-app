@@ -11,8 +11,12 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendEmail({ to, subject, text, html }) {
+    console.log("📤 [sendEmail] START");
+    console.log("➡️ To:", to);
+    console.log("➡️ Subject:", subject);
+
     try {
-        const info = await transporter.sendMail({
+        const result = await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to,
             subject,
@@ -23,9 +27,21 @@ async function sendEmail({ to, subject, text, html }) {
             }
         });
 
-        return info;
+        console.log("📥 [sendEmail] SUCCESS");
+        console.log("✉️ Message ID:", result?.messageId || result?.response);
+
+        return result;
+
     } catch (err) {
-        console.error('Error sending email:', err);
+        console.error("❌ [sendEmail] ERROR");
+        console.error("➡️ To:", to);
+        console.error("➡️ Subject:", subject);
+
+        // full error dump
+        console.error("📛 Error name:", err.name);
+        console.error("📛 Error message:", err.message);
+        console.error("📛 Full error:", err);
+
         throw err;
     }
 }
