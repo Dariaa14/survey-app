@@ -1,7 +1,18 @@
+plugins:
+  solid_lints:
+    path: D:/Coding/Flutter/solid_lints
 
-include: 
-  - package:flutter_lints/flutter.yaml
-  - package:solid_lints/analysis_options.yaml
+    diagnostics:
+      avoid_global_state: true
 
-linter:
-  rules:
+      avoid_debug_print_in_release:
+        enabled: true
+        max_occurrences: 0
+        allow_in_tests: true
+
+      max_function_length:
+        enabled: true
+        max_lines: 50
+        ignore_private: true
+
+      prefer_single_quotes: true

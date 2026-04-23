@@ -37,4 +37,6 @@ class AppBlocs {
 
   /// A static instance of [ResultsBloc] resolved from GetIt.
   static ResultsBloc resultsBloc = getIt<ResultsBloc>();
+
+  static ResultsBloc resultBloc2 = getIt<ResultsBloc>();
 }
